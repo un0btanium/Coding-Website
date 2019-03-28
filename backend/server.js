@@ -1,0 +1,186 @@
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const os = require('os');
+
+const PORT = 4000;
+const MONGODB_PORT = 27017;
+
+const { spawn } = require('child_process');
+
+let Exercise = require('./exercise.model');
+
+
+app.use(cors());
+app.use(bodyParser.json());
+
+mongoose.connect('mongodb://127.0.0.1:'+ MONGODB_PORT +'/exercises', { useNewUrlParser: true });
+const connection = mongoose.connection;
+connection.once('open', function() {
+    console.log("MongoDB database connection established successfully!");
+})
+
+
+
+// app.get('/exercises', function(req, res) {
+//     Exercise.find({}, 'name', function(err, exercises) {
+//         if (err) {
+//             console.log(err);
+//         } else {
+//             res.json(exercises);
+//         }
+//     })
+// });
+
+app.get('/exercises/:page', function(req, res) {
+    const page = parseInt(req.params.page) || 0;
+    // const options = { limit: 10, skip: page*10 };
+    const options = {};
+    Exercise.find({}, 'name', options, function(err, exercises) {
+        if (err) {
+            console.log(err);
+            res.status(404).send("something went wrong");
+        } else {
+            res.json({'exercises': exercises, 'page': page});
+        }
+    })
+});
+
+
+
+app.route('/exercise/:id')
+
+    .get(function(req, res) {
+        let id = req.params.id;
+        Exercise.findById(id, function(err, exercise) {
+            if (err) {
+                console.log(err);
+                res.status(404, 'Exercise not found!');
+            } else {
+                res.json(exercise);
+            }
+        })
+    })
+
+    .delete(function(req, res) {
+        let id = req.params.id;
+        Exercise.findByIdAndDelete(id, function(err) {
+            if (!err) {
+                res.sendStatus(200);
+            } else {
+                res.status(500).json({
+                    error: err
+                })
+            }
+        })
+    });
+
+
+
+app.route('/exercise')
+
+    .post(function(req, res) {
+        let document = {
+            name: req.body.name,
+            content: req.body.content || [],
+            source_files: req.body.source_files || []
+        };
+        let exercise = new Exercise(document);
+        exercise.save()
+            .then( newExercise => {
+                res.status(200).json({ id: newExercise._id });
+            })
+            .catch( err => {
+                res.status(400, 'Adding new exercise failed');
+            });
+    })
+
+    .put(function(req, res) {
+        Exercise.findById(req.body.id, function(err, exercise) {
+            if (!exercise) {
+                res.status(404).send('exercise was not found');
+                // TODO create new one so changes wont be lost?
+            } else {
+                exercise.name = req.body.name;
+                exercise.content = req.body.content;
+
+                exercise.save().then(exercise => {
+                    res.status(200).json('Exercise updated');
+                })
+                .catch(err => {
+                    res.status(400).send("Update not possible");
+                });
+            }
+        });
+    });
+
+
+
+app.route("/exercise/run") 
+
+    .post(function(req, res) {
+        let code_snippets = req.body.code_snippets;
+        let id = req.body.id;
+
+        Exercise.findById(id, function(err, exercise) {
+            if (!exercise) {
+                res.status(404).send('exercise was not found');
+            } else {
+                // console.log(id);
+                // console.log(code_snippets);
+
+                let source_files = [];
+                for (let sourceFile of exercise.source_files) {
+                    source_files.push(sourceFile);
+                }
+
+                let arg = {
+                    code_snippets: code_snippets,
+                    source_files: source_files
+                }
+
+                let javaExe = "java";
+                if (os.platform() === 'win32') {
+                    javaExe = "C:\\Program Files\\Java\\jdk-10\\bin\\" + "java.exe"
+                }
+                let javaOptions = { /*timeout: 5, maxBuffer: 20*1024, windowsHide: false */};
+                
+                let javaChild = spawn(javaExe, ["-jar", __dirname+"\\java\\executer.jar", JSON.stringify(arg)], javaOptions);
+
+                console.log(javaChild.spawnargs);
+
+                javaChild.stdout.on('data', function (data) {
+                    console.log("stdout");
+                    
+                    if (data && res) {
+                        console.log(JSON.stringify(data.toString()));
+                        res.writeHead(200, {"Content-Type": "application/json"});
+                        res.end(JSON.stringify(data.toString()));
+                        res = null;
+                    }
+                });
+                javaChild.stderr.on('data', function (data) {
+                    console.log("stderr");
+                    if (data) {
+                        console.log(data.toString());
+                    }
+                });
+                javaChild.on('close', function (exitCode) {
+                    console.log("close");
+                    console.log(exitCode);
+                });
+
+                // res.status(200).json({ console_output: "Hello World!\n"});
+            }
+        });
+
+    });
+
+
+
+
+app.listen(PORT, function() {
+    console.log("Server running on Port: " + PORT);
+});
