@@ -6,17 +6,21 @@ import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-import ContentEditor from '../components/ContentEditor.component';
+import ExerciseContent from './content/exercise-content.component';
 
-export default class ExerciseEdit extends Component {
+export default class ExerciseView extends Component {
     
     constructor(props) {
         super(props);
 
-        this.onChangeExerciseName = this.onChangeExerciseName.bind(this);
-        this.onChangeExerciseContent = this.onChangeExerciseContent.bind(this);
+        // both
         this.onChangeExerciseAceEditor = this.onChangeExerciseAceEditor.bind(this);
         
+
+        // edit only
+        this.onChangeExerciseName = this.onChangeExerciseName.bind(this);
+        this.onChangeExerciseContent = this.onChangeExerciseContent.bind(this);
+
         this.addNewTitle = this.addNewTitle.bind(this);
         this.addNewText = this.addNewText.bind(this);
         this.addNewCode = this.addNewCode.bind(this);
@@ -24,12 +28,25 @@ export default class ExerciseEdit extends Component {
 
         this.onSubmit = this.onSubmit.bind(this);
 
+
+        // solve only
+        this.runCode = this.runCode.bind(this);
+
+
         this.state = {
-            id_counter: 0,
+            mode: this.props.mode || "solve", // solve or edit
+
+            // both
             id: '',
             name: '',
             content: [
             ],
+
+            // edit only
+            id_counter: 0,
+
+            // solve only
+            result: {}
         }
     }
 
@@ -48,14 +65,30 @@ export default class ExerciseEdit extends Component {
     }
 
     render () {
+
+        let exerciseView;
+        if (this.state.mode === "edit") {
+            exerciseView = this.getExerciseEditView();
+        } else {
+            exerciseView = this.getExerciseSolveView();
+        }
+
         return (
             <div style={{marginTop: '50px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
-                <h3>Edit Exercise</h3>
+                { this.state.mode === "edit" && <h3>Edit Exercise</h3> }
+                { this.state.mode === "solve" && <h3>{this.state.name}</h3> }
 
                 <br />
                 <br />
 
-                <Form onSubmit={this.onSubmit}>
+                {exerciseView}
+                
+            </div>
+        )
+    }
+
+    getExerciseEditView() {
+        return <Form onSubmit={this.onSubmit}>
                     <Form.Group as={Row} className="form-group">
                         <Form.Label column sm><h5>Name:</h5></Form.Label>
                         <Col sm={10}>
@@ -73,7 +106,7 @@ export default class ExerciseEdit extends Component {
                     <br />
                     <br />
 
-                    <ContentEditor content={this.state.content} onChangeExerciseContent={this.onChangeExerciseContent} onChangeExerciseAceEditor={this.onChangeExerciseAceEditor} />
+                    <ExerciseContent content={this.state.content} mode={this.state.mode} onChangeExerciseContent={this.onChangeExerciseContent} onChangeExerciseAceEditor={this.onChangeExerciseAceEditor} result={this.state.result} />
                     
                     <br/>
                     <br/>
@@ -93,9 +126,16 @@ export default class ExerciseEdit extends Component {
                     <Form.Group className="form-group">
                         <Button type="submit" variant="success" style={{width: '150px', float: 'right'}}>Save</Button>
                     </Form.Group>
-                </Form>
-            </div>
-        )
+                </Form>;
+    }
+
+    getExerciseSolveView() {
+        return <><ExerciseContent content={this.state.content} mode={this.state.mode} onChangeExerciseContent={this.onChangeExerciseContent} onChangeExerciseAceEditor={this.onChangeExerciseAceEditor} result={this.state.result} />
+
+                <br/>
+                <br/>
+
+                <Button variant="success" onClick={this.runCode} style={{width: '150px', float: 'right'}}>Run Code</Button></>;
     }
 
 
@@ -258,5 +298,37 @@ export default class ExerciseEdit extends Component {
         });
     }
 
+    runCode(e) {
+        let code_snippets = {};
+        for (let currentContent of this.state.content) {
+            if (currentContent.type === "editor") {
+                code_snippets[currentContent.identifier] = {
+                    code: currentContent.code
+                }
+            }
+        }
+
+        let data = {
+            id: this.state.id,
+            code_snippets: code_snippets
+        }
+
+        console.log(data);
+
+        Axios.post('http://localhost:4000/exercise/run', data)
+            .then(response => {
+                if (response.status === 200) {
+                    console.log(response);
+                    console.log(JSON.parse(response.data));
+                    let json = JSON.parse(response.data);
+                    this.setState({
+                        result: json
+                    });
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
     
 }

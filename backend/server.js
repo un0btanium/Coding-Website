@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -5,45 +6,165 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const os = require('os');
 
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken')
+
+const checkAuth = require('./middleware/check-auth');
+
+// const passport = require('passport');
+// const passportJWT = require('passport-jwt');
+// const JWTStrategy = passportJWT.Strategy;
+// const ExtractJWT = passportJWT.ExtractJwt;
+
+// const JTWOptions = {
+//     jtwFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+//     secret: process.env.SECRET
+// };
+
+// const strategy = new JWTStrategy(JTWOptions, (payload, callback) => {
+//     // TODO get user from db
+//     const user = null;
+//     next(null, user);
+// });
+// passport.use(strategy);
+// app.use(passport.initialize());
+
 const PORT = 4000;
 const MONGODB_PORT = 27017;
 
 const { spawn } = require('child_process');
 
-let Exercise = require('./exercise.model');
+let Exercise = require('./models/exercise.model');
+let User = require('./models/user.model');
 
 
 app.use(cors());
 app.use(bodyParser.json());
 
-mongoose.connect('mongodb://127.0.0.1:'+ MONGODB_PORT +'/exercises', { useNewUrlParser: true });
+mongoose.connect('mongodb://127.0.0.1:' + MONGODB_PORT + '/exercises', { useNewUrlParser: true });
 const connection = mongoose.connection;
-connection.once('open', function() {
+connection.once('open', function () {
     console.log("MongoDB database connection established successfully!");
 })
 
 
 
-// app.get('/exercises', function(req, res) {
-//     Exercise.find({}, 'name', function(err, exercises) {
-//         if (err) {
-//             console.log(err);
-//         } else {
-//             res.json(exercises);
-//         }
-//     })
-// });
+app.post("/login", (req, res, next) => {
+    console.log(req.body);
+    User.find({ email: req.body.email })
+        .exec()
+        .then(user => {
+            if (user.length < 1) {
+                return res.status(401).json({
+                    message: "Auth failed"
+                });
+            }
+            console.log(req.body.password);
+            console.log(user[0].password);
+            bcrypt.hash(req.body.password, 10, (err, hash) => { console.log(hash)});
+            bcrypt.compare(req.body.password, user[0].password, (err, result) => {
+                console.log(result);
+                if (err) {
+                    return res.status(401).json({
+                        message: "Auth failed"
+                    });
+                }
 
-app.get('/exercises/:page', function(req, res) {
+                if (result) {
+                    const token = jwt.sign(
+                        {
+                            email: user[0].email,
+                            userId: user[0]._id,
+                            role: user[0].role
+                        },
+                        process.env.JWT_KEY,
+                        {
+                            expiresIn: "5m"
+                        }
+                    );
+                    
+                    return res
+                        .status(200)
+                        .send({ auth: true, token: token});
+                        // .header('x-auth', token)
+                        // .json({
+                        //     message: "User logged in!"
+                        // });
+                    //             .status(200).json({
+                    //     message: "Auth successful",
+                    //     token: token
+                    // });
+                }
+
+                res.status(401).json({
+                    message: "Auth failed"
+                });
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: err
+            });
+        });
+});
+
+app.post('/signup', (req, res, next) => {
+    if (!req.body) {
+        return;
+    }
+
+    User.find({ email: req.body.email })
+        .exec()
+        .then(user => {
+            if (user.length >= 1) {
+                return res.status(409).json({
+                    message: "User already exists"
+                });
+            } else {
+                bcrypt.hash(req.body.password, 10, (err, hash) => {
+                    if (err) {
+                        return res.status(500).json({
+                            error: err
+                        });
+                    } else {
+                        const user = new User({
+                            email: req.body.email,
+                            password: hash,
+                            role: 'student'
+                        });
+                        user
+                            .save()
+                            .then(result => {
+                                console.log(result);
+                                res.status(201).json({
+                                    message: "User created!"
+                                });
+                            })
+                            .catch(err => {
+                                console.log(err);
+                                res.status(500).json({
+                                    error: err
+                                });
+                            });
+                    }
+                });
+            }
+        })
+        .catch();
+
+});
+
+app.get('/exercises/:page', function (req, res) {
     const page = parseInt(req.params.page) || 0;
     // const options = { limit: 10, skip: page*10 };
     const options = {};
-    Exercise.find({}, 'name', options, function(err, exercises) {
+    Exercise.find({}, 'name', options, function (err, exercises) {
         if (err) {
             console.log(err);
             res.status(404).send("something went wrong");
         } else {
-            res.json({'exercises': exercises, 'page': page});
+            res.json({ 'exercises': exercises, 'page': page });
         }
     })
 });
@@ -52,9 +173,9 @@ app.get('/exercises/:page', function(req, res) {
 
 app.route('/exercise/:id')
 
-    .get(function(req, res) {
+    .get(function (req, res) {
         let id = req.params.id;
-        Exercise.findById(id, function(err, exercise) {
+        Exercise.findById(id, function (err, exercise) {
             if (err) {
                 console.log(err);
                 res.status(404, 'Exercise not found!');
@@ -64,9 +185,9 @@ app.route('/exercise/:id')
         })
     })
 
-    .delete(function(req, res) {
+    .delete((req, res, next) => checkAuth(req, res, next, ["admin", "maintainer"]), function (req, res) {
         let id = req.params.id;
-        Exercise.findByIdAndDelete(id, function(err) {
+        Exercise.findByIdAndDelete(id, function (err) {
             if (!err) {
                 res.sendStatus(200);
             } else {
@@ -81,7 +202,8 @@ app.route('/exercise/:id')
 
 app.route('/exercise')
 
-    .post(function(req, res) {
+    .post((req, res, next) => checkAuth(req, res, next, ["admin", "maintainer"]), function (req, res) {
+        console.log(req.userData);
         let document = {
             name: req.body.name,
             content: req.body.content || [],
@@ -89,16 +211,16 @@ app.route('/exercise')
         };
         let exercise = new Exercise(document);
         exercise.save()
-            .then( newExercise => {
+            .then(newExercise => {
                 res.status(200).json({ id: newExercise._id });
             })
-            .catch( err => {
+            .catch(err => {
                 res.status(400, 'Adding new exercise failed');
             });
     })
 
-    .put(function(req, res) {
-        Exercise.findById(req.body.id, function(err, exercise) {
+    .put((req, res, next) => checkAuth(req, res, next, ["admin", "maintainer"]), function (req, res) {
+        Exercise.findById(req.body.id, function (err, exercise) {
             if (!exercise) {
                 res.status(404).send('exercise was not found');
                 // TODO create new one so changes wont be lost?
@@ -109,22 +231,22 @@ app.route('/exercise')
                 exercise.save().then(exercise => {
                     res.status(200).json('Exercise updated');
                 })
-                .catch(err => {
-                    res.status(400).send("Update not possible");
-                });
+                    .catch(err => {
+                        res.status(400).send("Update not possible");
+                    });
             }
         });
     });
 
 
 
-app.route("/exercise/run") 
+app.route("/exercise/run")
 
-    .post(function(req, res) {
+    .post((req, res, next) => checkAuth(req, res, next),function (req, res) {
         let code_snippets = req.body.code_snippets;
         let id = req.body.id;
 
-        Exercise.findById(id, function(err, exercise) {
+        Exercise.findById(id, function (err, exercise) {
             if (!exercise) {
                 res.status(404).send('exercise was not found');
             } else {
@@ -145,18 +267,18 @@ app.route("/exercise/run")
                 if (os.platform() === 'win32') {
                     javaExe = "C:\\Program Files\\Java\\jdk-10\\bin\\" + "java.exe"
                 }
-                let javaOptions = { /*timeout: 5, maxBuffer: 20*1024, windowsHide: false */};
-                
-                let javaChild = spawn(javaExe, ["-jar", __dirname+"\\java\\executer.jar", JSON.stringify(arg)], javaOptions);
+                let javaOptions = { /*timeout: 5, maxBuffer: 20*1024, windowsHide: false */ };
+
+                let javaChild = spawn(javaExe, ["-jar", __dirname + "\\java\\executer.jar", JSON.stringify(arg)], javaOptions);
 
                 console.log(javaChild.spawnargs);
 
                 javaChild.stdout.on('data', function (data) {
                     console.log("stdout");
-                    
+
                     if (data && res) {
                         console.log(JSON.stringify(data.toString()));
-                        res.writeHead(200, {"Content-Type": "application/json"});
+                        res.writeHead(200, { "Content-Type": "application/json" });
                         res.end(JSON.stringify(data.toString()));
                         res = null;
                     }
@@ -181,6 +303,6 @@ app.route("/exercise/run")
 
 
 
-app.listen(PORT, function() {
+app.listen(PORT, function () {
     console.log("Server running on Port: " + PORT);
 });

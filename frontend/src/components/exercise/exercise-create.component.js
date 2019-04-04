@@ -72,7 +72,8 @@ export default class ExerciseCreate extends Component {
         const newExercise = {
             name: this.state.name
         }
-
+        
+        console.log(Axios.defaults.headers.common);
         Axios.post('http://localhost:4000/exercise', newExercise)
             .then(res => {
                 this.props.history.push('/exercise/edit/'+res.data.id);

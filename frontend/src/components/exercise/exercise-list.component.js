@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import Axios from 'axios';
 
+import { isAuthenticated } from "../../services/Authentication";
+
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Alert from 'react-bootstrap/Alert'
@@ -80,20 +82,37 @@ export default class ExerciseList extends Component {
     }
 
     exerciseList() {
+        // TODO Excerise not as table but list with custom areas
         const Exercise = props => (
             <tr>
                 <td>
-                    <Button variant="danger" onClick={() => this.showDeleteModal(props.exercise)}>Delete</Button>
-                    <span> </span>
-                    <Button variant="primary" onClick={() => this.edit(props.exercise._id)}>Edit</Button>
-                    <span> </span>
+                    { isAuthenticated(["admin", "maintainer"]) && [
+                        <Button variant="danger" onClick={() => this.showDeleteModal(props.exercise)}>Delete</Button>,
+                        <span> </span>,
+                        <Button variant="primary" onClick={() => this.edit(props.exercise._id)}>Edit</Button>,
+                        <span> </span>
+                        ]
+                    }
                     <Button variant="info" onClick={() => this.solve(props.exercise._id)}>Solve</Button>
                 </td>
-                <td><h5 style={{'height': '20px', 'lineHeight': '37px'}}>{props.exercise.name}</h5></td>
+                <td>
+                    <h5 style={{'height': '20px', 'lineHeight': '37px'}}>{props.exercise.name}</h5>
+                    <div className="progress-arrows-wrap">
+                        {
+                            [...Array(props.pages).keys()].map(function(value, i) {
+                                const arrowWidth = Math.min(((((1/props.pages)*100))-(0.5)), 6)+"%";
+                                let style = { width:arrowWidth, marginLeft:"5px", };
+                                return <div style={style} className="progress-arrow" key={i}></div>
+                            })
+                        }
+                    </div>
+                </td>
+                
             </tr>
         );
         return this.state.exercises.map(function(currentExercise, i) {
-            return <Exercise exercise={currentExercise} key={i} />;
+            const arrowAmount = 4;
+            return <Exercise exercise={currentExercise} pages={arrowAmount} key={i} />;
         });
     }
 

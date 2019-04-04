@@ -1,0 +1,56 @@
+
+.progress-arrows-wrap {
+  width: 96%;
+  height: 35px;
+  z-index:-2;
+  white-space: nowrap;
+}
+
+.progress-arrows-wrap div:first-child{
+  margin-left:-2%;
+}
+
+.progress-arrow {
+  margin:0;
+  height: 35px;
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  line-height: 35px;
+  transition: all 0.8s;
+}
+
+.progress-arrow:before,
+.progress-arrow:after {
+  content: "";
+  position: absolute;
+  transition: all 0.8s;
+  z-index:-1;
+}
+.progress-arrow:before {
+  height: 50%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(128, 128, 128, 1);
+  -webkit-transform: skew(45deg);
+  -moz-transform: skew(45deg);
+  transform: skew(45deg);
+}
+
+.progress-arrow:after {
+  height: 50%;
+  width: 100%;
+  top: 50%;
+  left: 0;
+  background: rgba(128, 128, 128, 1);
+  -webkit-transform: skew(-45deg);
+  -moz-transform: skew(-45deg);
+  transform: skew(-45deg);
+}
+
+.progress-arrow:hover:before,
+.progress-arrow:hover:after {
+  background: rgb(71, 255, 169);
+}
+

@@ -1,0 +1,42 @@
+import React, {Component} from 'react';
+
+import ExerciseTitle from './exercise-title.component';
+import ExerciseText from './exercise-text.component';
+import ExerciseCode from './exercise-code.component';
+import ExerciseEditor from './exercise-editor.component';
+import ExerciseConsole from './exercise-console.component';
+
+export default class ExerciseContent extends Component {
+    
+    render () {
+        
+        if (this.props.content.length === 0) {
+            return <div></div>;
+        }
+
+        const onChangeExerciseAceEditor = this.props.onChangeExerciseAceEditor;
+        const mode = this.props.mode;
+
+        let res = this.props.content.map(function(currentContent, i) {
+            switch(currentContent.type) {
+                case "title":
+                    return <ExerciseTitle content={currentContent} mode={mode} key={currentContent._id} />;
+                case "text":
+                    return <ExerciseText content={currentContent} mode={mode} key={currentContent._id} />;
+                case "code":
+                    return <ExerciseCode content={currentContent} mode={mode} key={currentContent._id} />;
+                case "editor":
+                    return <ExerciseEditor onChange={onChangeExerciseAceEditor} content={currentContent} mode={mode} key={currentContent._id} />;
+                
+                default:
+                    return <h4 key={i}>Unknown content!!!</h4>;
+            }
+        });
+
+        if (this.props.result.console_output) {
+            res.push(<ExerciseConsole console_output={this.props.result.console_output} mode={mode} key="console_output"/>);
+        }
+
+        return res;
+    }
+}
