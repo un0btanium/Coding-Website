@@ -35,8 +35,8 @@ export default class ExerciseContent extends Component {
             }
         });
 
-        if (this.props.result && this.props.result.console_output) {
-            res.push(<ExerciseConsole console_output={this.props.result.console_output} mode={mode} result={result} step={step} key="console_output"/>);
+        if (this.props.result && this.props.result.steps) {
+            res.push(<ExerciseConsole mode={mode} result={result} step={step} key="console_output"/>);
         }
 
         return res;

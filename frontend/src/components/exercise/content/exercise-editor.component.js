@@ -19,7 +19,7 @@ export default class ExerciseEditor extends Component {
             // for (let i = 0; i < this.props.console_output.length; i++) {
             //     this.result.console_output[this.props.step]
             // }
-            let node = this.props.result.node_data[this.props.result.console_output[this.props.step].id];
+            let node = this.props.result.node_data[this.props.result.steps[this.props.step].id];
             let sizeColumn = 9.9; //10.04166666666667;
             let sizeLine = 22;
 

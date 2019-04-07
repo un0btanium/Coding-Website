@@ -12,9 +12,12 @@ export default class ExerciseConsole extends Component {
         let consoleMessages = "";
         if (this.props.result && this.props.step >= 0) {
             for (let i = 0; i <= this.props.step; i++) {
-                consoleMessages += this.props.result.console_output[i].message; // .msg
+                if (this.props.result.steps[i].type === "console") {
+                    consoleMessages += this.props.result.steps[i].msg;
+                }
             }
         }
+        
         return (
             <div  as={Row} style={{'marginBottom': '30px', 'marginTop': '30px', 'borderColor': '#666666', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%'}}>
                 <Form.Control 

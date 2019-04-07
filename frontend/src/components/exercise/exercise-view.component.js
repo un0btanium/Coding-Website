@@ -51,7 +51,8 @@ export default class ExerciseView extends Component {
 
             // solve only
             result: null,
-            step: 0
+            step: 0,
+            defaultDelay: 64
         }
     }
 
@@ -329,64 +330,23 @@ export default class ExerciseView extends Component {
             // responseType: 'stream',
             maxContentLength: 1000000000,
             headers: {
-                "Content-Type": "application/json",
-                'keepAlive':true,
-                // 'Content-Length': 0,
-                // 'Connection': 'keep-alive',
-                // 'Transfer-Encoding': 'chunked',
-                'maxSockets':1
+                "Content-Type": "application/json"
             }
         };
-        // let outputArray = [];
+        
         Axios.post('http://localhost:4000/exercise/run', data, options)
             .then(response => {
                 if (response.status === 200) {
-
-                    console.log("response type");
-                    console.log(typeof response.data);
-                    console.log(response);
-
                     this.saveCodeResponse(response.data);
-                    
-                    // if (typeof response.data === "string") {
-                    //     this.saveCodeResponse(response.data);
-                    // } else if (typeof response.data === "object") {
-                    //     let output = Buffer.from(response.data).toString();
-                    //     this.saveCodeResponse(output);
-                    // } 
                 }
             })
             .catch(function (error) {
                 console.error(error);
             });
-
-            
-        // let httpData = {
-
-        // }
-        // let optionsHttp = {
-        //     method: 'POST',
-        //     host: 'localhost',
-        //     port: '4000',
-        //     path: '/exercise/run',
-        //     headers: {
-        //         'Content-Type': 'application/x-www-form-urlencoded'
-        //     },
-        //     timeout: 10000,
-        //     responseType: 'stream', 
-        //     headers: {
-        //         // 'Content-Length': 100000,
-        //         // 'Connection': 'keep-alive',
-        //         // 'Transfer-Encoding': 'chunked',
-        //         'keepAlive':true,
-        //         // 'maxSockets':1
-        //     }
-        // };
-        // Http.request(optionsHttp);
     }
 
     saveCodeResponse(json) {
-
+        console.log(json);
         if (timeout !== null) {
             clearTimeout(timeout);
         }
@@ -403,11 +363,11 @@ export default class ExerciseView extends Component {
         // console.log("step: " + this.state.step);
         // SAVE ENTIRE STATE DATA PER STEP (JSON LARGER BUT LESS SIMULATION ON THIS END REQUIRED, EASIER BACK AND FORTH)
         // OR SAVE CHANGES MADE ON EACH STEP (JSON SMALLER BUT HAVE TO SIMULATE ON THIS END. HAVE TO REDO OR SAVE PREVIOUS SIMULATED STATES, COULD ADD FILTER OR BREAKPOINTS)
-        if (this.state.result && this.state.result.console_output && this.state.result.console_output.length > 0 && (this.state.step+1) < this.state.result.console_output.length) {
+        if (this.state.result && this.state.result.steps && this.state.result.steps.length > 0 && (this.state.step+1) < this.state.result.steps.length) {
             this.setState({
                 step: this.state.step+1
             });
-            timeout = setTimeout(this.simulateNextStep, 64);
+            timeout = setTimeout(this.simulateNextStep, this.state.defaultDelay);
         } else {
             clearTimeout(timeout);
         }
