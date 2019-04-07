@@ -15,7 +15,7 @@ export const isAuthenticated = (allowedRoles) => {
 
 export const getUserData = () => {
     if (!isAuthenticated()) {
-        return {};
+        return { email: "unknown" };
     }
     return jwt_decode(Axios.defaults.headers.common['Authorization']);
 }
@@ -58,7 +58,7 @@ export const loginUser = (user, history, next) => {
                 if (res.status === 200) {
                     console.log("Successfully logged in!");
                 } else {
-                    console.log("Register failed with status code " + res.status);
+                    console.log("Login failed with status code " + res.status);
                 }
                 const decoded = login(res, history);
                 next(false, {

@@ -16,25 +16,27 @@ export default class ExerciseContent extends Component {
 
         const onChangeExerciseAceEditor = this.props.onChangeExerciseAceEditor;
         const mode = this.props.mode;
+        const result = this.props.result;
+        const step = this.props.step;
 
         let res = this.props.content.map(function(currentContent, i) {
             switch(currentContent.type) {
                 case "title":
-                    return <ExerciseTitle content={currentContent} mode={mode} key={currentContent._id} />;
+                    return <ExerciseTitle content={currentContent} mode={mode} result={result} step={step} key={currentContent._id} />;
                 case "text":
-                    return <ExerciseText content={currentContent} mode={mode} key={currentContent._id} />;
+                    return <ExerciseText content={currentContent} mode={mode} result={result} step={step} key={currentContent._id} />;
                 case "code":
-                    return <ExerciseCode content={currentContent} mode={mode} key={currentContent._id} />;
+                    return <ExerciseCode content={currentContent} mode={mode} result={result} step={step} key={currentContent._id} />;
                 case "editor":
-                    return <ExerciseEditor onChange={onChangeExerciseAceEditor} content={currentContent} mode={mode} key={currentContent._id} />;
+                    return <ExerciseEditor onChange={onChangeExerciseAceEditor} content={currentContent} mode={mode} result={result} step={step} key={currentContent._id} />;
                 
                 default:
                     return <h4 key={i}>Unknown content!!!</h4>;
             }
         });
 
-        if (this.props.result.console_output) {
-            res.push(<ExerciseConsole console_output={this.props.result.console_output} mode={mode} key="console_output"/>);
+        if (this.props.result && this.props.result.console_output) {
+            res.push(<ExerciseConsole console_output={this.props.result.console_output} mode={mode} result={result} step={step} key="console_output"/>);
         }
 
         return res;

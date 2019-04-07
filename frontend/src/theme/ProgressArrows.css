@@ -17,14 +17,14 @@
   display: inline-block;
   text-align: center;
   line-height: 35px;
-  transition: all 0.8s;
+  transition: all 0.5s;
 }
 
 .progress-arrow:before,
 .progress-arrow:after {
   content: "";
   position: absolute;
-  transition: all 0.8s;
+  transition: all 0.5s;
   z-index:-1;
 }
 .progress-arrow:before {

@@ -59,9 +59,6 @@ app.post("/login", (req, res, next) => {
                     message: "Auth failed"
                 });
             }
-            console.log(req.body.password);
-            console.log(user[0].password);
-            bcrypt.hash(req.body.password, 10, (err, hash) => { console.log(hash)});
             bcrypt.compare(req.body.password, user[0].password, (err, result) => {
                 console.log(result);
                 if (err) {
@@ -79,21 +76,13 @@ app.post("/login", (req, res, next) => {
                         },
                         process.env.JWT_KEY,
                         {
-                            expiresIn: "5m"
+                            expiresIn: "7h"
                         }
                     );
                     
                     return res
                         .status(200)
                         .send({ auth: true, token: token});
-                        // .header('x-auth', token)
-                        // .json({
-                        //     message: "User logged in!"
-                        // });
-                    //             .status(200).json({
-                    //     message: "Auth successful",
-                    //     token: token
-                    // });
                 }
 
                 res.status(401).json({
@@ -136,7 +125,6 @@ app.post('/signup', (req, res, next) => {
                         user
                             .save()
                             .then(result => {
-                                console.log(result);
                                 res.status(201).json({
                                     message: "User created!"
                                 });
@@ -203,7 +191,6 @@ app.route('/exercise/:id')
 app.route('/exercise')
 
     .post((req, res, next) => checkAuth(req, res, next, ["admin", "maintainer"]), function (req, res) {
-        console.log(req.userData);
         let document = {
             name: req.body.name,
             content: req.body.content || [],
@@ -228,12 +215,14 @@ app.route('/exercise')
                 exercise.name = req.body.name;
                 exercise.content = req.body.content;
 
-                exercise.save().then(exercise => {
+                exercise
+                .save()
+                .then(exercise => {
                     res.status(200).json('Exercise updated');
                 })
-                    .catch(err => {
-                        res.status(400).send("Update not possible");
-                    });
+                .catch(err => {
+                    res.status(400).send("Update not possible");
+                });
             }
         });
     });
@@ -267,40 +256,43 @@ app.route("/exercise/run")
                 if (os.platform() === 'win32') {
                     javaExe = "C:\\Program Files\\Java\\jdk-10\\bin\\" + "java.exe"
                 }
-                let javaOptions = { /*timeout: 5, maxBuffer: 20*1024, windowsHide: false */ };
+                let javaOptions = { maxBuffer: 1024*1024*1024 /*,timeout: 5, windowsHide: false */ };
+
+                res.dataArray = [];
 
                 let javaChild = spawn(javaExe, ["-jar", __dirname + "\\java\\executer.jar", JSON.stringify(arg)], javaOptions);
 
-                console.log(javaChild.spawnargs);
-
                 javaChild.stdout.on('data', function (data) {
                     console.log("stdout");
-
-                    if (data && res) {
-                        console.log(JSON.stringify(data.toString()));
-                        res.writeHead(200, { "Content-Type": "application/json" });
-                        res.end(JSON.stringify(data.toString()));
-                        res = null;
+                    if (data) {
+                        res.dataArray.push(data);
                     }
                 });
-                javaChild.stderr.on('data', function (data) {
+                javaChild.stderr.on('data', function (err) {
                     console.log("stderr");
-                    if (data) {
-                        console.log(data.toString());
+                    if (err && !res.isDataSend) {
+                        console.log(err.toString()); // TODO send to client and print on screen
                     }
                 });
                 javaChild.on('close', function (exitCode) {
                     console.log("close");
                     console.log(exitCode);
+                    
+                    let buffers = [];
+                    for (let buffer of res.dataArray) {
+                        buffers.push(Buffer.from(buffer));
+                    }
+
+                    let finalBuffer = Buffer.concat(buffers);
+
+                    let json = JSON.parse(finalBuffer.toString());
+                    res.status(200).json(json);
                 });
 
-                // res.status(200).json({ console_output: "Hello World!\n"});
             }
         });
 
     });
-
-
 
 
 app.listen(PORT, function () {
