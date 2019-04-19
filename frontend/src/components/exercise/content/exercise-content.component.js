@@ -31,68 +31,60 @@ export default class ExerciseContent extends Component {
                 let text = "Unknown";
                 switch(currentContent.type) {
                     case "title":
-                        if (mode === "edit") {
-                            text = "Title";
-                            element =
-                                <ExerciseTitle
-                                    onChange={onChangeExerciseContent}
-                                    deleteContent={deleteContent}
-                                    moveContent={moveContent}
-                                    content={currentContent}
-                                    mode={mode}
-                                    result={result}
-                                    step={step}
-                                    key={"ExerciseContent" + currentContent._id}
-                                />;
-                        }
+                        text = "Title";
+                        element =
+                            <ExerciseTitle
+                                onChange={onChangeExerciseContent}
+                                deleteContent={deleteContent}
+                                moveContent={moveContent}
+                                content={currentContent}
+                                mode={mode}
+                                result={result}
+                                step={step}
+                                key={"ExerciseContent" + currentContent._id}
+                            />;
                         break;
                     case "text":
-                        if (mode === "edit") {
-                            text = "Text";
-                            element =
-                                <ExerciseText 
-                                    onChange={onChangeExerciseContent}
-                                    deleteContent={deleteContent}
-                                    moveContent={moveContent}
-                                    content={currentContent}
-                                    mode={mode}
-                                    result={result}
-                                    step={step}
-                                    key={"ExerciseContent" + currentContent._id}
-                                />;
-                        }
+                        text = "Text";
+                        element =
+                            <ExerciseText 
+                                onChange={onChangeExerciseContent}
+                                deleteContent={deleteContent}
+                                moveContent={moveContent}
+                                content={currentContent}
+                                mode={mode}
+                                result={result}
+                                step={step}
+                                key={"ExerciseContent" + currentContent._id}
+                            />;
                         break;
                     case "code":
-                        if (mode === "edit") {
-                            text = "Code";
-                            element =
-                                <ExerciseCode
-                                    onChange={onChangeExerciseAceEditor}
-                                    deleteContent={deleteContent}
-                                    moveContent={moveContent}
-                                    content={currentContent}
-                                    mode={mode}
-                                    result={result}
-                                    step={step}
-                                    key={"ExerciseContent" + currentContent._id}
-                                />;
-                        }
+                        text = "Code";
+                        element =
+                            <ExerciseCode
+                                onChange={onChangeExerciseAceEditor}
+                                deleteContent={deleteContent}
+                                moveContent={moveContent}
+                                content={currentContent}
+                                mode={mode}
+                                result={result}
+                                step={step}
+                                key={"ExerciseContent" + currentContent._id}
+                            />;
                         break;
                     case "editor":
-                        if (mode === "edit") {
-                            text = "Editor";
-                            element =
-                                <ExerciseEditor
-                                    onChange={onChangeExerciseAceEditor}
-                                    deleteContent={deleteContent}
-                                    moveContent={moveContent}
-                                    content={currentContent}
-                                    mode={mode}
-                                    result={result}
-                                    step={step}
-                                    key={"ExerciseContent" + currentContent._id}
-                                />;
-                        }
+                        text = "Editor";
+                        element =
+                            <ExerciseEditor
+                                onChange={onChangeExerciseAceEditor}
+                                deleteContent={deleteContent}
+                                moveContent={moveContent}
+                                content={currentContent}
+                                mode={mode}
+                                result={result}
+                                step={step}
+                                key={"ExerciseContent" + currentContent._id}
+                            />;
                         break;
                     default:
                         element = <h4 key={"ExerciseContent" + i}>Unknown content!!!</h4>;
@@ -106,8 +98,10 @@ export default class ExerciseContent extends Component {
                             {element}
                         </Form.Group>
                     );
-                } else {
+                } else if (mode === "solve") {
                     return element;
+                } else {
+                    return <div>Unknown mode</div>
                 }
             })
 
