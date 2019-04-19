@@ -98,7 +98,7 @@ export default class ExerciseView extends Component {
 
         return (
             <div style={{marginTop: '50px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
-                { this.state.mode === "edit" && <h3>Edit Exercise</h3> }
+                { this.state.mode === "edit" && <h3>Edit Exercise {this.state.name}</h3> }
                 { this.state.mode === "solve" && <h3>{this.state.name}</h3> }
 
                 <br />
@@ -162,6 +162,7 @@ export default class ExerciseView extends Component {
 
                         <Tab eventKey="source-file" title="Source Files">
                             <ExerciseSourceFiles
+                                mode={this.state.mode}
                                 sourceFiles={this.state.sourceFiles}
                                 onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
                                 deleteSourceFile={this.deleteSourceFile}
@@ -199,6 +200,8 @@ export default class ExerciseView extends Component {
                     step={this.state.step}
                     onChangeExerciseContent={this.onChangeExerciseContent}
                     onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
+                    deleteContent={this.deleteContent}
+                    moveContent={this.moveContent}
                 />
 
                 <br />
