@@ -48,6 +48,7 @@ connection.once('open', function () {
 })
 
 
+let javaProcesses = {};
 
 app.post("/login", (req, res, next) => {
     console.log(req.body);
@@ -210,10 +211,10 @@ app.route('/exercise')
         Exercise.findById(req.body.id, function (err, exercise) {
             if (!exercise) {
                 res.status(404).send('exercise was not found');
-                // TODO create new one so changes wont be lost?
             } else {
                 exercise.name = req.body.name;
                 exercise.content = req.body.content;
+                exercise.source_files = req.body.source_files;
 
                 exercise
                 .save()
@@ -228,12 +229,30 @@ app.route('/exercise')
     });
 
 
+app.route("/exercise/input")
+
+    .post((req, res, next) => checkAuth(req, res, next), function (req, res) {
+        let input = req.body.input;
+        let userData = req.tokenData;
+
+        if (input != null && javaProcesses[userData.userId] !== undefined && javaProcesses[userData.userId] !== null && !javaProcesses[userData.userId].killed) {
+            console.log("Writing input to java process!");
+            javaProcesses[userData.userId].stdin.write(input);
+            res.send(200);
+        } else {
+            console.warn("No java process available anymore to write to!");
+        }
+    });
 
 app.route("/exercise/run")
 
-    .post((req, res, next) => checkAuth(req, res, next),function (req, res) {
+    .post((req, res, next) => checkAuth(req, res, next), function (req, res) {
         let code_snippets = req.body.code_snippets;
         let id = req.body.id;
+        let userData = req.tokenData;
+
+        // TODO save code for user
+        // TODO save child process in table by user id. cancel running process before new one is started. set process timeout to 30 min or something. also use this for input commands from user.
 
         Exercise.findById(id, function (err, exercise) {
             if (!exercise) {
@@ -258,9 +277,19 @@ app.route("/exercise/run")
                 }
                 let javaOptions = { maxBuffer: 1024*1024*1024 /*,timeout: 5, windowsHide: false */ };
 
+
+                if (javaProcesses[userData.userId] !== undefined && javaProcesses[userData.userId] !== null) {
+                    console.log("Kill java process!");
+                    javaProcesses[userData.userId].kill('SIGINT');
+                    console.log(javaProcesses[userData.userId].killed);
+                    javaProcesses[userData.userId] = null;
+                }
+
                 res.dataArray = [];
 
                 let javaChild = spawn(javaExe, ["-jar", __dirname + "\\java\\executer.jar", JSON.stringify(arg)], javaOptions);
+
+                javaProcesses[userData.userId] = javaChild;
 
                 javaChild.stdout.on('data', function (data) {
                     console.log("stdout");
@@ -278,6 +307,13 @@ app.route("/exercise/run")
                     console.log("close");
                     console.log(exitCode);
                     
+                    javaProcesses[userData.userId] = null;
+
+                    if (exitCode === null) {
+                        console.log("canceled response");
+                        return;
+                    }
+                    
                     let buffers = [];
                     for (let buffer of res.dataArray) {
                         buffers.push(Buffer.from(buffer));
@@ -285,8 +321,15 @@ app.route("/exercise/run")
 
                     let finalBuffer = Buffer.concat(buffers);
 
-                    let json = JSON.parse(finalBuffer.toString());
-                    res.status(200).json(json);
+                    // console.log(finalBuffer.toString());
+                    try {
+                        let json = JSON.parse(finalBuffer.toString());
+                        res.status(200).json(json);
+                    } catch (e) {
+                        console.error(e);
+                        res.status(400).json({});
+                    }
+
                 });
 
             }

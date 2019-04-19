@@ -51,7 +51,7 @@ export const registerUser = (user, history, next) => {
         });
 }
 
-export const loginUser = (user, history, next) => {
+export const loginUser = (user, history, next, nextRoute) => {
     Axios.post('http://localhost:4000/login', user)
         .then(res => {
             if (res) {
@@ -60,7 +60,7 @@ export const loginUser = (user, history, next) => {
                 } else {
                     console.log("Login failed with status code " + res.status);
                 }
-                const decoded = login(res, history);
+                const decoded = login(res, history, nextRoute);
                 next(false, {
                     message: "Successfully logged in!",
                     data: decoded
@@ -77,12 +77,13 @@ export const loginUser = (user, history, next) => {
         });
 }
 
-const login = (res, history) => {
+const login = (res, history, nextRoute) => {
+    nextRoute = nextRoute || "/exercises";
     const { token } = res.data;
     // localStorage.setItem('jwtToken', token);
     setAuthToken(token);
     const decoded = jwt_decode(token);
-    history.push('/exercises');
+    history.push(nextRoute);
     return decoded;
 }
 

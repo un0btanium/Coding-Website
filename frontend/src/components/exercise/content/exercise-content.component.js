@@ -15,25 +15,64 @@ export default class ExerciseContent extends Component {
         }
 
         const onChangeExerciseAceEditor = this.props.onChangeExerciseAceEditor;
+        const onChangeExerciseContent = this.props.onChangeExerciseContent;
+        let deleteContent = this.props.deleteContent;
+        let moveContent = this.props.moveContent;
         const mode = this.props.mode;
         const result = this.props.result;
         const step = this.props.step;
 
-        let res = this.props.content.map(function(currentContent, i) {
-            switch(currentContent.type) {
-                case "title":
-                    return <ExerciseTitle content={currentContent} mode={mode} result={result} step={step} key={currentContent._id} />;
-                case "text":
-                    return <ExerciseText content={currentContent} mode={mode} result={result} step={step} key={currentContent._id} />;
-                case "code":
-                    return <ExerciseCode content={currentContent} mode={mode} result={result} step={step} key={currentContent._id} />;
-                case "editor":
-                    return <ExerciseEditor onChange={onChangeExerciseAceEditor} content={currentContent} mode={mode} result={result} step={step} key={currentContent._id} />;
-                
-                default:
-                    return <h4 key={i}>Unknown content!!!</h4>;
-            }
-        });
+        let res = 
+            this.props.content.map(function(currentContent, i) {
+                switch(currentContent.type) {
+                    case "title":
+                        return <ExerciseTitle
+                            onChange={onChangeExerciseContent}
+                            deleteContent={deleteContent}
+                            moveContent={moveContent}
+                            content={currentContent}
+                            mode={mode}
+                            result={result}
+                            step={step}
+                            key={currentContent._id}
+                        />;
+                    case "text":
+                        return <ExerciseText 
+                            onChange={onChangeExerciseContent}
+                            deleteContent={deleteContent}
+                            moveContent={moveContent}
+                            content={currentContent}
+                            mode={mode}
+                            result={result}
+                            step={step}
+                            key={currentContent._id}
+                        />;
+                    case "code":
+                        return <ExerciseCode
+                            onChange={onChangeExerciseAceEditor}
+                            deleteContent={deleteContent}
+                            moveContent={moveContent}
+                            content={currentContent}
+                            mode={mode}
+                            result={result}
+                            step={step}
+                            key={currentContent._id}
+                        />;
+                    case "editor":
+                        return <ExerciseEditor
+                            onChange={onChangeExerciseAceEditor}
+                            deleteContent={deleteContent}
+                            moveContent={moveContent}
+                            content={currentContent}
+                            mode={mode}
+                            result={result}
+                            step={step}
+                            key={currentContent._id}
+                        />;
+                    default:
+                        return <h4 key={i}>Unknown content!!!</h4>;
+                }
+            })
 
         if (this.props.result && this.props.result.steps) {
             res.push(<ExerciseConsole mode={mode} result={result} step={step} key="console_output"/>);

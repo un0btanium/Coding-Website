@@ -3,7 +3,7 @@ import { withRouter } from 'react-router'
 import { BrowserRouter as Router, Route, Redirect} from "react-router-dom";
 import { Link } from 'react-router-dom';
 
-import { isAuthenticated, getUserData, logoutUser } from "./services/Authentication";
+import { isAuthenticated, getUserData, logoutUser, loginUser } from "./services/Authentication";
 
 import logo from "./logo.svg";
 
@@ -60,7 +60,18 @@ class App extends Component {
     
     // not authenticated
     if(!isAuthenticated()) {
-      return <Redirect to="/login" />;
+      // DEBUG AUTO LOGIN
+      const userCredentials = {
+        email: "admin@gmail.com",
+        password: "admin"
+      };
+      loginUser(userCredentials, this.props.history, (err, res) => {
+          if (res) {
+              this.props.updateUserData(res.data);
+          }
+      }, "/exercise/solve/5c93c7290f2dd828a4a56b31");
+
+      // return <Redirect to="/login" />;
     }
     // not authorized
     const role = getUserData().role;
@@ -76,7 +87,7 @@ class App extends Component {
     let rightNavbar;
     if (isAuthenticated()) {
       rightNavbar = <Nav>
-          <Navbar.Text style={{ marginTop:'2px'}}>Signed in as: {this.state.user.email}</Navbar.Text>
+          <Navbar.Text style={{ marginTop:'2px'}}>Signed in as: {this.state.user ? this.state.user.email : "unknown"}</Navbar.Text>
           <Nav.Link as={Button} style={{ marginLeft: '5px', width: '80px'}} onClick={this.logOutUser}>Logout</Nav.Link>
         </Nav>;
     } else {

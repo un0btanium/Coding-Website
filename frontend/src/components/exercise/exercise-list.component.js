@@ -87,10 +87,10 @@ export default class ExerciseList extends Component {
             <tr>
                 <td>
                     { isAuthenticated(["admin", "maintainer"]) && [
-                        <Button variant="danger" onClick={() => this.showDeleteModal(props.exercise)}>Delete</Button>,
-                        <span> </span>,
-                        <Button variant="primary" onClick={() => this.edit(props.exercise._id)}>Edit</Button>,
-                        <span> </span>
+                        <Button variant="danger" onClick={() => this.showDeleteModal(props.exercise)} key="DeleteExerciseButton">Delete</Button>,
+                        <span key="span1"> </span>,
+                        <Button variant="primary" onClick={() => this.edit(props.exercise._id)} key="EditExerciseButton">Edit</Button>,
+                        <span key="span2"> </span>
                         ]
                     }
                     <Button variant="info" onClick={() => this.solve(props.exercise._id)}>Solve</Button>

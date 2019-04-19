@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 
-import Form from 'react-bootstrap/Form';
-import Row from 'react-bootstrap/Row';
+import { Form, Button, Container, Row, Col } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCaretUp, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 
 // import brace from 'brace';
 import AceEditor from 'react-ace';
@@ -14,8 +15,9 @@ import 'brace/ext/searchbox';
 export default class ExerciseEditor extends Component {
     
     render () {
+        
         let highlightOverlay = null;
-        if (this.props.result && this.props.step >= 0) {
+        if (this.props.result && this.props.result.steps && this.props.result.steps.length > 0 && this.props.step >= 0) {
             // for (let i = 0; i < this.props.console_output.length; i++) {
             //     this.result.console_output[this.props.step]
             // }
@@ -24,21 +26,21 @@ export default class ExerciseEditor extends Component {
             let sizeLine = 22;
 
             let x = 46 + sizeColumn * (node.columnStart-1);
-            let y = sizeLine * (node.lineStart-1-9); // -9
+            let y = sizeLine * (node.lineStart-1-11); // -9
 
-            let w = sizeColumn * ((node.columnEnd - node.columnStart) + 2);
+            let w = sizeColumn * ((node.columnEnd - node.columnStart) + 1);
             let h = sizeLine * ((node.lineEnd-node.lineStart)+1);
 
             // console.log(x + " " + y + " " + w + " " + h);
 
-            highlightOverlay = <div style={{position: 'relative', width: '100%', height: '100%'}}><div style={{position: 'absolute', width: w, height: h, left: x, top: y, backgroundColor: 'rgba(255,32,32,0.4)', zIndex: '2', pointerEvents: 'none'}}></div></div>;
+            highlightOverlay = <div style={{position: 'relative', width: '100%', height: '100%'}}><div style={{position: 'absolute', width: w, height: h, left: x, top: y, backgroundColor: 'rgba(255,32,32,0.3)', zIndex: '2', pointerEvents: 'none'}}></div></div>;
         }
 
         if (this.props.mode === "solve") {
             return (
-                <div as={Row} style={{'marginBottom': '30px', 'marginTop': '30px', 'borderColor': '#538135', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%'}}>
+                <Row style={{'marginLeft': '0px', 'marginBottom': '15px', 'marginTop': '15px', 'borderColor': '#538135', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%'}}>
                 {highlightOverlay}
-                <AceEditor
+                    <AceEditor
                         mode="java"
                         theme="monokai"
                         name={this.props.content._id}
@@ -57,16 +59,44 @@ export default class ExerciseEditor extends Component {
                             maxLines: Infinity,
                             wrap: false,
                             animatedScroll: true,
-                            autoScrollEditorIntoView: true
+                            autoScrollEditorIntoView: true,
+                            printMarginColumn: 200
                         }}
                     />
-                </div>
+                </Row>
             );
         } else if (this.props.mode === "edit") {
+
+            let deleteContent = this.props.deleteContent;
+            let moveContent = this.props.moveContent;
+            
             return (
                 <Form.Group as={Row} className="form-group">
-                    <Form.Label column sm><h5>Editor:</h5></Form.Label>
-                    <div style={{'borderColor': '#538135', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%'}}>
+                    <div style={{ textAlign: 'right', position: 'relative', left: '-140px', top: '67px',  marginTop: '-55px' }}>
+                        <h5>Editor:</h5>
+                        <Button size="sm" variant="danger" onClick={ (e) => { deleteContent(this.props.content._id); }}>Delete</Button> 
+                        <Button size="sm" variant="info" onClick={ (e) => { moveContent(this.props.content._id, true); }}><FontAwesomeIcon icon={faCaretUp} /></Button> 
+                        <Button size="sm" variant="info" onClick={ (e) => { moveContent(this.props.content._id, false); }}><FontAwesomeIcon icon={faCaretDown} /></Button> 
+                    </div>
+                    <Container>
+                        
+                        <Row>
+                            <Col sm={2}  style={{textAlign: 'right'}}>
+                                <Form.Label style={{ 'marginTop': '5px'}}><h5>Identifier:</h5></Form.Label>
+                            </Col>
+                            <Col sm={4}>
+                                <Form.Control
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="Enter identifier"
+                                    name={this.props.content._id}
+                                    value={this.props.content.identifier}
+                                    onChange={(e) => { this.props.onChange(e, e.target.value, this.props.content._id, "identifier"); }}
+                                />
+                            </Col>
+                        </Row>
+                    </Container>
+                    <Row style={{'marginLeft': '0px', 'borderColor': '#538135', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%'}}>
                         {highlightOverlay}
                         <AceEditor
                             mode="java"
@@ -87,10 +117,11 @@ export default class ExerciseEditor extends Component {
                                 maxLines: Infinity,
                                 wrap: false,
                                 animatedScroll: true,
-                                autoScrollEditorIntoView: true
+                                autoScrollEditorIntoView: true,
+                                printMarginColumn: 200
                             }}
                         />
-                    </div>
+                    </Row>
                 </Form.Group>
             );
         }
