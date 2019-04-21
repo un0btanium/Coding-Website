@@ -1,10 +1,20 @@
 import React, {Component} from 'react';
 
-import Row from 'react-bootstrap/Row';
-import Form from 'react-bootstrap/Form';
+import { Form, Row, Col } from 'react-bootstrap';
 
 export default class ExerciseConsole extends Component {
     
+    
+    constructor(props) {
+        super(props);
+
+        this.onChangeConsoleInput = this.onChangeConsoleInput.bind(this);
+
+        this.state = {
+            consoleInputValue: ""
+        }
+    }
+
     render () {
         // TODO create own console text area with tooltip hover which hightlights the System.out.println method
         // TODO edit view
@@ -17,6 +27,27 @@ export default class ExerciseConsole extends Component {
                 }
             }
         }
+
+        let inputField = null;
+        if (this.props.result && this.props.result.isReadIn) {
+            inputField =
+                <Form onSubmit={(e) => { this.props.onConsoleInput(e, this.state.consoleInputValue) }}>
+                    <Form.Group as={Row} className="form-group">
+                        <Form.Label column sm={2} style={{textAlign: 'right'}}><h5>Console Input:</h5></Form.Label>
+                        <Col sm={6}>
+                            <Form.Control 
+                                autoFocus
+                                type="text"
+                                className="form-control"
+                                placeholder="Enter input"
+                                value={this.state.consoleInputValue}
+                                onChange={this.onChangeConsoleInput}
+                            />
+                        </Col>
+                    </Form.Group>
+                </Form>;
+        }
+        
         
         return (
             <div  as={Row} style={{'marginBottom': '30px', 'marginTop': '30px', 'borderColor': '#666666', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%'}}>
@@ -30,16 +61,15 @@ export default class ExerciseConsole extends Component {
                     onChange={this.onChange}
                     readOnly={false}
                 />
+                {inputField}
             </div>
         );
     }
 
-    listConsole() {
-        let output = "";
-        this.props.console_output.forEach(element => {
-            output += element.message;
+    onChangeConsoleInput(e) {
+        this.setState({
+            consoleInputValue: e.target.value
         });
-        return output;
     }
 
     onChange(e) {

@@ -45,6 +45,7 @@ export default class ExerciseView extends Component {
         this.simulateNextStep = this.simulateNextStep.bind(this);
         this.onNextStepClick = this.onNextStepClick.bind(this);
         this.onPreviousStepClick = this.onPreviousStepClick.bind(this);
+        this.onConsoleInput  = this.onConsoleInput.bind(this);
 
 
         this.state = {
@@ -113,8 +114,8 @@ export default class ExerciseView extends Component {
     getExerciseEditView() {
         return <Form onSubmit={this.onSubmit}>
                     <Form.Group as={Row} className="form-group">
-                        <Form.Label column sm><h5>Name:</h5></Form.Label>
-                        <Col sm={10}>
+                        <Form.Label column sm={2} style={{textAlign: 'right'}}><h5>Name:</h5></Form.Label>
+                        <Col sm={8}>
                             <Form.Control 
                                 autoFocus
                                 type="text"
@@ -135,7 +136,7 @@ export default class ExerciseView extends Component {
                         onSelect={(tabKey) => this.setState({ tabKey })}
                     >
 
-                        <Tab eventKey="content" title="Content Elements">
+                        <Tab variant="primary" eventKey="content" title="Content Elements">
                             <ExerciseContent
                                 content={this.state.content}
                                 mode={this.state.mode}
@@ -145,6 +146,7 @@ export default class ExerciseView extends Component {
                                 onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
                                 deleteContent={this.deleteContent}
                                 moveContent={this.moveContent}
+                                onConsoleInput={this.onConsoleInput}
                             />
                             
                             <br />
@@ -160,7 +162,7 @@ export default class ExerciseView extends Component {
                             </Form.Group>
                         </Tab>
 
-                        <Tab eventKey="source-file" title="Source Files">
+                        <Tab variant="primary" eventKey="source-file" title="Source Files">
                             <ExerciseSourceFiles
                                 mode={this.state.mode}
                                 sourceFiles={this.state.sourceFiles}
@@ -202,12 +204,13 @@ export default class ExerciseView extends Component {
                     onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
                     deleteContent={this.deleteContent}
                     moveContent={this.moveContent}
+                    onConsoleInput={this.onConsoleInput}
                 />
 
                 <br />
                 <br />
 
-                <DropdownButton onChange={this.onSimulationSpeedChange}id="dropdown-basic-button" title={("Speed (" + this.state.delay + ")")}>
+                <DropdownButton onChange={this.onSimulationSpeedChange} id="dropdown-basic-button" title={("Speed (" + this.state.delay + ")")}>
                     <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 32 ? true : false} eventKey="32" >32ms</Dropdown.Item>
                     <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 64 ? true : false} eventKey="64">64ms</Dropdown.Item>
                     <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 128 ? true : false} eventKey="128">128ms</Dropdown.Item>
@@ -222,7 +225,6 @@ export default class ExerciseView extends Component {
                 <br />
 
                 <Button style={{marginBottom: '150px', marginTop: '10px', width: '150px', float: 'right'}} variant="success" onClick={this.runCode} >Run Code</Button>
-                <Button style={{marginBottom: '150px', marginTop: '10px', width: '150px', float: 'right'}} variant="info" onClick={this.sendInput} >Send Input</Button>
             </>;
     }
 
@@ -246,8 +248,8 @@ export default class ExerciseView extends Component {
                             "\n" + 
                             "public class Main {\n" + 
                             "    \n" + 
-                            "    public static void main() {\n" + 
-                            "        // main_method_body\n" + 
+                            "    public static void main(String[] args) {\n" + 
+                            "// main_method_body\n" + 
                             "    }\n" + 
                             "    \n" + 
                             "}"
@@ -321,6 +323,20 @@ export default class ExerciseView extends Component {
     }
 
     addNewEditor() {
+        let identifier = "";
+
+        let containsEditor = false;
+        for (let element of this.state.content) {
+            if (element.type === "editor") {
+                containsEditor = true;
+                break;
+            }
+        }
+
+        if (!containsEditor) {
+            identifier = "main_method_body";
+        }
+
         this.setState({
             contentIDCounter: this.state.contentIDCounter+1,
             content: this.state.content.concat(
@@ -328,6 +344,7 @@ export default class ExerciseView extends Component {
                     {
                         _id: "NEW " + this.state.contentIDCounter,
                         type: "editor",
+                        identifier: identifier,
                         code: "",
                         solution: "",
                         settings: {
@@ -560,10 +577,12 @@ export default class ExerciseView extends Component {
 
 
 
-    sendInput(e) {
+    onConsoleInput(e, value) {
+        console.log(value);
+        e.preventDefault()
 
         let data = {
-            input: "Marius"
+            input: value
         }
 
         let options = {
@@ -579,7 +598,9 @@ export default class ExerciseView extends Component {
             .then(response => {
                 if (response.status === 200) {
                     console.log(response);
+                    this.saveCodeResponse(response.data);
                 } else {
+                    console.log(response);
                     // TODO stop code execution because something went wrong
                 }
             })
@@ -593,6 +614,7 @@ export default class ExerciseView extends Component {
     runCode(e) {
 
         // TODO add delay of 5 seconds before making another request as well as a spinning button
+        // TODO only rerun code result if code does not contain user inputs
 
         if (!this.state.didChangeCode) {
             this.setState({
@@ -648,9 +670,13 @@ export default class ExerciseView extends Component {
         }
 
         if (json && json.steps && json.steps.length > 0) {
+            let step = 0;
+            if (json.isReadIn) {
+                step = this.state.step;
+            }
             this.setState({
                 result: json,
-                step: 0,
+                step: step,
                 didChangeCode: false
             });
             timeout = setTimeout(this.simulateNextStep, this.state.delay);

@@ -26,7 +26,7 @@ export default class ExerciseSourceFiles extends Component {
             this.props.sourceFiles.map(function(sourceFile, i) {
                 return (
                 <Form.Group as={Row} className="form-group" key={"SourceFile" + sourceFile._id}>
-                    <ExerciseElementSidebar text="Source File:" id={sourceFile._id} mode={mode} delete={deleteSourceFile} move={moveSourceFile} key={"ExerciseSidebar" + sourceFile._id}/>
+                    <ExerciseElementSidebar text="Source File" id={sourceFile._id} mode={mode} delete={deleteSourceFile} move={moveSourceFile} key={"ExerciseSidebar" + sourceFile._id}/>
                     <Container>
                         
                         <Row>

@@ -106,7 +106,12 @@ export default class ExerciseContent extends Component {
             })
 
         if (this.props.result && this.props.result.steps) {
-            res.push(<ExerciseConsole mode={mode} result={result} step={step} key="console_output"/>);
+            res.push(<ExerciseConsole
+                mode={mode}
+                result={result}
+                step={step}
+                onConsoleInput={this.props.onConsoleInput}
+                key="console_output"/>);
         }
 
         return res;

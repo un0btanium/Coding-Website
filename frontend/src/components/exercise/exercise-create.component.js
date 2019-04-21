@@ -29,8 +29,8 @@ export default class ExerciseCreate extends Component {
 
                 <Form onSubmit={this.onSubmit}>
                     <Form.Group as={Row} className="form-group">
-                        <Form.Label column sm><h5>Name:</h5></Form.Label>
-                        <Col sm={10}>
+                        <Form.Label column sm={2} style={{textAlign: 'right'}}><h5>Name:</h5></Form.Label>
+                        <Col sm={6}>
                             <Form.Control 
                                 autoFocus
                                 type="text"

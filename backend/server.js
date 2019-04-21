@@ -48,7 +48,7 @@ connection.once('open', function () {
 })
 
 
-let javaProcesses = {};
+let javaProcesses = new Object();
 
 app.post("/login", (req, res, next) => {
     console.log(req.body);
@@ -235,10 +235,85 @@ app.route("/exercise/input")
         let input = req.body.input;
         let userData = req.tokenData;
 
-        if (input != null && javaProcesses[userData.userId] !== undefined && javaProcesses[userData.userId] !== null && !javaProcesses[userData.userId].killed) {
-            console.log("Writing input to java process!");
-            javaProcesses[userData.userId].stdin.write(input);
-            res.send(200);
+        if (input !== null && javaProcesses[userData.userId] !== undefined && javaProcesses[userData.userId] !== null && !javaProcesses[userData.userId].killed) {
+            console.log("Writing input '" + input + "' to java process!");
+            let javaChild = javaProcesses[userData.userId]
+
+            res.dataArray = [];
+
+            javaChild.stdout.on('data', function (data) {
+                console.log("stdout input");
+                if (data && !res.isDataSend) {
+                    res.dataArray.push(data);
+                    // Check if it is is a read in command
+                    try {
+                        let buffers = [];
+                        for (let buffer of res.dataArray) {
+                            buffers.push(Buffer.from(buffer));
+                        }
+
+                        let finalBuffer = Buffer.concat(buffers);
+
+                        let json = JSON.parse(finalBuffer.toString());
+                        if (json !== null && json.isReadIn) {
+                            res.isDataSend = true;
+                            res.status(200).json(json);
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+            });
+            javaChild.stderr.on('data', function (err) {
+                console.log("stderr input");
+                if (err && !res.isDataSend) {
+                    console.log(err.toString()); // TODO send to client and print on screen (warp in json error step)
+                }
+            });
+            javaChild.on('close', function (exitCode) {
+                console.log("close input");
+                console.log(exitCode);
+                
+                if (res.isDataSend) {
+                    console.log("canceled response (data was already send)");
+                    return;
+                }
+
+                javaProcesses[userData.userId] = null;
+
+                if (exitCode === null) {
+                    console.log("canceled response (exitCode ist null)");
+                    return;
+                }
+
+                
+                let buffers = [];
+                for (let buffer of res.dataArray) {
+                    buffers.push(Buffer.from(buffer));
+                }
+
+                let finalBuffer = Buffer.concat(buffers);
+
+                // console.log(finalBuffer.toString());
+                try {
+                    let json = JSON.parse(finalBuffer.toString());
+                    res.isDataSend = true;
+                    res.status(200).json(json);
+                } catch (e) {
+                    console.error(e);
+                    res.isDataSend = true;
+                    res.status(400).json({});
+                }
+
+            });
+            try {
+                console.log("Writing!");
+                javaChild.stdin.write(input); // 
+                javaChild.stdin.end(); // TODO do this after the 'on' events have been reassigned
+                console.log("Written!");
+            } catch (e) {
+                console.log(e);
+            }
         } else {
             console.warn("No java process available anymore to write to!");
         }
@@ -275,13 +350,13 @@ app.route("/exercise/run")
                 if (os.platform() === 'win32') {
                     javaExe = "C:\\Program Files\\Java\\jdk-10\\bin\\" + "java.exe"
                 }
-                let javaOptions = { maxBuffer: 1024*1024*1024 /*,timeout: 5, windowsHide: false */ };
+                let javaOptions = { maxBuffer: 1024*1024*1024 ,timeout: 10*1000, /* windowsHide: false */ };
 
 
                 if (javaProcesses[userData.userId] !== undefined && javaProcesses[userData.userId] !== null) {
-                    console.log("Kill java process!");
+                    console.log("Killing java process!");
                     javaProcesses[userData.userId].kill('SIGINT');
-                    console.log(javaProcesses[userData.userId].killed);
+                    console.log(javaProcesses[userData.userId].killed ? "Killed java process!" : "Didnt kill java process!");
                     javaProcesses[userData.userId] = null;
                 }
 
@@ -292,44 +367,70 @@ app.route("/exercise/run")
                 javaProcesses[userData.userId] = javaChild;
 
                 javaChild.stdout.on('data', function (data) {
-                    console.log("stdout");
-                    if (data) {
+                    console.log("stdout run");
+                    if (data && !res.isDataSend) {
                         res.dataArray.push(data);
+                        // Check if it is is a read in command
+                        try {
+                            let buffers = [];
+                            for (let buffer of res.dataArray) {
+                                buffers.push(Buffer.from(buffer));
+                            }
+    
+                            let finalBuffer = Buffer.concat(buffers);
+                            
+                            console.log(finalBuffer.toString());
+                            
+                            let json = JSON.parse(finalBuffer.toString());
+                            if (json !== null && json.isReadIn) {
+                                res.isDataSend = true;
+                                res.status(200).json(json);
+                            }
+                        } catch (e) {
+                            console.error(e);
+                        }
                     }
                 });
                 javaChild.stderr.on('data', function (err) {
-                    console.log("stderr");
+                    console.log("stderr run");
                     if (err && !res.isDataSend) {
-                        console.log(err.toString()); // TODO send to client and print on screen
+                        console.log(err.toString()); // TODO send to client and print on screen (warp in json error step)
                     }
                 });
                 javaChild.on('close', function (exitCode) {
-                    console.log("close");
+                    console.log("close run");
                     console.log(exitCode);
                     
+                    if (res.isDataSend) {
+                        console.log("canceled response (data was already send)");
+                        return;
+                    }
+
                     javaProcesses[userData.userId] = null;
 
                     if (exitCode === null) {
-                        console.log("canceled response");
+                        console.log("canceled response (exitCode ist null)");
                         return;
                     }
-                    
+
                     let buffers = [];
                     for (let buffer of res.dataArray) {
                         buffers.push(Buffer.from(buffer));
                     }
-
+    
                     let finalBuffer = Buffer.concat(buffers);
-
+    
                     // console.log(finalBuffer.toString());
                     try {
                         let json = JSON.parse(finalBuffer.toString());
+                        res.isDataSend = true;
                         res.status(200).json(json);
                     } catch (e) {
                         console.error(e);
+                        res.isDataSend = true;
                         res.status(400).json({});
                     }
-
+    
                 });
 
             }
