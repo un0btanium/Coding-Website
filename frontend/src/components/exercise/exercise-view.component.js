@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import Axios from 'axios';
 
-import { Form, Button, Row, Col, Dropdown, DropdownButton, Tabs, Tab } from 'react-bootstrap';
+import { Form, Button, ButtonGroup, Row, Col, Dropdown, DropdownButton, Tabs, Tab } from 'react-bootstrap';
 
 import ExerciseContent from './content/exercise-content.component';
 import ExerciseSourceFiles from './content/exercise-source-files.component';
@@ -118,6 +118,9 @@ export default class ExerciseView extends Component {
                         <Col sm={8}>
                             <Form.Control 
                                 autoFocus
+                                style={{color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
+                                plaintext="true"
+                                autoComplete="off"
                                 type="text"
                                 className="form-control"
                                 placeholder="Enter name"
@@ -209,17 +212,17 @@ export default class ExerciseView extends Component {
 
                 <br />
                 <br />
-
-                <DropdownButton onChange={this.onSimulationSpeedChange} id="dropdown-basic-button" title={("Speed (" + this.state.delay + ")")}>
-                    <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 32 ? true : false} eventKey="32" >32ms</Dropdown.Item>
-                    <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 64 ? true : false} eventKey="64">64ms</Dropdown.Item>
-                    <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 128 ? true : false} eventKey="128">128ms</Dropdown.Item>
-                    <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 256 ? true : false} eventKey="256">256ms</Dropdown.Item>
-                    <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 512 ? true : false} eventKey="512">512ms</Dropdown.Item>
-                </DropdownButton>
-
-                <Button bg={BG} variant={VARIANT} onClick={this.onPreviousStepClick}>Previous</Button>
-                <Button bg={BG} variant={VARIANT} onClick={this.onNextStepClick}>Next</Button>
+                <ButtonGroup>
+                    <DropdownButton onChange={this.onSimulationSpeedChange} id="dropdown-basic-button" title={("Speed (" + this.state.delay + ")")}>
+                        <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 32 ? true : false} eventKey="32" >32ms</Dropdown.Item>
+                        <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 64 ? true : false} eventKey="64">64ms</Dropdown.Item>
+                        <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 128 ? true : false} eventKey="128">128ms</Dropdown.Item>
+                        <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 256 ? true : false} eventKey="256">256ms</Dropdown.Item>
+                        <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 512 ? true : false} eventKey="512">512ms</Dropdown.Item>
+                    </DropdownButton>
+                    <Button bg={BG} variant={VARIANT} onClick={this.onPreviousStepClick}>Previous</Button>
+                    <Button bg={BG} variant={VARIANT} onClick={this.onNextStepClick}>Next</Button>
+                </ButtonGroup>
 
                 <br />
                 <br />
@@ -598,7 +601,7 @@ export default class ExerciseView extends Component {
             .then(response => {
                 if (response.status === 200) {
                     console.log(response);
-                    this.saveCodeResponse(response.data);
+                    this.saveCodeResponse(response.data, this.state.result.steps.length-1);
                 } else {
                     console.log(response);
                     // TODO stop code execution because something went wrong
@@ -614,7 +617,7 @@ export default class ExerciseView extends Component {
     runCode(e) {
 
         // TODO add delay of 5 seconds before making another request as well as a spinning button
-        // TODO only rerun code result if code does not contain user inputs
+        // TODO only rerun code result if code does not contain user inputs (OR: SPLIT RERUN AND RUN (when input))
 
         if (!this.state.didChangeCode) {
             this.setState({
@@ -654,7 +657,7 @@ export default class ExerciseView extends Component {
             .then(response => {
                 if (response.status === 200) {
                     console.log(response);
-                    this.saveCodeResponse(response.data);
+                    this.saveCodeResponse(response.data, 0);
                 }
             })
             .catch(function (error) {
@@ -662,21 +665,17 @@ export default class ExerciseView extends Component {
             });
     }
 
-    saveCodeResponse(json) {
+    saveCodeResponse(json, startAtStep) {
 
         console.log(json);
-        if (timeout !== null) {
-            clearTimeout(timeout);
-        }
 
         if (json && json.steps && json.steps.length > 0) {
-            let step = 0;
-            if (json.isReadIn) {
-                step = this.state.step;
+            if (timeout !== null) {
+                clearTimeout(timeout);
             }
             this.setState({
                 result: json,
-                step: step,
+                step: startAtStep,
                 didChangeCode: false
             });
             timeout = setTimeout(this.simulateNextStep, this.state.delay);
@@ -685,7 +684,7 @@ export default class ExerciseView extends Component {
     }
 
     simulateNextStep() {
-        console.log("step: " + this.state.step);
+        console.log("step: " + this.state.step + " " + this.state.result.steps[this.state.step].valueType + " " + this.state.result.steps[this.state.step].value);
         // SAVE ENTIRE STATE DATA PER STEP (JSON LARGER BUT LESS SIMULATION ON THIS END REQUIRED, EASIER BACK AND FORTH)
         // OR SAVE CHANGES MADE ON EACH STEP (JSON SMALLER BUT HAVE TO SIMULATE ON THIS END. HAVE TO REDO OR SAVE PREVIOUS SIMULATED STATES, COULD ADD FILTER OR BREAKPOINTS)
         if (this.state.result && this.state.result.steps && this.state.result.steps.length > 0 && (this.state.step+1) < this.state.result.steps.length) {
@@ -730,7 +729,7 @@ export default class ExerciseView extends Component {
             clearTimeout(timeout);
         }
         if (this.state.result && this.state.result.steps && this.state.result.steps.length > 0) {
-            if ((this.state.step-1) > 0) {
+            if ((this.state.step-1) >= 0) {
                 this.setState({
                     step: this.state.step-1
                 });

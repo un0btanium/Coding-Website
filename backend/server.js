@@ -307,10 +307,8 @@ app.route("/exercise/input")
 
             });
             try {
-                console.log("Writing!");
-                javaChild.stdin.write(input); // 
-                javaChild.stdin.end(); // TODO do this after the 'on' events have been reassigned
-                console.log("Written!");
+                javaChild.stdin.write(input);
+                javaChild.stdin.end();
             } catch (e) {
                 console.log(e);
             }
@@ -378,8 +376,6 @@ app.route("/exercise/run")
                             }
     
                             let finalBuffer = Buffer.concat(buffers);
-                            
-                            console.log(finalBuffer.toString());
                             
                             let json = JSON.parse(finalBuffer.toString());
                             if (json !== null && json.isReadIn) {

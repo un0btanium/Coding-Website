@@ -14,6 +14,8 @@ export default class ExerciseEditor extends Component {
     
     render () {
         
+        // TODO second first overlay box which displays the value of a variable or expression
+
         let highlightOverlay = null;
         if (this.props.result && this.props.result.steps && this.props.result.steps.length > 0 && this.props.step >= 0) {
             // for (let i = 0; i < this.props.console_output.length; i++) {
@@ -73,6 +75,9 @@ export default class ExerciseEditor extends Component {
                             </Col>
                             <Col sm={4}>
                                 <Form.Control
+                                    style={{color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
+                                    plaintext="true"
+                                    autoComplete="off"
                                     type="text"
                                     className="form-control"
                                     placeholder="Enter identifier"

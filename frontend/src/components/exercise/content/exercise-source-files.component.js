@@ -35,7 +35,10 @@ export default class ExerciseSourceFiles extends Component {
                             </Col>
                             <Col sm={4}>
                                 <Form.Control
+                                    plaintext="true"
                                     type="text"
+                                    style={{color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
+                                    autoComplete="off"
                                     className="form-control"
                                     placeholder="Enter package"
                                     name={"package" + sourceFile._id}
@@ -51,6 +54,9 @@ export default class ExerciseSourceFiles extends Component {
                             </Col>
                             <Col sm={4}>
                                 <Form.Control 
+                                    style={{color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
+                                    plaintext="true"
+                                    autoComplete="off"
                                     type="text"
                                     className="form-control"
                                     placeholder="Enter class name"

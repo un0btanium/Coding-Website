@@ -32,6 +32,9 @@ export default class ExerciseCreate extends Component {
                         <Form.Label column sm={2} style={{textAlign: 'right'}}><h5>Name:</h5></Form.Label>
                         <Col sm={6}>
                             <Form.Control 
+                                style={{color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
+                                plaintext="true"
+                                autoComplete="off"
                                 autoFocus
                                 type="text"
                                 className="form-control"

@@ -13,7 +13,9 @@ export default class ExerciseTitle extends Component {
             
             return (
                 <Form.Control 
+                    style={{color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
                     type="text"
+                    autoComplete="off"
                     className="form-control"
                     placeholder="Enter title"
                     name={this.props.content._id}

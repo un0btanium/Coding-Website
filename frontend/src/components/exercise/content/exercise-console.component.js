@@ -33,10 +33,13 @@ export default class ExerciseConsole extends Component {
             inputField =
                 <Form onSubmit={(e) => { this.props.onConsoleInput(e, this.state.consoleInputValue) }}>
                     <Form.Group as={Row} className="form-group">
-                        <Form.Label column sm={2} style={{textAlign: 'right'}}><h5>Console Input:</h5></Form.Label>
-                        <Col sm={6}>
+                        <Form.Label column sm={3} style={{marginTop: '15px', textAlign: 'right'}}><h5>Console Input:</h5></Form.Label>
+                        <Col sm={7}>
                             <Form.Control 
                                 autoFocus
+                                style={{marginTop: '15px', color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
+                                plaintext="true"
+                                autoComplete="off"
                                 type="text"
                                 className="form-control"
                                 placeholder="Enter input"
