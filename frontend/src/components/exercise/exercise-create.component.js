@@ -12,10 +12,12 @@ export default class ExerciseCreate extends Component {
         super(props);
 
         this.onChangeExerciseName = this.onChangeExerciseName.bind(this);
+        this.onChangeExerciseImportString = this.onChangeExerciseImportString.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
 
         this.state = {
-            name: ''
+            name: '',
+            importString: ''
         }
     }
 
@@ -47,6 +49,25 @@ export default class ExerciseCreate extends Component {
                     
                     <br/>
                     <br/>
+
+                    <Form.Group as={Row} className="form-group">
+                        <Form.Label column sm={2} style={{textAlign: 'right'}}><h5>Import:</h5></Form.Label>
+                        <Col sm={6}>
+                            <Form.Control 
+                                style={{color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
+                                plaintext="true"
+                                autoComplete="off"
+                                type="text"
+                                className="form-control"
+                                placeholder="Or enter json import string"
+                                value={this.state.importString}
+                                onChange={this.onChangeExerciseImportString}
+                            />
+                        </Col>
+                    </Form.Group>
+
+                    <br/>
+                    <br/>
                     
                     <Form.Group className="form-group">
                         <Button type="submit" variant="success" style={{width: '150px', float: 'right'}}>Create and Edit</Button>
@@ -62,18 +83,42 @@ export default class ExerciseCreate extends Component {
         });
     }
 
+    onChangeExerciseImportString(e) {
+        this.setState({
+            importString: e.target.value
+        });
+    }
+
     onSubmit(e) {
         e.preventDefault();
 
-        if (this.state.name === '') {
+        if (this.state.name === '' && this.state.importString === '') {
             return;
         }
 
+        let name = this.state.name;
+        let content = null;
+        let source_files = null;
+        if (this.state.importString !== '') {
+            try {
+                let json = JSON.parse(this.state.importString);
+
+                name = json.name;
+                content = json.content;
+                source_files = json.source_files;
+            } catch (e) {
+                console.log(e);
+                return;
+            } 
+        }
+
         console.log(`New exercise created!`);
-        console.log(`Exercise Name: ${this.state.name}`);
+        console.log(`Exercise Name: ${name}`);
         
         const newExercise = {
-            name: this.state.name
+            name: name,
+            content: content,
+            source_files: source_files
         }
         
         console.log(Axios.defaults.headers.common);
@@ -81,6 +126,8 @@ export default class ExerciseCreate extends Component {
             .then(res => {
                 this.props.history.push('/exercise/edit/'+res.data.id);
             });
+
+        
     }
 
     

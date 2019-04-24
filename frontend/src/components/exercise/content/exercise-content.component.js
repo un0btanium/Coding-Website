@@ -6,7 +6,6 @@ import ExerciseTitle from './exercise-title.component';
 import ExerciseText from './exercise-text.component';
 import ExerciseCode from './exercise-code.component';
 import ExerciseEditor from './exercise-editor.component';
-import ExerciseConsole from './exercise-console.component';
 import ExerciseElementSidebar from './exercise-element-sidebar.component';
 
 export default class ExerciseContent extends Component {
@@ -104,15 +103,6 @@ export default class ExerciseContent extends Component {
                     return <div>Unknown mode</div>
                 }
             })
-
-        if (this.props.result && this.props.result.steps) {
-            res.push(<ExerciseConsole
-                mode={mode}
-                result={result}
-                step={step}
-                onConsoleInput={this.props.onConsoleInput}
-                key="console_output"/>);
-        }
 
         return res;
     }

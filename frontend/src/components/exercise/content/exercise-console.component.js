@@ -1,6 +1,9 @@
 import React, {Component} from 'react';
 
-import { Form, Row, Col } from 'react-bootstrap';
+import { Form, Row, Col, ButtonGroup, DropdownButton, Dropdown, Button, ProgressBar } from 'react-bootstrap';
+
+const BG = "primary"; // primary, dark, light
+const VARIANT = "dark"; // dark, light
 
 export default class ExerciseConsole extends Component {
     
@@ -18,6 +21,7 @@ export default class ExerciseConsole extends Component {
     render () {
         // TODO create own console text area with tooltip hover which hightlights the System.out.println method
         // TODO edit view
+        // TODO put whole execution lopic in here! (keeps exercise view cleaner and less binding)
         
         let consoleMessages = "";
         if (this.props.result && this.props.step >= 0) {
@@ -28,32 +32,11 @@ export default class ExerciseConsole extends Component {
             }
         }
 
+        let consoleField = null;
         let inputField = null;
-        if (this.props.result && this.props.result.isReadIn) {
-            inputField =
-                <Form onSubmit={(e) => { this.props.onConsoleInput(e, this.state.consoleInputValue) }}>
-                    <Form.Group as={Row} className="form-group">
-                        <Form.Label column sm={3} style={{marginTop: '15px', textAlign: 'right'}}><h5>Console Input:</h5></Form.Label>
-                        <Col sm={7}>
-                            <Form.Control 
-                                autoFocus
-                                style={{marginTop: '15px', color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
-                                plaintext="true"
-                                autoComplete="off"
-                                type="text"
-                                className="form-control"
-                                placeholder="Enter input"
-                                value={this.state.consoleInputValue}
-                                onChange={this.onChangeConsoleInput}
-                            />
-                        </Col>
-                    </Form.Group>
-                </Form>;
-        }
-        
-        
-        return (
-            <div  as={Row} style={{'marginBottom': '30px', 'marginTop': '30px', 'borderColor': '#666666', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%'}}>
+        let progressBar = null;
+        if (this.props.result && this.props.result.steps) {
+            consoleField = 
                 <Form.Control 
                     style={{'fontFamily': 'Consolas,monaco,monospace'}}
                     as="textarea"
@@ -63,8 +46,57 @@ export default class ExerciseConsole extends Component {
                     value={consoleMessages}
                     onChange={this.onChange}
                     readOnly={false}
-                />
-                {inputField}
+                />;
+            progressBar = <ProgressBar style={{height: '15px', marginLeft: '1px', marginRight: '1px'}} min={0} max={this.props.result.steps.length} now={this.props.step+1} label={(this.props.step+1) + "/" + this.props.result.steps.length}></ProgressBar>;
+            if (this.props.result.isReadIn) {
+                inputField =
+                    <Form onSubmit={(e) => { this.props.onConsoleInput(e, this.state.consoleInputValue) }}>
+                        <Form.Group as={Row} className="form-group">
+                            <Form.Label column sm={3} style={{marginTop: '15px', textAlign: 'right'}}><h5>Console Input:</h5></Form.Label>
+                            <Col sm={7}>
+                                <Form.Control 
+                                    autoFocus
+                                    style={{marginTop: '15px', color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
+                                    plaintext="true"
+                                    autoComplete="off"
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="Enter input"
+                                    value={this.state.consoleInputValue}
+                                    onChange={this.onChangeConsoleInput}
+                                />
+                            </Col>
+                        </Form.Group>
+                    </Form>;
+            }
+        }
+        
+        
+        return (
+            <div  as={Row} style={{'marginBottom': '500px', 'marginTop': '30px', 'borderColor': '#666666', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%'}}>
+                {consoleField}
+                <div>
+                    {progressBar}
+                    {inputField}
+                    <div style={{margin: '10px'}}>
+                        <ButtonGroup style={{float: 'left'}}>
+                            <DropdownButton onChange={this.props.onSimulationSpeedChange} id="dropdown-basic-button" title={("Speed (" + this.props.delay + "ms)")}>
+                                <Dropdown.Item onSelect={this.props.onSimulationSpeedChange} active={this.props.delay === 32 ? true : false} eventKey="32" >32ms</Dropdown.Item>
+                                <Dropdown.Item onSelect={this.props.onSimulationSpeedChange} active={this.props.delay === 64 ? true : false} eventKey="64">64ms</Dropdown.Item>
+                                <Dropdown.Item onSelect={this.props.onSimulationSpeedChange} active={this.props.delay === 128 ? true : false} eventKey="128">128ms</Dropdown.Item>
+                                <Dropdown.Item onSelect={this.props.onSimulationSpeedChange} active={this.props.delay === 256 ? true : false} eventKey="256">256ms</Dropdown.Item>
+                                <Dropdown.Item onSelect={this.props.onSimulationSpeedChange} active={this.props.delay === 512 ? true : false} eventKey="512">512ms</Dropdown.Item>
+                            </DropdownButton>
+                        </ButtonGroup>
+                        <ButtonGroup style={{marginLeft: '22%'}}>
+                            <Button style={{width: '100px'}} bg={BG} variant={VARIANT} onClick={this.props.onPreviousStepClick}>Previous</Button>
+                            <Button style={{width: '100px'}} bg={BG} variant={VARIANT} onClick={this.props.onNextStepClick}>Next</Button>
+                        </ButtonGroup>
+                        <ButtonGroup style={{float: 'right'}}>
+                            <Button style={{width: '150px'}} variant="success" onClick={this.props.runCode} >Run Code</Button>
+                        </ButtonGroup>
+                    </div>
+                </div>
             </div>
         );
     }

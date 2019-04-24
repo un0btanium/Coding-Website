@@ -1,14 +1,12 @@
 import React, {Component} from 'react';
 import Axios from 'axios';
 
-import { Form, Button, ButtonGroup, Row, Col, Dropdown, DropdownButton, Tabs, Tab } from 'react-bootstrap';
+import { Form, Button, Row, Col, Tabs, Tab } from 'react-bootstrap';
 
 import ExerciseContent from './content/exercise-content.component';
 import ExerciseSourceFiles from './content/exercise-source-files.component';
+import ExerciseConsole from './content/exercise-console.component';
 
-
-const BG = "primary"; // primary, dark, light
-const VARIANT = "dark"; // dark, light
 
 let timeout = null;
 export default class ExerciseView extends Component {
@@ -37,6 +35,7 @@ export default class ExerciseView extends Component {
         this.moveSourceFile = this.moveSourceFile.bind(this);
 
         this.onSubmit = this.onSubmit.bind(this);
+        this.exportExerciseAsJSON = this.exportExerciseAsJSON.bind(this);
 
 
         // solve only
@@ -60,12 +59,13 @@ export default class ExerciseView extends Component {
             // edit only
             contentIDCounter: 0,
             tabKey: "content",
+            exportExerciseField: null,
 
             // solve only
             didChangeCode: true,
             result: null,
             step: 0,
-            delay: 64
+            delay: 128
         }
     }
 
@@ -186,19 +186,33 @@ export default class ExerciseView extends Component {
 
                     </Tabs>
 
-
-
                     <br />
                     <br />
+
+                    {this.state.exportExerciseField &&
+                       <Form.Control
+                            style={{color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
+                            plaintext="true"
+                            autoComplete="off"
+                            as="textarea"
+                            rows="10"
+                            name="ExportExerciseField"
+                            defaultValue={this.state.exportExerciseField}
+                        />
+                    }
 
                     <Form.Group className="form-group">
                         <Button type="submit" variant="success" style={{marginBottom: '150px', marginTop: '30px', width: '150px', float: 'right'}}>Save</Button>
+                        <Button variant="danger" onClick={this.exportExerciseAsJSON} style={{marginBottom: '150px', marginTop: '30px', width: '150px', float: 'right'}}>Export</Button>
                     </Form.Group>
+
                 </Form>;
     }
 
     getExerciseSolveView() {
-        return <><ExerciseContent
+        return (
+            <>
+                <ExerciseContent
                     content={this.state.content}
                     mode={this.state.mode}
                     result={this.state.result}
@@ -212,23 +226,20 @@ export default class ExerciseView extends Component {
 
                 <br />
                 <br />
-                <ButtonGroup>
-                    <DropdownButton onChange={this.onSimulationSpeedChange} id="dropdown-basic-button" title={("Speed (" + this.state.delay + ")")}>
-                        <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 32 ? true : false} eventKey="32" >32ms</Dropdown.Item>
-                        <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 64 ? true : false} eventKey="64">64ms</Dropdown.Item>
-                        <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 128 ? true : false} eventKey="128">128ms</Dropdown.Item>
-                        <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 256 ? true : false} eventKey="256">256ms</Dropdown.Item>
-                        <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 512 ? true : false} eventKey="512">512ms</Dropdown.Item>
-                    </DropdownButton>
-                    <Button bg={BG} variant={VARIANT} onClick={this.onPreviousStepClick}>Previous</Button>
-                    <Button bg={BG} variant={VARIANT} onClick={this.onNextStepClick}>Next</Button>
-                </ButtonGroup>
 
-                <br />
-                <br />
-
-                <Button style={{marginBottom: '150px', marginTop: '10px', width: '150px', float: 'right'}} variant="success" onClick={this.runCode} >Run Code</Button>
-            </>;
+                <ExerciseConsole
+                    mode={this.state.mode}
+                    result={this.state.result}
+                    step={this.state.step}
+                    delay={this.state.delay}
+                    runCode={this.runCode}
+                    onPreviousStepClick={this.onPreviousStepClick}
+                    onNextStepClick={this.onNextStepClick}
+                    onSimulationSpeedChange={this.onSimulationSpeedChange}
+                    onConsoleInput={this.onConsoleInput}
+                />
+            </>
+        );
     }
 
     addNewSourceFile() {
@@ -526,8 +537,42 @@ export default class ExerciseView extends Component {
 
 
 
+    
+    exportExerciseAsJSON() {
 
+        let sourceFiles = [];
+        for (let sourceFile of this.state.sourceFiles) {
+            let newSourceFile = {
+                package: sourceFile.package,
+                name: sourceFile.name,
+                code: sourceFile.code
+            }
+            sourceFiles.push(newSourceFile);
+        }
 
+        let content = [];
+        for (let c of this.state.content) {
+            let newContent = {
+                type: c.type,
+                text: c.text,
+                identifier: c.identifier,
+                code: c.code,
+                solution: c.solution,
+                settings: c.settings
+            }
+            content.push(newContent);
+        }
+
+        let exercise = JSON.stringify({
+            name: this.state.name,
+            content: content,
+            source_files: sourceFiles
+        });
+
+        this.setState({
+            exportExerciseField: exercise
+        });
+    }
 
     
     onSubmit(e) {
