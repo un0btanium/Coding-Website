@@ -1,0 +1,50 @@
+
+
+
+
+Code Simulator:
+- More code element highlighting
+- Memory Inspector
+-- Object-Handling
+- Tooltip on mouse hover
+- Code Replacement Feature?
+- robuster machen (symbol solver mit verwenden)
+
+Features:
+- Language Server Protocoll (LSP) ?
+-- Editor that supports LSP
+--- Replace Ace Editor with Monaco Editor
+- More settings for exercises (features on/off)
+- Multi-page exercises
+- Add solution code (toggle viewable by admin)
+- Add image element
+- Add formula element
+- Custom Error Message Explanations
+- Fireworks on completion (Canvas)
+- Live Environment
+- Overall code cleanup and documentation
+
+Backend:
+- Execution Safety
+-- Bubblewrap?
+--- Read/Write?
+- Error Handling on compile
+- Error Handling on execution
+- Save exercise code for User
+- Save exercise progress for Users
+
+Frontend:
+- Admin-Dashboard for User Settings (role)
+- Error Displaying (compile and execution)
+- Hide/Show text areas on exercise page
+
+More ideas:
+- Code overview of exercise for admin
+-- Statistics
+-- Error Statistics
+- Testing (Console Ouput, UnitTests, Source Code Testing)
+- Feedback Box
+- API for exporting embedded HTML to display exercises on other pages
+- Kubernetes (feasible?)
+-- Split code execution into its own backend and API
+-- Split each language its own microservice
