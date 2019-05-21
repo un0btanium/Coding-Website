@@ -23,16 +23,43 @@ export default class ExerciseConsole extends Component {
         // TODO edit view
         // TODO put whole execution lopic in here! (keeps exercise view cleaner and less binding)
         
+
+        let onConsoleInput = this.props.onConsoleInput;
         let consoleMessages = "";
+        let guiElements = null;
         if (this.props.result && this.props.step >= 0) {
             for (let i = 0; i <= this.props.step; i++) {
                 if (this.props.result.steps[i].type === "console") {
                     consoleMessages += this.props.result.steps[i].msg;
                 }
             }
+            if (this.props.result.steps[this.props.step].type === "htmlGui") {
+                console.log(this.props.result.steps[this.props.step].guiElements);
+                guiElements = this.props.result.steps[this.props.step].guiElements.map(function(guiRow, i) {
+                    let guiRowElements = guiRow.map(function(guiElement, i) {
+                        let element = null;
+                        switch(guiElement.type) {
+                            case "square":
+                                let rgbSquare = 'rgb(' + guiElement.color.red + ', ' + guiElement.color.green + ', ' + guiElement.color.blue + ')';
+                                element = <Col style={{ width: '50px', height: '50px', margin: '2px', backgroundColor: rgbSquare }} >{guiElement.labelText}</Col>;
+                                break;
+                            case "button":
+                                let rgbButton = 'rgb(' + guiElement.color.red + ', ' + guiElement.color.green + ', ' + guiElement.color.blue + ')';
+                                element = <Button style={{ width: '50px', height: '50px', margin: '2px', backgroundColor: rgbButton }} onClick={(e) => { onConsoleInput(e, guiElement.id) }}>{guiElement.labelText}</Button>;
+                                break;
+                            default:
+                                element = null;
+                                break;
+                        }
+                        return element;
+                    })
+                    return <Row>{guiRowElements}</Row>;
+                });
+            }
         }
 
         let consoleField = null;
+        let htmlGui = null;
         let inputField = null;
         let progressBar = null;
         if (this.props.result && this.props.result.steps) {
@@ -69,12 +96,17 @@ export default class ExerciseConsole extends Component {
                         </Form.Group>
                     </Form>;
             }
+            htmlGui =
+                <div>
+                    {guiElements}
+                </div>;
         }
         
         
         return (
             <div  as={Row} style={{'marginBottom': '500px', 'marginTop': '30px', 'borderColor': '#666666', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%'}}>
                 {consoleField}
+                {htmlGui}
                 <div>
                     {progressBar}
                     {inputField}

@@ -255,7 +255,7 @@ app.route("/exercise/input")
                         let finalBuffer = Buffer.concat(buffers);
 
                         let json = JSON.parse(finalBuffer.toString());
-                        if (json !== null && json.isReadIn) {
+                        if (json !== null && (json.isReadIn || json.isGuiReadIn)) {
                             res.isDataSend = true;
                             res.status(200).json(json);
                         }
@@ -378,7 +378,7 @@ app.route("/exercise/run")
                             let finalBuffer = Buffer.concat(buffers);
                             
                             let json = JSON.parse(finalBuffer.toString());
-                            if (json !== null && json.isReadIn) {
+                            if (json !== null && (json.isReadIn || json.isGuiReadIn)) {
                                 res.isDataSend = true;
                                 res.status(200).json(json);
                             }

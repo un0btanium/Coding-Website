@@ -15,6 +15,7 @@ Features:
 -- Editor that supports LSP
 --- Replace Ace Editor with Monaco Editor
 - More settings for exercises (features on/off)
+-- Filter (fixed, like how detailed, and auto-generated ones from the source code, like which and if methods should be stepped in or skipped)
 - Multi-page exercises
 - Add solution code (toggle viewable by admin)
 - Add image element

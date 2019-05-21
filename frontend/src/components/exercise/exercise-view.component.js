@@ -630,7 +630,7 @@ export default class ExerciseView extends Component {
         e.preventDefault()
 
         let data = {
-            input: value
+            input: ''+value
         }
 
         let options = {
