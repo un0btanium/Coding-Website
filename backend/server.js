@@ -118,10 +118,14 @@ app.post('/signup', (req, res, next) => {
                             error: err
                         });
                     } else {
+                        let role = 'student';
+                        if (User.count() === 0) {
+                            roles = 'admin';
+                        }
                         const user = new User({
                             email: req.body.email,
                             password: hash,
-                            role: 'student'
+                            role: role
                         });
                         user
                             .save()
