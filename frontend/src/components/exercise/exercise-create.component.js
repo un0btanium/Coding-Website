@@ -122,7 +122,7 @@ export default class ExerciseCreate extends Component {
         }
         
         //console.log(Axios.defaults.headers.common);
-        Axios.post(process.env.BACKEND_SERVER + '/exercise', newExercise)
+        Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/exercise', newExercise)
             .then(res => {
                 this.props.history.push('/exercise/edit/'+res.data.id);
             });
