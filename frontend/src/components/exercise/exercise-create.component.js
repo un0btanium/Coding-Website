@@ -112,8 +112,8 @@ export default class ExerciseCreate extends Component {
             } 
         }
 
-        console.log(`New exercise created!`);
-        console.log(`Exercise Name: ${name}`);
+        //console.log(`New exercise created!`);
+        //console.log(`Exercise Name: ${name}`);
         
         const newExercise = {
             name: name,
@@ -121,8 +121,8 @@ export default class ExerciseCreate extends Component {
             source_files: source_files
         }
         
-        console.log(Axios.defaults.headers.common);
-        Axios.post('http://localhost:4000/exercise', newExercise)
+        //console.log(Axios.defaults.headers.common);
+        Axios.post(process.env.BACKEND_SERVER + '/exercise', newExercise)
             .then(res => {
                 this.props.history.push('/exercise/edit/'+res.data.id);
             });

@@ -60,19 +60,23 @@ class App extends Component {
     
     // not authenticated
     if(!isAuthenticated()) {
+      // TODO
       // DEBUG AUTO LOGIN
-      const userCredentials = {
-        email: "admin@gmail.com",
-        password: "admin"
-      };
-      loginUser(userCredentials, this.props.history, (err, res) => {
-          if (res) {
-              this.props.updateUserData(res.data);
-          }
-      }, "/exercise/solve/5c93c7290f2dd828a4a56b31");
-
-      // return <Redirect to="/login" />;
+      if (process.env.NODE_ENV === "production") {
+        return <Redirect to="/login" />;
+      } else {
+        const userCredentials = {
+          email: "admin@gmail.com",
+          password: "admin"
+        };
+        loginUser(userCredentials, this.props.history, (err, res) => {
+            if (res) {
+                this.props.updateUserData(res.data);
+            }
+        }, "/exercises");
+      }
     }
+
     // not authorized
     const role = getUserData().role;
     if(!role || (allowedRoles && allowedRoles.length > 0 && allowedRoles.indexOf(role) === -1)) {

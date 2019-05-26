@@ -21,7 +21,7 @@ export default class ExerciseList extends Component {
     }
 
     componentDidMount() {
-        Axios.get('http://localhost:4000/exercises/'+this.state.page)
+        Axios.get(process.env.BACKEND_SERVER + '/exercises/'+this.state.page)
             .then(response => {
                 this.setState({
                     exercises: response.data.exercises,
@@ -143,7 +143,7 @@ export default class ExerciseList extends Component {
     }
 
     delete(id) {
-        Axios.delete('http://localhost:4000/exercise/'+id)
+        Axios.delete(process.env.BACKEND_SERVER + '/exercise/'+id)
             .then(response => {
 
                 let index = -1

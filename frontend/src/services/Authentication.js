@@ -28,7 +28,7 @@ export const logoutUser = (history, next) => {
 }
 
 export const registerUser = (user, history, next) => {
-    Axios.post('http://localhost:4000/signup', user)
+    Axios.post(process.env.BACKEND_SERVER + '/signup', user)
         .then(res => {
             if (res.status === 201) {
                 console.log("Successfully registered!");
@@ -52,7 +52,7 @@ export const registerUser = (user, history, next) => {
 }
 
 export const loginUser = (user, history, next, nextRoute) => {
-    Axios.post('http://localhost:4000/login', user)
+    Axios.post(process.env.BACKEND_SERVER + '/login', user)
         .then(res => {
             if (res) {
                 if (res.status === 200) {
