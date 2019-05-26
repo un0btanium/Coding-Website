@@ -70,7 +70,7 @@ export default class ExerciseView extends Component {
     }
 
     componentDidMount() {
-        Axios.get(process.env.BACKEND_SERVER + '/exercise/'+this.props.match.params.id)
+        Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/exercise/'+this.props.match.params.id)
             .then(response => {
                 this.setState({
                     id: response.data._id,
@@ -610,7 +610,7 @@ export default class ExerciseView extends Component {
         }
         console.log(exercise);
 
-        Axios.put(process.env.BACKEND_SERVER + '/exercise', exercise)
+        Axios.put(process.env.REACT_APP_BACKEND_SERVER + '/exercise', exercise)
         .then(res => {
             console.log(res.data);
             this.props.history.push('/exercises');
@@ -642,7 +642,7 @@ export default class ExerciseView extends Component {
             }
         };
 
-        Axios.post(process.env.BACKEND_SERVER + '/exercise/input', data, options)
+        Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/exercise/input', data, options)
             .then(response => {
                 if (response.status === 200) {
                     console.log(response);
@@ -698,7 +698,7 @@ export default class ExerciseView extends Component {
             }
         };
         
-        Axios.post(process.env.BACKEND_SERVER + '/exercise/run', data, options)
+        Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/exercise/run', data, options)
             .then(response => {
                 if (response.status === 200) {
                     console.log(response);

@@ -28,7 +28,7 @@ export const logoutUser = (history, next) => {
 }
 
 export const registerUser = (user, history, next) => {
-    Axios.post(process.env.BACKEND_SERVER + '/signup', user)
+    Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/signup', user)
         .then(res => {
             if (res.status === 201) {
                 console.log("Successfully registered!");
@@ -52,7 +52,7 @@ export const registerUser = (user, history, next) => {
 }
 
 export const loginUser = (user, history, next, nextRoute) => {
-    Axios.post(process.env.BACKEND_SERVER + '/login', user)
+    Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/login', user)
         .then(res => {
             if (res) {
                 if (res.status === 200) {

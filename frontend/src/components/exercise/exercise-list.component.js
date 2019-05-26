@@ -21,6 +21,7 @@ export default class ExerciseList extends Component {
     }
 
     componentDidMount() {
+        console.log(process.env.BACKEND_SERVER);
         Axios.get(process.env.BACKEND_SERVER + '/exercises/'+this.state.page)
             .then(response => {
                 this.setState({
