@@ -23,7 +23,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "rsync -avzhe ssh --progress ./build/* root@coding-buddy.mni.thm.de:/home/mgrb74/Coding-Website/frontend/build"
+    "deploy": "scp -r ./build/* root@coding-buddy.mni.thm.de:/home/mgrb74/Coding-Website/frontend/build"
   },
   "eslintConfig": {
     "extends": "react-app"
