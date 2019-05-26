@@ -41,7 +41,7 @@ let User = require('./models/user.model');
 app.use(cors());
 app.use(bodyParser.json());
 
-mongoose.connect('mongodb://127.0.0.1:' + MONGODB_PORT + '/exercises', { useNewUrlParser: true });
+mongoose.connect('mongodb://127.0.0.1:' + MONGODB_PORT + '/codingbuddy', { useNewUrlParser: true });
 const connection = mongoose.connection;
 connection.once('open', function () {
     console.log("MongoDB database connection established successfully!");
