@@ -51,7 +51,7 @@ connection.once('open', function () {
 let javaProcesses = new Object();
 
 app.post("/api/login", (req, res, next) => {
-    console.log(req.body);
+    // console.log(req.body);
     User.find({ email: req.body.email })
         .exec()
         .then(user => {
@@ -61,7 +61,7 @@ app.post("/api/login", (req, res, next) => {
                 });
             }
             bcrypt.compare(req.body.password, user[0].password, (err, result) => {
-                console.log(result);
+                // console.log(result);
                 if (err) {
                     return res.status(401).json({
                         message: "Auth failed"
@@ -120,7 +120,7 @@ app.post('/api/signup', (req, res, next) => {
                     } else {
                         let role = 'student';
                         if (User.count() === 0) {
-                            roles = 'admin';
+                            role = 'admin';
                         }
                         const user = new User({
                             email: req.body.email,
