@@ -45,7 +45,7 @@ export const registerUser = (user, history, next) => {
                 console.error(err);
                 next({
                     message: "Register failed!",
-                    errors: err.response.data
+                    errors: err
                 }, false);
             }
         });
