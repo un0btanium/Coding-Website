@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const os = require('os');
+const path = require('path');
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
@@ -352,7 +353,7 @@ app.route("/api/exercise/run")
 
                 let javaExe = "java";
                 if (os.platform() === 'win32') {
-                    javaExe = "C:\\Program Files\\Java\\jdk-10\\bin\\" + "java.exe"
+                    javaExe = "C:" + path.sep + "Program Files" + path.sep + "Java" + path.sep + "jdk-10" + path.sep + "bin" + path.sep + "java.exe";
                 }
                 let javaOptions = { maxBuffer: 1024*1024*1024 ,timeout: 10*1000, /* windowsHide: false */ };
 
@@ -366,7 +367,8 @@ app.route("/api/exercise/run")
 
                 res.dataArray = [];
 
-                let javaChild = spawn(javaExe, ["-jar", __dirname + "\\java\\executer.jar", JSON.stringify(arg)], javaOptions);
+
+                let javaChild = spawn(javaExe, ["-jar", __dirname + path.sep + "java" + path.sep + "executer.jar", JSON.stringify(arg)], javaOptions);
 
                 javaProcesses[userData.userId] = javaChild;
 
