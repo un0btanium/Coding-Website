@@ -50,7 +50,7 @@ connection.once('open', function () {
 
 let javaProcesses = new Object();
 
-app.post("/login", (req, res, next) => {
+app.post("/api/login", (req, res, next) => {
     console.log(req.body);
     User.find({ email: req.body.email })
         .exec()
@@ -99,7 +99,7 @@ app.post("/login", (req, res, next) => {
         });
 });
 
-app.post('/signup', (req, res, next) => {
+app.post('/api/signup', (req, res, next) => {
     if (!req.body) {
         return;
     }
@@ -148,7 +148,7 @@ app.post('/signup', (req, res, next) => {
 
 });
 
-app.get('/exercises/:page', function (req, res) {
+app.get('/api/exercises/:page', function (req, res) {
     const page = parseInt(req.params.page) || 0;
     // const options = { limit: 10, skip: page*10 };
     const options = {};
@@ -164,7 +164,7 @@ app.get('/exercises/:page', function (req, res) {
 
 
 
-app.route('/exercise/:id')
+app.route('/api/exercise/:id')
 
     .get(function (req, res) {
         let id = req.params.id;
@@ -193,7 +193,7 @@ app.route('/exercise/:id')
 
 
 
-app.route('/exercise')
+app.route('/api/exercise')
 
     .post((req, res, next) => checkAuth(req, res, next, ["admin", "maintainer"]), function (req, res) {
         let document = {
@@ -233,7 +233,7 @@ app.route('/exercise')
     });
 
 
-app.route("/exercise/input")
+app.route("/api/exercise/input")
 
     .post((req, res, next) => checkAuth(req, res, next), function (req, res) {
         let input = req.body.input;
@@ -321,7 +321,7 @@ app.route("/exercise/input")
         }
     });
 
-app.route("/exercise/run")
+app.route("/api/exercise/run")
 
     .post((req, res, next) => checkAuth(req, res, next), function (req, res) {
         let code_snippets = req.body.code_snippets;
