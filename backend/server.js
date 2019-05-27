@@ -119,27 +119,29 @@ app.post('/api/signup', (req, res, next) => {
                         });
                     } else {
                         let role = 'student';
-                        if (User.count() === 0) {
-                            role = 'admin';
-                        }
-                        const user = new User({
-                            email: req.body.email,
-                            password: hash,
-                            role: role
-                        });
-                        user
-                            .save()
-                            .then(result => {
-                                res.status(201).json({
-                                    message: "User created!"
-                                });
-                            })
-                            .catch(err => {
-                                console.log(err);
-                                res.status(500).json({
-                                    error: err
-                                });
+                        User.findOne().then(document => {
+                            if (document === null) {
+                                role = 'admin';
+                            }
+                            const user = new User({
+                                email: req.body.email,
+                                password: hash,
+                                role: role
                             });
+                            user
+                                .save()
+                                .then(result => {
+                                    res.status(201).json({
+                                        message: "User created!"
+                                    });
+                                })
+                                .catch(err => {
+                                    console.log(err);
+                                    res.status(500).json({
+                                        error: err
+                                    });
+                                });
+                        });
                     }
                 });
             }
