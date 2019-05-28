@@ -1,6 +1,7 @@
 
 
-
+- Encrypt password when sending via http
+- Fix editor highlighting when line numbers increase
 
 Code Simulator:
 - More code element highlighting
@@ -11,9 +12,6 @@ Code Simulator:
 - robuster machen (symbol solver mit verwenden)
 
 Features:
-- Language Server Protocoll (LSP) ?
--- Editor that supports LSP
---- Replace Ace Editor with Monaco Editor
 - More settings for exercises (features on/off)
 -- Filter (fixed, like how detailed, and auto-generated ones from the source code, like which and if methods should be stepped in or skipped) (use fixed Sliders instead)
 - Multi-page exercises

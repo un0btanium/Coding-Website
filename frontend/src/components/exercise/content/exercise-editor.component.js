@@ -15,13 +15,15 @@ export default class ExerciseEditor extends Component {
     render () {
         
         // TODO second first overlay box which displays the value of a variable or expression
+        // TODO add editor id name of node highlighting!! add check!
+
 
         let highlightOverlay = null;
-        if (this.props.result && this.props.result.steps && this.props.result.steps.length > 0 && this.props.step >= 0) {
+        if (this.props.highlighting) {
             // for (let i = 0; i < this.props.console_output.length; i++) {
             //     this.result.console_output[this.props.step]
             // }
-            let node = this.props.result.node_data[this.props.result.steps[this.props.step].id];
+            let node = this.props.highlighting;
             let sizeColumn = 9.9; //10.04166666666667;
             let sizeLine = 22;
 

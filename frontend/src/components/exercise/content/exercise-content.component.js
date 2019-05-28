@@ -21,8 +21,7 @@ export default class ExerciseContent extends Component {
         let deleteContent = this.props.deleteContent;
         let moveContent = this.props.moveContent;
         const mode = this.props.mode;
-        const result = this.props.result;
-        const step = this.props.step;
+        const highlighting = this.props.highlighting;
 
         let res = 
             this.props.content.map(function(currentContent, i) {
@@ -38,8 +37,6 @@ export default class ExerciseContent extends Component {
                                 moveContent={moveContent}
                                 content={currentContent}
                                 mode={mode}
-                                result={result}
-                                step={step}
                                 key={"ExerciseContent" + currentContent._id}
                             />;
                         break;
@@ -52,8 +49,6 @@ export default class ExerciseContent extends Component {
                                 moveContent={moveContent}
                                 content={currentContent}
                                 mode={mode}
-                                result={result}
-                                step={step}
                                 key={"ExerciseContent" + currentContent._id}
                             />;
                         break;
@@ -66,8 +61,6 @@ export default class ExerciseContent extends Component {
                                 moveContent={moveContent}
                                 content={currentContent}
                                 mode={mode}
-                                result={result}
-                                step={step}
                                 key={"ExerciseContent" + currentContent._id}
                             />;
                         break;
@@ -79,9 +72,8 @@ export default class ExerciseContent extends Component {
                                 deleteContent={deleteContent}
                                 moveContent={moveContent}
                                 content={currentContent}
+                                highlighting={highlighting}
                                 mode={mode}
-                                result={result}
-                                step={step}
                                 key={"ExerciseContent" + currentContent._id}
                             />;
                         break;
