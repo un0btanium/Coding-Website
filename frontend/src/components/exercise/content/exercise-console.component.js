@@ -133,11 +133,7 @@ export default class ExerciseConsole extends Component {
         
         return (
             <div  as={Row} style={{'marginBottom': '500px', 'marginTop': '30px', 'borderColor': '#666666', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%'}}>
-                {consoleField}
-                {htmlGui}
                 <div>
-                    {progressBar}
-                    {inputField}
                     <div style={{margin: '10px'}}>
                         <ButtonGroup style={{float: 'left'}}>
                             <Slider
@@ -202,7 +198,11 @@ export default class ExerciseConsole extends Component {
                             <Button style={{width: '150px'}} variant="success" onClick={this.runCode} >Run Code</Button>
                         </ButtonGroup>
                     </div>
+                    {progressBar}
+                    {inputField}
                 </div>
+                {consoleField}
+                {htmlGui}
             </div>
         );
     }
