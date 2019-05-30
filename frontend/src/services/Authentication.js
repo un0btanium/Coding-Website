@@ -1,6 +1,8 @@
 import Axios from 'axios';
 import jwt_decode from 'jwt-decode';
 
+import { log } from '../services/Logger';
+
 export const isAuthenticated = (allowedRoles) => {
     if (Axios.defaults.headers.common['Authorization']) {
         if(allowedRoles && allowedRoles.length > 0 && allowedRoles.indexOf(getUserData().role) === -1) {
@@ -31,9 +33,9 @@ export const registerUser = (user, history, next) => {
     Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/signup', user)
         .then(res => {
             if (res.status === 201) {
-                console.log("Successfully registered!");
+                log("Successfully registered!");
             } else {
-                console.log("Register failed with status code " + res.status);
+                console.error("Register failed with status code " + res.status);
             }
             if (res) {
                 history.push('/login')
@@ -56,9 +58,9 @@ export const loginUser = (user, history, next, nextRoute) => {
         .then(res => {
             if (res) {
                 if (res.status === 200) {
-                    console.log("Successfully logged in!");
+                    log("Successfully logged in!");
                 } else {
-                    console.log("Login failed with status code " + res.status);
+                    console.error("Login failed with status code " + res.status);
                 }
                 const decoded = login(res, history, nextRoute);
                 next(false, {
