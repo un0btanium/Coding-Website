@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import Axios from 'axios';
 
 import ExerciseContent from './content/exercise-content.component';
-import ExerciseConsole from './content/exercise-console.component';
+import ExerciseExecuter from './content/exercise-executer.component';
 
 
 export default class ExerciseSolve extends Component {
@@ -65,7 +65,7 @@ export default class ExerciseSolve extends Component {
                 <br />
                 <br />
 
-                <ExerciseConsole
+                <ExerciseExecuter
                     exerciseID={this.state.exerciseID}
                     content={this.state.content}
                     didChangeCode={this.state.didChangeCode}
