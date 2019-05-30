@@ -8,9 +8,13 @@ import { Form, Row, Col, ButtonGroup, DropdownButton, Dropdown, Button, Progress
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFastBackward, faStepBackward, faPlay, faPause, faStepForward, faFastForward } from '@fortawesome/free-solid-svg-icons';
 
+import { log, logError } from '../../../services/Logger';
+
 const BG = "primary"; // primary, dark, light
 const VARIANT = "dark"; // dark, light
 
+let consoleCache = {};
+const CACHE_STEPS = 100;
 
 let timeout = null;
 
@@ -55,13 +59,28 @@ export default class ExerciseConsole extends Component {
         let consoleMessages = "";
         let guiElements = null;
         if (this.state.result && this.state.step >= 0) {
-            for (let i = 0; i <= this.state.step; i++) {
+
+            // CONSOLE
+            let stepStart = 0;
+            let lastCachePoint = this.state.step - (this.state.step % CACHE_STEPS);
+            if (consoleCache[lastCachePoint] !== undefined) {
+                consoleMessages = consoleCache[lastCachePoint];
+                stepStart = lastCachePoint+1;
+            }
+
+            for (let i = stepStart; i <= this.state.step; i++) {
                 if (this.state.result.steps[i].type === "console") {
                     consoleMessages += this.state.result.steps[i].msg;
                 }
+                if (i % CACHE_STEPS === 0 && consoleCache[i] === undefined) {
+                    consoleCache[i] = consoleMessages;
+                }
             }
+
+
+            // HTML GUI
             if (this.state.result.steps[this.state.step].type === "htmlGui") {
-                // console.log(this.state.result.steps[this.state.step].guiElements);
+                log(this.state.result.steps[this.state.step].guiElements);
                 let onConsoleInput = this.onConsoleInput;
                 guiElements = this.state.result.steps[this.state.step].guiElements.map(function(guiRow, i) {
                     let guiRowElements = guiRow.map(function(guiElement, i) {
@@ -221,7 +240,6 @@ export default class ExerciseConsole extends Component {
 
 
     onConsoleInput(e, value) {
-        console.log(value);
         e.preventDefault()
 
         let data = {
@@ -240,15 +258,15 @@ export default class ExerciseConsole extends Component {
         Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/exercise/input', data, options)
             .then(response => {
                 if (response.status === 200) {
-                    console.log(response);
+                    log(response);
                     this.saveCodeResponse(response.data, this.state.result.steps.length-1);
                 } else {
-                    console.log(response);
+                    log(response);
                     // TODO stop code execution because something went wrong
                 }
             })
             .catch(function (error) {
-                console.error(error);
+                logError(error);
             });
     }
 
@@ -264,7 +282,7 @@ export default class ExerciseConsole extends Component {
                 step: 0
             });
             timeout = setTimeout(this.simulateNextStep, this.state.delay);
-            console.log("Rerun code!");
+            log("Rerun code!");
             return;
         }
 
@@ -282,7 +300,7 @@ export default class ExerciseConsole extends Component {
             code_snippets: code_snippets
         }
 
-        console.log(data);
+        log(data);
         
         let options = {
             timeout: 60*1000, // TODO adjust?
@@ -296,20 +314,21 @@ export default class ExerciseConsole extends Component {
         Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/exercise/run', data, options)
             .then(response => {
                 if (response.status === 200) {
-                    console.log(response);
+                    log(response);
                     this.saveCodeResponse(response.data, 0);
                 }
             })
             .catch(function (error) {
-                console.error(error);
+                logError(error);
             });
     }
 
     saveCodeResponse(json, startAtStep) {
 
-        console.log(json);
+        log(json);
 
         if (json && json.steps && json.steps.length > 0) {
+            consoleCache = {};
             if (timeout !== null) {
                 clearTimeout(timeout);
             }
@@ -337,7 +356,7 @@ export default class ExerciseConsole extends Component {
         // SAVE ENTIRE STATE DATA PER STEP (JSON LARGER BUT LESS SIMULATION ON THIS END REQUIRED, EASIER BACK AND FORTH)
         // OR SAVE CHANGES MADE ON EACH STEP (JSON SMALLER BUT HAVE TO SIMULATE ON THIS END. HAVE TO REDO OR SAVE PREVIOUS SIMULATED STATES, COULD ADD FILTER OR BREAKPOINTS)
         if (this.state.result && this.state.result.steps && this.state.result.steps.length > 0 && (this.state.step+1) < this.state.result.steps.length) {
-            console.log("step: " + this.state.step + " " + this.state.result.steps[this.state.step].valueType + " " + this.state.result.steps[this.state.step].value);
+            log("step: " + this.state.step + " " + this.state.result.steps[this.state.step].valueType + " " + this.state.result.steps[this.state.step].value);
             this.props.setHighlighting(this.state.result.node_data[this.state.result.steps[this.state.step+1].id]);
             this.setState({
                 step: this.state.step+1,
