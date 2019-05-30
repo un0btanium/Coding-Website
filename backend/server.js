@@ -261,10 +261,15 @@ app.route("/api/exercise/input")
 
                         let finalBuffer = Buffer.concat(buffers);
 
-                        let json = JSON.parse(finalBuffer.toString());
-                        if (json !== null && (json.isReadIn || json.isGuiReadIn)) {
-                            res.isDataSend = true;
-                            res.status(200).json(json);
+                        try {
+                            let json = JSON.parse(finalBuffer.toString()); // checks if it is the end of the json string, throws error if it isnt
+
+                            if (json !== null && (json.isReadIn || json.isGuiReadIn)) {
+                                res.isDataSend = true;
+                                res.status(200).json(json);
+                            }
+                        } catch (e) {
+                            console.error("Not the end of json string!");
                         }
                     } catch (e) {
                         console.error(e);
@@ -385,10 +390,15 @@ app.route("/api/exercise/run")
     
                             let finalBuffer = Buffer.concat(buffers);
                             
-                            let json = JSON.parse(finalBuffer.toString());
-                            if (json !== null && (json.isReadIn || json.isGuiReadIn)) {
-                                res.isDataSend = true;
-                                res.status(200).json(json);
+                            try {
+                                let json = JSON.parse(finalBuffer.toString()); // checks if it is the end of the json string, throws error if it
+
+                                if (json !== null && (json.isReadIn || json.isGuiReadIn)) {
+                                    res.isDataSend = true;
+                                    res.status(200).json(json);
+                                }
+                            } catch (e) {
+                                console.error("Not the end of json string!");
                             }
                         } catch (e) {
                             console.error(e);
