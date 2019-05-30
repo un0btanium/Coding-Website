@@ -18,10 +18,11 @@ export default class ExerciseContent extends Component {
 
         const onChangeExerciseAceEditor = this.props.onChangeExerciseAceEditor;
         const onChangeExerciseContent = this.props.onChangeExerciseContent;
-        let deleteContent = this.props.deleteContent;
-        let moveContent = this.props.moveContent;
+        const deleteContent = this.props.deleteContent;
+        const moveContent = this.props.moveContent;
         const mode = this.props.mode;
         const highlighting = this.props.highlighting;
+        const setHighlighting = this.props.setHighlighting;
 
         let res = 
             this.props.content.map(function(currentContent, i) {
@@ -72,6 +73,7 @@ export default class ExerciseContent extends Component {
                                 deleteContent={deleteContent}
                                 moveContent={moveContent}
                                 content={currentContent}
+                                setHighlighting={setHighlighting}
                                 highlighting={highlighting}
                                 mode={mode}
                                 key={"ExerciseContent" + currentContent._id}

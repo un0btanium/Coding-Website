@@ -58,6 +58,7 @@ export default class ExerciseSolve extends Component {
                     onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
                     deleteContent={this.deleteContent}
                     moveContent={this.moveContent}
+                    setHighlighting={this.setHighlighting}
                     highlighting={this.state.highlighting}
                 />
 
@@ -88,10 +89,9 @@ export default class ExerciseSolve extends Component {
             this.setState({content: newContent});
             if (key === "code" || key === "solution") {
                 this.setState({didChangeCode: true});
+                this.setHighlighting(null);
             }
         }
-
-
     }
 
     getIndexOfContent(id) {
@@ -127,9 +127,9 @@ export default class ExerciseSolve extends Component {
     }
 
 
-    setHighlighting(region) {
+    setHighlighting(highlighting) {
         this.setState({
-            highlighting: region
+            highlighting: highlighting
         });
     }
 

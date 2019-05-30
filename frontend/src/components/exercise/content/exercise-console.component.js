@@ -357,7 +357,10 @@ export default class ExerciseConsole extends Component {
         // OR SAVE CHANGES MADE ON EACH STEP (JSON SMALLER BUT HAVE TO SIMULATE ON THIS END. HAVE TO REDO OR SAVE PREVIOUS SIMULATED STATES, COULD ADD FILTER OR BREAKPOINTS)
         if (this.state.result && this.state.result.steps && this.state.result.steps.length > 0 && (this.state.step+1) < this.state.result.steps.length) {
             log("step: " + this.state.step + " " + this.state.result.steps[this.state.step].valueType + " " + this.state.result.steps[this.state.step].value);
-            this.props.setHighlighting(this.state.result.node_data[this.state.result.steps[this.state.step+1].id]);
+            this.props.setHighlighting({
+                node: this.state.result.node_data[this.state.result.steps[this.state.step+1].id],
+                step: this.state.result.steps[this.state.step+1]
+            });
             this.setState({
                 step: this.state.step+1,
                 isRunning: true
@@ -376,7 +379,10 @@ export default class ExerciseConsole extends Component {
             this.pauseSimulation();
         }
         if (this.state.result && this.state.result.steps && this.state.result.steps.length > 0) {
-            this.props.setHighlighting(this.state.result.node_data[this.state.result.steps[0].id]);
+            this.props.setHighlighting({
+                node: this.state.result.node_data[this.state.result.steps[0].id],
+                step: this.state.result.steps[0]
+            });
             this.setState({
                 step: 0
             });
@@ -389,12 +395,18 @@ export default class ExerciseConsole extends Component {
         }
         if (this.state.result && this.state.result.steps && this.state.result.steps.length > 0) {
             if ((this.state.step+1) < this.state.result.steps.length) {
-                this.props.setHighlighting(this.state.result.node_data[this.state.result.steps[this.state.step+1].id]);
+                this.props.setHighlighting({
+                    node: this.state.result.node_data[this.state.result.steps[this.state.step+1].id],
+                    step: this.state.result.steps[this.state.step+1]
+                });
                 this.setState({
                     step: this.state.step+1
                 });
             } else {
-                this.props.setHighlighting(this.state.result.node_data[this.state.result.steps[0].id]);
+                this.props.setHighlighting({
+                    node: this.state.result.node_data[this.state.result.steps[0].id],
+                    step: this.state.result.steps[0]
+                });
                 this.setState({
                     step: 0
                 });
@@ -408,7 +420,10 @@ export default class ExerciseConsole extends Component {
                 this.pauseSimulation();
             } else {
                 if (this.state.step === this.state.result.steps.length-1) {
-                    this.props.setHighlighting(this.state.result.node_data[this.state.result.steps[0].id]);
+                    this.props.setHighlighting({
+                        node: this.state.result.node_data[this.state.result.steps[0].id],
+                        step: this.state.result.steps[0]
+                    });
                     this.setState({
                         step: 0
                     });
@@ -433,12 +448,18 @@ export default class ExerciseConsole extends Component {
         }
         if (this.state.result && this.state.result.steps && this.state.result.steps.length > 0) {
             if ((this.state.step-1) >= 0) {
-                this.props.setHighlighting(this.state.result.node_data[this.state.result.steps[this.state.step-1].id]);
+                this.props.setHighlighting({
+                    node: this.state.result.node_data[this.state.result.steps[this.state.step-1].id],
+                    step: this.state.result.steps[this.state.step-1]
+                });
                 this.setState({
                     step: this.state.step-1
                 });
             } else {
-                this.props.setHighlighting(this.state.result.node_data[this.state.result.steps[this.state.result.steps.length-1].id]);
+                this.props.setHighlighting({
+                    node: this.state.result.node_data[this.state.result.steps[this.state.result.steps.length-1].id],
+                    step: this.state.result.steps[this.state.result.steps.length-1]
+                });
                 this.setState({
                     step: this.state.result.steps.length-1
                 });
@@ -451,7 +472,10 @@ export default class ExerciseConsole extends Component {
             this.pauseSimulation();
         }
         if (this.state.result && this.state.result.steps && this.state.result.steps.length > 0) {
-            this.props.setHighlighting(this.state.result.node_data[this.state.result.steps[this.state.result.steps.length-1].id]);
+            this.props.setHighlighting({
+                node: this.state.result.node_data[this.state.result.steps[this.state.result.steps.length-1].id],
+                step: this.state.result.steps[this.state.steps.length-1]
+            });
             this.setState({
                 step: this.state.result.steps.length-1
             });

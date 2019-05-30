@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import { Form, Container, Row, Col } from 'react-bootstrap';
+import { Form, Container, Row, Col, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 // import brace from 'brace';
 import AceEditor from 'react-ace';
@@ -23,7 +23,7 @@ export default class ExerciseEditor extends Component {
             // for (let i = 0; i < this.props.console_output.length; i++) {
             //     this.result.console_output[this.props.step]
             // }
-            let node = this.props.highlighting;
+            let node = this.props.highlighting.node;
             let sizeColumn = 9.9; //10.04166666666667;
             let sizeLine = 22;
 
@@ -35,7 +35,27 @@ export default class ExerciseEditor extends Component {
 
             // console.log(x + " " + y + " " + w + " " + h);
 
-            highlightOverlay = <div style={{position: 'relative', width: '100%', height: '100%'}}><div style={{position: 'absolute', width: w, height: h, left: x, top: y, backgroundColor: 'rgba(255,32,32,0.3)', zIndex: '2', pointerEvents: 'none'}}></div></div>;
+            highlightOverlay =
+                <div style={{position: 'relative', width: '100%', height: '100%'}}>
+                    <OverlayTrigger
+                        key="tooltopHighlighting"
+                        placement="top"
+                        delay={{'show': 0, 'hide': 128}}
+                        overlay={
+                            <Tooltip
+                                style={{maxWidth: '100%'}}
+                                id="tooltip-top"
+                            >
+                                <div style={{minWidth: '100px', wordWrap: 'break-word', textAlign: 'left', whiteSpace: 'pre'}}>
+                                    <span>{'type:   '+ this.props.highlighting.step.valueType}</span><br/>
+                                    <span>{'value: ' + this.props.highlighting.step.value}</span>
+                                </div>
+                            </Tooltip>
+                        }
+                    >
+                        <div style={{position: 'absolute', width: w, height: h, left: x, top: y, backgroundColor: 'rgba(255,32,32,0.3)', zIndex: '2', /* pointerEvents: 'none'*/}}></div>
+                    </OverlayTrigger>
+                </div>;
         }
 
         if (this.props.mode === "solve") {
@@ -51,6 +71,7 @@ export default class ExerciseEditor extends Component {
                         width='100%'
                         // cursorStart={1}
                         onChange={(value, e) => { this.props.onChange(e, value, this.props.content._id); }}
+                        onFocus={() => { this.props.setHighlighting(null) }}
                         editorProps={{$blockScrolling: Infinity}}
                         setOptions={{
                             enableBasicAutocompletion: true,
