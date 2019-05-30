@@ -43,7 +43,8 @@ export default class ExerciseExecuter extends Component {
             delay: 128,
             isRunning: false,
 
-            resetConsoleCache: false
+            resetConsoleCache: false,
+            containsReadIn: false
         }
     }
 
@@ -175,7 +176,8 @@ export default class ExerciseExecuter extends Component {
         };
         
         this.setState({
-            isExecutingOnServer: true
+            isExecutingOnServer: true,
+            containsReadIn: true
         });
 
         Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/exercise/input', data, options)
@@ -209,7 +211,7 @@ export default class ExerciseExecuter extends Component {
             return;
         }
 
-        if (!this.props.didChangeCode) {
+        if (!this.props.didChangeCode && !this.state.containsReadIn) {
             this.setState({
                 step: 0
             });
@@ -259,7 +261,8 @@ export default class ExerciseExecuter extends Component {
             })
             .finally(() => {
                 this.setState({
-                    isExecutingOnServer: false
+                    isExecutingOnServer: false,
+                    containsReadIn: false
                 });
             });
     }
@@ -272,8 +275,7 @@ export default class ExerciseExecuter extends Component {
             if (startAtStep === 0) {
                 this.setState({
                     resetConsoleCache: true,
-                    step: 0,
-                    isExecutingOnServer: false
+                    step: 0
                 });
             }
             if (timeout !== null) {
@@ -283,8 +285,7 @@ export default class ExerciseExecuter extends Component {
                 result: json,
                 step: startAtStep,
                 isRunning: true,
-                resetConsoleCache: false,
-                isExecutingOnServer: false
+                resetConsoleCache: false
             });
             this.props.onRanCode();
             timeout = setTimeout(this.simulateNextStep, this.state.delay);

@@ -51,7 +51,7 @@ export default class ExerciseConsole extends Component {
             
             if (this.props.result.isReadIn) {
                 inputField =
-                    <Form onSubmit={(e) => { this.props.onConsoleInput(e, this.state.consoleInputValue) }}>
+                    <Form onSubmit={(e) => { this.props.onConsoleInput(e, this.state.consoleInputValue); this.setState({ consoleInputValue: '' }); }}>
                         <Form.Group as={Row} className="form-group">
                             <Form.Label column sm={3} style={{marginTop: '15px', textAlign: 'right'}}><h5>Console Input:</h5></Form.Label>
                             <Col sm={7}>
@@ -74,7 +74,7 @@ export default class ExerciseConsole extends Component {
             return (
                 <div  as={Row} style={{'marginBottom': '50px', 'marginTop': '30px', 'borderColor': '#666666', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%'}}>
                     <Form.Control 
-                        style={{'fontFamily': 'Consolas,monaco,monospace'}}
+                        style={{'fontFamily': 'Consolas,monaco,monospace', color: '#FFFFFF', backgroundColor: '#000000'}}
                         as="textarea"
                         rows="10"
                         name="console_output_textarea"
