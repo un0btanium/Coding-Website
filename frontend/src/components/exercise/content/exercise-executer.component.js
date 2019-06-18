@@ -125,7 +125,7 @@ export default class ExerciseExecuter extends Component {
                                 <Button style={{width: '40px'}} bg={BG} variant={VARIANT} onClick={this.onLastStepClick}><FontAwesomeIcon icon={faFastForward} /></Button>
                             </ButtonGroup>
                             <ButtonGroup style={{float: 'right'}}>
-                                <Button style={{width: '150px'}} variant="success" onClick={this.runCode} >{this.state.isExecutingOnServer ? <span><FontAwesomeIcon icon={faSpinner} pulse={true} size="lg" /> Running...</span> : "Run Code"}</Button>
+                                <Button style={{width: '200px'}} variant="success" onClick={this.runCode} >{this.state.isExecutingOnServer ? <span><FontAwesomeIcon style={{ 'marginRight': '12px'}} icon={faSpinner} pulse={true} size="lg" />Running...</span> : "Run Code"}</Button>
                             </ButtonGroup>
                         </div>
                         {progressBar}
