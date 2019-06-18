@@ -19,7 +19,7 @@ export default class ExerciseEditor extends Component {
 
 
         let highlightOverlay = null;
-        if (this.props.highlighting) {
+        if (this.props.highlighting && this.props.highlighting.node !== undefined) {
             // for (let i = 0; i < this.props.console_output.length; i++) {
             //     this.result.console_output[this.props.step]
             // }
@@ -47,8 +47,14 @@ export default class ExerciseEditor extends Component {
                                 id="tooltip-top"
                             >
                                 <div style={{minWidth: '100px', wordWrap: 'break-word', textAlign: 'left', whiteSpace: 'pre'}}>
-                                    <span>{'type:   '+ this.props.highlighting.step.valueType}</span><br/>
-                                    <span>{'value: ' + this.props.highlighting.step.value}</span>
+                                    {this.props.highlighting.step.action ? <><span><h6>{this.props.highlighting.step.action}</h6></span></> : null}
+                                    {this.props.highlighting.step.name ? <><span>{'variable name:   '+ this.props.highlighting.step.name}</span><br/></> : null}
+                                    {this.props.highlighting.step.valueType ? <><span>{'type:     '+ this.props.highlighting.step.valueType}</span><br/></> : null}
+                                    {this.props.highlighting.step.value ? <><span>{'value:   ' + this.props.highlighting.step.value}</span><br/></> : null}
+                                    {this.props.highlighting.step.isPostfix ? <><span>{'isPostfix:   ' + this.props.highlighting.step.isPostfix}</span><br/></> : null}
+                                    {this.props.highlighting.step.valueBefore ? <><span>{'value (before):   ' + this.props.highlighting.step.valueBefore}</span><br/></> : null}
+                                    {this.props.highlighting.step.valueAfter ? <><span>{'value (after):   ' + this.props.highlighting.step.valueAfter}</span><br/></> : null}
+                                    
                                 </div>
                             </Tooltip>
                         }
