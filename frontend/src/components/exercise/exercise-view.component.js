@@ -15,6 +15,7 @@ export default class ExerciseView extends Component {
         super(props);
 
         this.onChangeMode = this.onChangeMode.bind(this);
+        this.setModeToSolve = this.setModeToSolve.bind(this);
 
         this.state = {
             mode: this.props.mode || "solve", // solve or edit
@@ -31,14 +32,14 @@ export default class ExerciseView extends Component {
             return (
                 <>
                     {modeToggle}
-                    <ExerciseEdit  exerciseID={this.props.match.params.id} history={this.props.history} />
+                    <ExerciseEdit  exerciseID={this.props.match.params.id} setModeToSolve={this.setModeToSolve} />
                 </>
             );
         } else {
             return (
                 <>
                     {modeToggle}
-                    <ExerciseSolve exerciseID={this.props.match.params.id} history={this.props.history} />
+                    <ExerciseSolve exerciseID={this.props.match.params.id} />
                 </>
             );
         }
@@ -47,8 +48,13 @@ export default class ExerciseView extends Component {
     onChangeMode(e) {
         this.setState({
             mode: e.target.checked ? "edit" : "solve"
-        })
-        
+        });
+    }
+
+    setModeToSolve(e) {
+        this.setState({
+            mode: "solve"
+        });
     }
 
 }

@@ -534,8 +534,8 @@ export default class ExerciseEdit extends Component {
         Axios.put(process.env.REACT_APP_BACKEND_SERVER + '/exercise', exercise)
         .then(res => {
             console.log(res.data);
-            if (this.props.history !== null) {
-                this.props.history.push('/exercise/solve/' + this.state.exerciseID);
+            if (res.status === 200) {
+                this.props.setModeToSolve();
             }
         });
     }
