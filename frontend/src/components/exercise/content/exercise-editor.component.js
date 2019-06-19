@@ -27,10 +27,10 @@ export default class ExerciseEditor extends Component {
             let sizeColumn = 9.9; //10.04166666666667;
             let sizeLine = 22;
 
-            let x = 46 + sizeColumn * (node.columnStart-1);
+            let x = 46 + sizeColumn * (node.columnStart-1) + sizeColumn * (('' + ((this.props.content.code.match(/\r\n|\r|\n/g) || '').length + 1)).length-1);
             let y = sizeLine * (node.lineStart-1-11); // -9
 
-            let w = sizeColumn * ((node.columnEnd - node.columnStart) + 1);
+            let w = sizeColumn * ((node.columnEnd - node.columnStart) + 1) + 2;
             let h = sizeLine * ((node.lineEnd-node.lineStart)+1);
 
             // console.log(x + " " + y + " " + w + " " + h);
