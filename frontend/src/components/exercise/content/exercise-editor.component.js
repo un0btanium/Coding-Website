@@ -35,6 +35,17 @@ export default class ExerciseEditor extends Component {
 
             // console.log(x + " " + y + " " + w + " " + h);
 
+            
+            // let rgba = 'rgba(20, 171, 255, 0.3)';
+            let rgba = 'rgba(255, 255, 32, 0.3)';
+            if (this.props.highlighting.step.valueType === "boolean" || this.props.highlighting.step.valueType === "Boolean") {
+                if (this.props.highlighting.step.value === "true") {
+                    rgba = 'rgba(32, 255, 32, 0.3)';
+                } else {
+                    rgba = 'rgba(255, 32, 32, 0.3)';
+                }
+            }
+
             highlightOverlay =
                 <div style={{position: 'relative', width: '100%', height: '100%'}}>
                     <OverlayTrigger
@@ -59,7 +70,7 @@ export default class ExerciseEditor extends Component {
                             </Tooltip>
                         }
                     >
-                        <div style={{position: 'absolute', width: w, height: h, left: x, top: y, backgroundColor: 'rgba(255,32,32,0.3)', zIndex: '2', /* pointerEvents: 'none'*/}}></div>
+                        <div style={{position: 'absolute', width: w, height: h, left: x, top: y, backgroundColor: rgba, zIndex: '2', /* pointerEvents: 'none'*/}}></div>
                     </OverlayTrigger>
                 </div>;
         }
