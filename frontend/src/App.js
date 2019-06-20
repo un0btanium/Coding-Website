@@ -40,6 +40,19 @@ class App extends Component {
     this.logOutUser = this.logOutUser.bind(this);
   }
 
+  componentDidMount() {
+    if (process.env.NODE_ENV === "development") {
+      const userCredentials = {
+        email: "admin@gmail.com",
+        password: "admin"
+      };
+      loginUser(userCredentials, this.props.history, (err, res) => {
+          if (res) {
+              this.updateUserData(res.data);
+          }
+      }, null);
+    }
+  }
 
   updateUserData(userData) {
     this.setState({
@@ -71,19 +84,30 @@ class App extends Component {
         };
         loginUser(userCredentials, this.props.history, (err, res) => {
             if (res) {
-                this.props.updateUserData(res.data);
+                this.updateUserData(res.data);
+    
+                // not authorized
+                const role = getUserData().role;
+                if(!role || (allowedRoles && allowedRoles.length > 0 && allowedRoles.indexOf(role) === -1)) {
+                  return <Redirect to={routeUnauthorized} />;
+                }
+    
+                return jsx;
             }
-        }, "/exercises");
+            // TODO err messages
+        }, null);
+        return jsx;
       }
+    } else {
+  
+      // not authorized
+      const role = getUserData().role;
+      if(!role || (allowedRoles && allowedRoles.length > 0 && allowedRoles.indexOf(role) === -1)) {
+        return <Redirect to={routeUnauthorized} />;
+      }
+  
+      return jsx;
     }
-
-    // not authorized
-    const role = getUserData().role;
-    if(!role || (allowedRoles && allowedRoles.length > 0 && allowedRoles.indexOf(role) === -1)) {
-      return <Redirect to={routeUnauthorized} />;
-    }
-
-    return jsx;
   }
 
   render() {

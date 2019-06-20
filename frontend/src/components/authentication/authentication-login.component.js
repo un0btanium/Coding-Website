@@ -89,7 +89,7 @@ export default class AuthenticationLogin extends Component {
             if (res) {
                 this.props.updateUserData(res.data);
             }
-        });
+        }, "/exercises");
     }
 
 }

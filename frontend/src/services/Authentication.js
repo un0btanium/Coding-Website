@@ -59,33 +59,43 @@ export const loginUser = (user, history, next, nextRoute) => {
             if (res) {
                 if (res.status === 200) {
                     log("Successfully logged in!");
+                    const decoded = login(res, history, nextRoute);
+                    next(false, {
+                        message: "Successfully logged in!",
+                        data: decoded
+                    });
                 } else {
                     console.error("Login failed with status code " + res.status);
+                    next({
+                        message: "Login failed!",
+                        // errors: err.response.data
+                        // TODO errors
+                    }, false);
                 }
-                const decoded = login(res, history, nextRoute);
-                next(false, {
-                    message: "Successfully logged in!",
-                    data: decoded
-                });
             }
         })
         .catch(err => {
             if (err) {
+                console.error("Login failed! Catched error!");
+                console.error(err);
                 next({
                     message: "Login failed!",
                     // errors: err.response.data
+                    // TODO errors
                 }, false);
             }
         });
 }
 
 const login = (res, history, nextRoute) => {
-    nextRoute = nextRoute || "/exercises";
+    // nextRoute = nextRoute || "/exercises";
     const { token } = res.data;
     // localStorage.setItem('jwtToken', token);
     setAuthToken(token);
     const decoded = jwt_decode(token);
-    history.push(nextRoute);
+    if (nextRoute !== null) {
+        history.push(nextRoute);
+    }
     return decoded;
 }
 
