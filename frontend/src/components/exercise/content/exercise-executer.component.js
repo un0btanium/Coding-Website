@@ -12,6 +12,7 @@ import ExerciseConsole from './exercise-console.component';
 import ExerciseHTMLGUI from './exercise-htmlgui.component';
 
 import { log, logError } from '../../../services/Logger';
+import lzstring from 'lz-string';
 
 const BG = "primary"; // primary, dark, light
 const VARIANT = "dark"; // dark, ligh
@@ -184,7 +185,7 @@ export default class ExerciseExecuter extends Component {
             .then(response => {
                 if (response.status === 200) {
                     log(response);
-                    this.saveCodeResponse(response.data, this.state.result.steps.length-1);
+                    this.saveCodeResponse(response.data.compressedJson, this.state.result.steps.length-1);
                 } else {
                     log(response);
                     // TODO stop code execution because something went wrong
@@ -253,7 +254,7 @@ export default class ExerciseExecuter extends Component {
             .then(response => {
                 if (response.status === 200) {
                     log(response);
-                    this.saveCodeResponse(response.data, 0);
+                    this.saveCodeResponse(response.data.compressedJson, 0);
                 }
             })
             .catch(function (error) {
@@ -267,7 +268,19 @@ export default class ExerciseExecuter extends Component {
             });
     }
 
-    saveCodeResponse(json, startAtStep) {
+    saveCodeResponse(compressedJson, startAtStep) {
+        let json = null;
+
+        if (compressedJson) {
+            try {
+                json = JSON.parse(lzstring.decompressFromBase64(compressedJson));
+            } catch (e) {
+                logError(e);
+                return;
+            }
+        } else {
+            return;
+        }
 
         log(json);
 

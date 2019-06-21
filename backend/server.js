@@ -6,6 +6,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const os = require('os');
 const path = require('path');
+const lzstring = require('lz-string');
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
@@ -267,8 +268,13 @@ app.route("/api/exercise/input")
                                 let json = JSON.parse(jsonString); // checks if it is the end of the json string, throws error if it isnt
                                 
                                 if (json !== null && (json.isReadIn || json.isGuiReadIn)) {
+                                    let compressedJson = lzstring.compressToBase64(jsonString);
+                                    let jsonMessage = {
+                                        compressedJson: compressedJson
+                                    };
+                                    
                                     res.isDataSend = true;
-                                    res.status(200).json(json);
+                                    res.status(200).json(jsonMessage);
                                 }
                             }
                         } catch (e) {
@@ -313,9 +319,15 @@ app.route("/api/exercise/input")
                 try {
                     let jsonString = finalBuffer.toString()
                     if (jsonString.includes("}",jsonString.length-4)) {
-                        let json = JSON.parse(jsonString);
+                        JSON.parse(jsonString); // checks if this is valid json
+
+                        let compressedJson = lzstring.compressToBase64(jsonString);
+                        let jsonMessage = {
+                            compressedJson: compressedJson
+                        };
+                        
                         res.isDataSend = true;
-                        res.status(200).json(json);
+                        res.status(200).json(jsonMessage);
                     }
                 } catch (e) {
                     console.error(e);
@@ -402,8 +414,13 @@ app.route("/api/exercise/run")
                                     let json = JSON.parse(jsonString); // checks if it is the end of the json string, throws error if it
     
                                     if (json !== null && (json.isReadIn || json.isGuiReadIn)) {
+                                        let compressedJson = lzstring.compressToBase64(jsonString);
+                                        let jsonMessage = {
+                                            compressedJson: compressedJson
+                                        };
+                                        
                                         res.isDataSend = true;
-                                        res.status(200).json(json);
+                                        res.status(200).json(jsonMessage);
                                     }
                                 }
                             } catch (e) {
@@ -447,9 +464,15 @@ app.route("/api/exercise/run")
                     try {
                         let jsonString = finalBuffer.toString()
                         if (jsonString.includes("}",jsonString.length-4)) {
-                            let json = JSON.parse(jsonString);
+                            JSON.parse(jsonString); // checks if this is valid json
+
+                            let compressedJson = lzstring.compressToBase64(jsonString);
+                            let jsonMessage = {
+                                compressedJson: compressedJson
+                            };
+
                             res.isDataSend = true;
-                            res.status(200).json(json);
+                            res.status(200).json(jsonMessage);
                         }
                     } catch (e) {
                         console.error(e);
