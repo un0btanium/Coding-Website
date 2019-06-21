@@ -262,11 +262,14 @@ app.route("/api/exercise/input")
                         let finalBuffer = Buffer.concat(buffers);
 
                         try {
-                            let json = JSON.parse(finalBuffer.toString()); // checks if it is the end of the json string, throws error if it isnt
-
-                            if (json !== null && (json.isReadIn || json.isGuiReadIn)) {
-                                res.isDataSend = true;
-                                res.status(200).json(json);
+                            let jsonString = finalBuffer.toString()
+                            if (jsonString.includes("}",jsonString.length-4)) {
+                                let json = JSON.parse(jsonString); // checks if it is the end of the json string, throws error if it isnt
+                                
+                                if (json !== null && (json.isReadIn || json.isGuiReadIn)) {
+                                    res.isDataSend = true;
+                                    res.status(200).json(json);
+                                }
                             }
                         } catch (e) {
                             console.error("Not the end of json string!");
@@ -308,9 +311,12 @@ app.route("/api/exercise/input")
 
                 // console.log(finalBuffer.toString());
                 try {
-                    let json = JSON.parse(finalBuffer.toString());
-                    res.isDataSend = true;
-                    res.status(200).json(json);
+                    let jsonString = finalBuffer.toString()
+                    if (jsonString.includes("}",jsonString.length-4)) {
+                        let json = JSON.parse(jsonString);
+                        res.isDataSend = true;
+                        res.status(200).json(json);
+                    }
                 } catch (e) {
                     console.error(e);
                     res.isDataSend = true;
@@ -391,11 +397,14 @@ app.route("/api/exercise/run")
                             let finalBuffer = Buffer.concat(buffers);
                             
                             try {
-                                let json = JSON.parse(finalBuffer.toString()); // checks if it is the end of the json string, throws error if it
-
-                                if (json !== null && (json.isReadIn || json.isGuiReadIn)) {
-                                    res.isDataSend = true;
-                                    res.status(200).json(json);
+                                let jsonString = finalBuffer.toString()
+                                if (jsonString.includes("}",jsonString.length-4)) {
+                                    let json = JSON.parse(jsonString); // checks if it is the end of the json string, throws error if it
+    
+                                    if (json !== null && (json.isReadIn || json.isGuiReadIn)) {
+                                        res.isDataSend = true;
+                                        res.status(200).json(json);
+                                    }
                                 }
                             } catch (e) {
                                 console.error("Not the end of json string!");
@@ -436,9 +445,12 @@ app.route("/api/exercise/run")
     
                     // console.log(finalBuffer.toString());
                     try {
-                        let json = JSON.parse(finalBuffer.toString());
-                        res.isDataSend = true;
-                        res.status(200).json(json);
+                        let jsonString = finalBuffer.toString()
+                        if (jsonString.includes("}",jsonString.length-4)) {
+                            let json = JSON.parse(jsonString);
+                            res.isDataSend = true;
+                            res.status(200).json(json);
+                        }
                     } catch (e) {
                         console.error(e);
                         res.isDataSend = true;
