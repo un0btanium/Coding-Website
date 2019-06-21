@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import { Form, Container, Row, Col, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Form, Container, Row, Col, OverlayTrigger, Popover } from 'react-bootstrap';
 
 // import brace from 'brace';
 import AceEditor from 'react-ace';
@@ -47,27 +47,25 @@ export default class ExerciseEditor extends Component {
             }
 
             highlightOverlay =
-                <div style={{position: 'relative', width: '100%', height: '100%'}}>
+                <div style={{position: 'relative'}}>
                     <OverlayTrigger
-                        key="tooltopHighlighting"
+                        key="tooltipOverlayHighlighting"
                         placement="top"
                         delay={{'show': 0, 'hide': 128}}
                         overlay={
-                            <Tooltip
-                                style={{maxWidth: '100%'}}
-                                id="tooltip-top"
+                            <Popover
+                                style={{ background: 'rgba(0,0,0, 0.8)', backgroundColor: 'rgba(0,0,0, 0.8)', textAlign: 'left', wordBreak: 'keep-all', whiteSpace: 'pre'}}
+                                // arrowProps={style="{{background: 'rgba(0,0,0, 0.8)'}}"}
+                                id="tooltipHighlighting"
                             >
-                                <div style={{minWidth: '100px', wordWrap: 'break-word', textAlign: 'left', whiteSpace: 'pre'}}>
-                                    {this.props.highlighting.step.action ? <><span><h6>{this.props.highlighting.step.action}</h6></span></> : null}
-                                    {this.props.highlighting.step.name ? <><span>{'variable name:   '+ this.props.highlighting.step.name}</span><br/></> : null}
-                                    {this.props.highlighting.step.valueType ? <><span>{'type:     '+ this.props.highlighting.step.valueType}</span><br/></> : null}
-                                    {this.props.highlighting.step.value ? <><span>{'value:   ' + this.props.highlighting.step.value}</span><br/></> : null}
-                                    {this.props.highlighting.step.isPostfix ? <><span>{'isPostfix:   ' + this.props.highlighting.step.isPostfix}</span><br/></> : null}
-                                    {this.props.highlighting.step.valueBefore ? <><span>{'value (before):   ' + this.props.highlighting.step.valueBefore}</span><br/></> : null}
-                                    {this.props.highlighting.step.valueAfter ? <><span>{'value (after):   ' + this.props.highlighting.step.valueAfter}</span><br/></> : null}
-                                    
-                                </div>
-                            </Tooltip>
+                                {this.props.highlighting.step.action ? <><span><h6>{this.props.highlighting.step.action}</h6></span></> : null}
+                                {this.props.highlighting.step.name ? <><span>{'variable name:   '+ this.props.highlighting.step.name}</span><br/></> : null}
+                                {this.props.highlighting.step.valueType ? <><span>{'type:     '+ this.props.highlighting.step.valueType}</span><br/></> : null}
+                                {this.props.highlighting.step.value ? <><span>{'value:   ' + this.props.highlighting.step.value}</span><br/></> : null}
+                                {this.props.highlighting.step.isPostfix ? <><span>{'isPostfix:   ' + this.props.highlighting.step.isPostfix}</span><br/></> : null}
+                                {this.props.highlighting.step.valueBefore ? <><span>{'value (before):   ' + this.props.highlighting.step.valueBefore}</span><br/></> : null}
+                                {this.props.highlighting.step.valueAfter ? <><span>{'value (after):   ' + this.props.highlighting.step.valueAfter}</span><br/></> : null}
+                            </Popover>
                         }
                     >
                         <div style={{position: 'absolute', width: w, height: h, left: x, top: y, backgroundColor: rgba, zIndex: '2', /* pointerEvents: 'none'*/}}></div>
