@@ -57,9 +57,9 @@ export default class ExerciseExecuter extends Component {
 
         let progressBar = null;
         if (this.state.result && this.state.result.steps) {
-            progressBar = <ProgressBar style={{height: '15px' }} min={0} max={this.state.result.steps.length} now={this.state.step+1} label={(this.state.step+1) + "/" + this.state.result.steps.length}></ProgressBar>;
+            progressBar = <ProgressBar style={{height: '10px' }} min={0} max={this.state.result.steps.length} now={this.state.step+1} label={(this.state.step+1) + "/" + this.state.result.steps.length}></ProgressBar>;
         } else {
-            progressBar = <div style={{height: '15px', backgroundColor: '#4e5d6d'}}></div>
+            // progressBar = <div style={{height: '10px', backgroundColor: '#4e5d6d'}}></div>
         }
         
         let runCodeButton = <Button style={{width: '230px'}} variant="success" onClick={this.runCode} >Run Code</Button>
