@@ -19,7 +19,7 @@ export default class ExerciseEditor extends Component {
 
 
         let highlightOverlay = null;
-        if (this.props.highlighting && this.props.highlighting.node !== undefined) {
+        if (this.props.highlighting && this.props.highlighting.node !== undefined && this.props.highlighting.node.identifier === this.props.content.identifier) {
             // for (let i = 0; i < this.props.console_output.length; i++) {
             //     this.result.console_output[this.props.step]
             // }
@@ -28,10 +28,18 @@ export default class ExerciseEditor extends Component {
             let sizeLine = 22;
 
             let x = 46 + sizeColumn * (node.columnStart-1) + sizeColumn * (('' + ((this.props.content.code.match(/\r\n|\r|\n/g) || '').length + 1)).length-1);
-            let y = sizeLine * (node.lineStart-1-11); // -9
+            let y = sizeLine * node.lineStart;
 
-            let w = sizeColumn * ((node.columnEnd - node.columnStart) + 1) + 2;
-            let h = sizeLine * ((node.lineEnd-node.lineStart)+1);
+            let w;
+            let h;
+            if (node.lineStart === node.lineEnd) {
+                w = sizeColumn * ((node.columnEnd - node.columnStart) + 1) + 2;
+                h = sizeLine;
+            } else {
+                w = sizeColumn * ((node.columnStart+node.columnEnd) - 1) + 2;
+                h = sizeLine * ((node.lineEnd - node.lineStart) + 1) + 2;
+            }
+
 
             // console.log(x + " " + y + " " + w + " " + h);
 

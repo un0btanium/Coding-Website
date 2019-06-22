@@ -376,7 +376,7 @@ app.route("/api/exercise/run")
 
                 let javaExe = "java";
                 if (os.platform() === 'win32') {
-                    javaExe = "C:" + path.sep + "Program Files" + path.sep + "Java" + path.sep + "jdk-10" + path.sep + "bin" + path.sep + "java.exe";
+                    javaExe = "C:" + path.sep + "Program Files" + path.sep + "Java" + path.sep + "jdk-11" + path.sep + "bin" + path.sep + "java.exe";
                 }
                 let javaOptions = { maxBuffer: 1024*1024*1024 ,timeout: 10*1000, /* windowsHide: false */ };
 
@@ -462,7 +462,7 @@ app.route("/api/exercise/run")
     
                     // console.log(finalBuffer.toString());
                     try {
-                        let jsonString = finalBuffer.toString()
+                        let jsonString = finalBuffer.toString();
                         if (jsonString.includes("}",jsonString.length-4)) {
                             JSON.parse(jsonString); // checks if this is valid json
 
