@@ -62,6 +62,14 @@ export default class ExerciseExecuter extends Component {
             progressBar = <div style={{height: '15px', backgroundColor: '#4e5d6d'}}></div>
         }
         
+        let runCodeButton = <Button style={{width: '230px'}} variant="success" onClick={this.runCode} >Run Code</Button>
+        if (this.state.isExecutingOnServer) {
+            runCodeButton = <Button style={{width: '230px'}} variant="success" onClick={this.runCode} ><span><FontAwesomeIcon style={{ 'marginRight': '12px'}} icon={faSpinner} pulse={true} size="lg" />Running...</span></Button>
+        } else if (this.state.result && (this.state.result.isGuiReadIn || this.state.result.isReadIn)) {
+            runCodeButton = <Button style={{width: '230px'}} variant="success" onClick={this.runCode} ><span><FontAwesomeIcon style={{ 'marginRight': '12px'}} icon={faSpinner} pulse={true} size="lg" />Waiting for User Input...</span></Button>
+        }
+
+
         let consoleComponent = 
             <ExerciseConsole
                 result={this.state.result}
@@ -140,7 +148,7 @@ export default class ExerciseExecuter extends Component {
                         <Button style={{width: '40px'}} bg={BG} variant={VARIANT} onClick={this.onLastStepClick}><FontAwesomeIcon icon={faFastForward} /></Button>
                     </ButtonGroup>
                     <ButtonGroup style={{float: 'right'}}>
-                        <Button style={{width: '200px'}} variant="success" onClick={this.runCode} >{this.state.isExecutingOnServer ? <span><FontAwesomeIcon style={{ 'marginRight': '12px'}} icon={faSpinner} pulse={true} size="lg" />Running...</span> : "Run Code"}</Button>
+                        {runCodeButton}
                     </ButtonGroup>
                 </div>
                 {progressBar}
