@@ -45,7 +45,7 @@ export default class ExerciseSolve extends Component {
 
     render () {
         return (
-            <div style={{marginTop: '50px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
+            <div style={{marginTop: '60px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
                 <h3>{this.state.name}</h3>
 
                 <br />

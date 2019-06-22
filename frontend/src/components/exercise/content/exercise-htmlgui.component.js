@@ -44,7 +44,7 @@ export default class ExerciseHTMLGUI extends Component {
             });
 
             return (
-                <div  as={Row} style={{'marginBottom': '50px', 'marginTop': '30px', 'borderColor': '#666666', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%'}}>
+                <div  as={Row} style={{'width': '88%', margin: '40px 50px'}}>
                     {guiElements}
                 </div>
             );

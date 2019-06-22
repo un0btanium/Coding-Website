@@ -57,93 +57,109 @@ export default class ExerciseExecuter extends Component {
 
         let progressBar = null;
         if (this.state.result && this.state.result.steps) {
-            progressBar = <ProgressBar style={{height: '15px', marginLeft: '1px', marginRight: '1px'}} min={0} max={this.state.result.steps.length} now={this.state.step+1} label={(this.state.step+1) + "/" + this.state.result.steps.length}></ProgressBar>;
+            progressBar = <ProgressBar style={{height: '15px' }} min={0} max={this.state.result.steps.length} now={this.state.step+1} label={(this.state.step+1) + "/" + this.state.result.steps.length}></ProgressBar>;
+        } else {
+            progressBar = <div style={{height: '15px', backgroundColor: '#4e5d6d'}}></div>
         }
         
+        let consoleComponent = 
+            <ExerciseConsole
+                result={this.state.result}
+                step={this.state.step}
+                onConsoleInput={this.onConsoleInput}
+                resetConsoleCache={this.state.resetConsoleCache}
+            />
+
+        let HTMLGUIComponent = 
+            <ExerciseHTMLGUI
+                result={this.state.result}
+                step={this.state.step}
+                onConsoleInput={this.onConsoleInput}
+            />
+
+        let hud = 
+            <div>
+                <div style={{margin: '10px'}}>
+                    <ButtonGroup style={{float: 'left'}}>
+                        <Slider
+                            mode={1}
+                            step={1}
+                            domain={[0, 5]}
+                            rootStyle={{position: 'relative', width: '200px', height: '40px', touchAction: 'none'}}
+                            // onChange={this.onChangeSlider}
+                            values={[1]}
+                        >
+                            <Rail>
+                            {({ getRailProps }) => (  // adding the rail props sets up events on the rail
+                                <div style={{position: 'absolute', width: '100%', height: '10px', marginTop: '15px', borderRadius: '5px', backgroundColor: '#4e5d6c'}} {...getRailProps()} /> 
+                            )}
+                            </Rail>
+                            <Handles>
+                                {({ handles, getHandleProps }) => (
+                                    <div className="slider-handles">
+                                        {handles.map(handle => (
+                                            <Handle
+                                            key={handle.id}
+                                            handle={handle}
+                                            getHandleProps={getHandleProps}
+                                        />
+                                        ))}
+                                    </div>
+                                )}
+                            </Handles>
+                            <Tracks right={false}>
+                                {({ tracks, getTrackProps }) => (
+                                    <div className="slider-tracks">
+                                    {tracks.map(({ id, source, target }) => (
+                                        <Track
+                                        key={id}
+                                        source={source}
+                                        target={target}
+                                        getTrackProps={getTrackProps}
+                                        />
+                                    ))}
+                                    </div>
+                                )}
+                            </Tracks>
+                        </Slider>
+                    </ButtonGroup>
+                    <ButtonGroup style={{marginLeft: '12%'}}>
+                        <Button style={{width: '40px'}} bg={BG} variant={VARIANT} onClick={this.onFirstStepClick}><FontAwesomeIcon icon={faFastBackward} /></Button>
+                        <Button style={{width: '40px'}} bg={BG} variant={VARIANT} onClick={this.onPreviousStepClick}><FontAwesomeIcon icon={faStepBackward} /></Button>
+                        <ButtonGroup>
+                            <Button style={{width: '40px'}} bg={BG} variant={VARIANT} onClick={this.onPauseUnpauseClick}>{this.state.isRunning ? <FontAwesomeIcon icon={faPause} /> : <FontAwesomeIcon icon={faPlay} />}</Button>
+                            <DropdownButton bg={BG} variant={VARIANT} onChange={this.onSimulationSpeedChange} id="dropdown-speed-button">
+                                <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 32 ? true : false} eventKey="32">32ms</Dropdown.Item>
+                                <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 64 ? true : false} eventKey="64">64ms</Dropdown.Item>
+                                <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 128 ? true : false} eventKey="128">128ms</Dropdown.Item>
+                                <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 256 ? true : false} eventKey="256">256ms</Dropdown.Item>
+                                <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 512 ? true : false} eventKey="512">512ms</Dropdown.Item>
+                            </DropdownButton>
+                        </ButtonGroup>
+                        <Button style={{width: '40px'}} bg={BG} variant={VARIANT} onClick={this.onNextStepClick}><FontAwesomeIcon icon={faStepForward} /></Button>
+                        <Button style={{width: '40px'}} bg={BG} variant={VARIANT} onClick={this.onLastStepClick}><FontAwesomeIcon icon={faFastForward} /></Button>
+                    </ButtonGroup>
+                    <ButtonGroup style={{float: 'right'}}>
+                        <Button style={{width: '200px'}} variant="success" onClick={this.runCode} >{this.state.isExecutingOnServer ? <span><FontAwesomeIcon style={{ 'marginRight': '12px'}} icon={faSpinner} pulse={true} size="lg" />Running...</span> : "Run Code"}</Button>
+                    </ButtonGroup>
+                </div>
+                {progressBar}
+                {consoleComponent}
+                {HTMLGUIComponent}
+            </div>
+        
+        
+        let hudWrapper =
+            <div  as={Row} style={{ position: 'sticky', zIndex: '10', bottom: '-8px', backgroundColor: '#2b3e50', borderColor: '#df691a', borderRadius: '0px', borderWidth: '8px', borderStyle: 'solid'}}>
+                {hud}
+            </div>
         
         return (
+            <>
+            {hudWrapper}
             <div style={{'marginBottom': '500px'}}>
-                <div  as={Row} style={{ 'marginTop': '30px', 'borderColor': '#666666', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%'}}>
-                    <div>
-                        <div style={{margin: '10px'}}>
-                            <ButtonGroup style={{float: 'left'}}>
-                                <Slider
-                                    mode={1}
-                                    step={1}
-                                    domain={[0, 5]}
-                                    rootStyle={{position: 'relative', width: '200px', height: '40px', touchAction: 'none'}}
-                                    // onChange={this.onChangeSlider}
-                                    values={[1]}
-                                >
-                                    <Rail>
-                                    {({ getRailProps }) => (  // adding the rail props sets up events on the rail
-                                        <div style={{position: 'absolute', width: '100%', height: '10px', marginTop: '15px', borderRadius: '5px', backgroundColor: '#4e5d6c'}} {...getRailProps()} /> 
-                                    )}
-                                    </Rail>
-                                    <Handles>
-                                        {({ handles, getHandleProps }) => (
-                                            <div className="slider-handles">
-                                                {handles.map(handle => (
-                                                    <Handle
-                                                    key={handle.id}
-                                                    handle={handle}
-                                                    getHandleProps={getHandleProps}
-                                                />
-                                                ))}
-                                            </div>
-                                        )}
-                                    </Handles>
-                                    <Tracks right={false}>
-                                        {({ tracks, getTrackProps }) => (
-                                            <div className="slider-tracks">
-                                            {tracks.map(({ id, source, target }) => (
-                                                <Track
-                                                key={id}
-                                                source={source}
-                                                target={target}
-                                                getTrackProps={getTrackProps}
-                                                />
-                                            ))}
-                                            </div>
-                                        )}
-                                    </Tracks>
-                                </Slider>
-                            </ButtonGroup>
-                            <ButtonGroup style={{marginLeft: '12%'}}>
-                                <Button style={{width: '40px'}} bg={BG} variant={VARIANT} onClick={this.onFirstStepClick}><FontAwesomeIcon icon={faFastBackward} /></Button>
-                                <Button style={{width: '40px'}} bg={BG} variant={VARIANT} onClick={this.onPreviousStepClick}><FontAwesomeIcon icon={faStepBackward} /></Button>
-                                <ButtonGroup>
-                                    <Button style={{width: '40px'}} bg={BG} variant={VARIANT} onClick={this.onPauseUnpauseClick}>{this.state.isRunning ? <FontAwesomeIcon icon={faPause} /> : <FontAwesomeIcon icon={faPlay} />}</Button>
-                                    <DropdownButton bg={BG} variant={VARIANT} onChange={this.onSimulationSpeedChange} id="dropdown-speed-button">
-                                        <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 32 ? true : false} eventKey="32">32ms</Dropdown.Item>
-                                        <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 64 ? true : false} eventKey="64">64ms</Dropdown.Item>
-                                        <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 128 ? true : false} eventKey="128">128ms</Dropdown.Item>
-                                        <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 256 ? true : false} eventKey="256">256ms</Dropdown.Item>
-                                        <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 512 ? true : false} eventKey="512">512ms</Dropdown.Item>
-                                    </DropdownButton>
-                                </ButtonGroup>
-                                <Button style={{width: '40px'}} bg={BG} variant={VARIANT} onClick={this.onNextStepClick}><FontAwesomeIcon icon={faStepForward} /></Button>
-                                <Button style={{width: '40px'}} bg={BG} variant={VARIANT} onClick={this.onLastStepClick}><FontAwesomeIcon icon={faFastForward} /></Button>
-                            </ButtonGroup>
-                            <ButtonGroup style={{float: 'right'}}>
-                                <Button style={{width: '200px'}} variant="success" onClick={this.runCode} >{this.state.isExecutingOnServer ? <span><FontAwesomeIcon style={{ 'marginRight': '12px'}} icon={faSpinner} pulse={true} size="lg" />Running...</span> : "Run Code"}</Button>
-                            </ButtonGroup>
-                        </div>
-                        {progressBar}
-                    </div>
-                </div>
-                <ExerciseConsole
-                    result={this.state.result}
-                    step={this.state.step}
-                    onConsoleInput={this.onConsoleInput}
-                    resetConsoleCache={this.state.resetConsoleCache}
-                />
-                <ExerciseHTMLGUI
-                    result={this.state.result}
-                    step={this.state.step}
-                    onConsoleInput={this.onConsoleInput}
-                />
             </div>
+            </>
         );
     }
 
@@ -162,6 +178,13 @@ export default class ExerciseExecuter extends Component {
 
     onConsoleInput(e, value) {
         e.preventDefault()
+
+        if (this.state.result) {
+            let type = this.state.result.steps[this.state.step].type;
+            if (type && type === "htmlGui" && this.state.step !== this.state.result.steps.length-1) {
+                return; // prevent sending data when on wrong gui step
+            }
+        }
 
         let data = {
             input: ''+value

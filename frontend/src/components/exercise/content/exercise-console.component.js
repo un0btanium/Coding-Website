@@ -48,6 +48,11 @@ export default class ExerciseConsole extends Component {
                     log("Saving console cache " + i);
                 }
             }
+
+            let type = this.props.result.steps[this.props.step].type;
+            if (type && type === "htmlGui") {
+                return null; // only print html gui, not console
+            }
             
             if (this.props.result.isReadIn) {
                 inputField =
@@ -59,7 +64,7 @@ export default class ExerciseConsole extends Component {
                                     autoFocus
                                     style={{marginTop: '15px', color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
                                     plaintext="true"
-                                    autoComplete="off"
+                                    autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck="false"
                                     type="text"
                                     className="form-control"
                                     placeholder="Enter input"
@@ -72,11 +77,12 @@ export default class ExerciseConsole extends Component {
             }
 
             return (
-                <div  as={Row} style={{'marginBottom': '50px', 'marginTop': '30px', 'borderColor': '#666666', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%'}}>
+                <div  as={Row} style={{'width': '100%'}}>
                     <Form.Control 
-                        style={{'fontFamily': 'Consolas,monaco,monospace', color: '#FFFFFF', backgroundColor: '#000000'}}
+                        style={{minHeight: '75px', maxHeight: '700px', boxShadow: 'none', 'fontFamily': 'Consolas,monaco,monospace', color: '#FFFFFF', backgroundColor: '#000000'}}
+                        autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck="false"
                         as="textarea"
-                        rows="10"
+                        rows="8"
                         name="console_output_textarea"
                         value={consoleMessages}
                         onChange={this.onChange}
