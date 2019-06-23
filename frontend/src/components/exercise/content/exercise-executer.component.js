@@ -236,18 +236,22 @@ export default class ExerciseExecuter extends Component {
 
     runCode(e) {
 
-        // TODO add delay of 5 seconds before making another request as well as a spinning button
-        // TODO only rerun code result if code does not contain user inputs (OR: SPLIT RERUN AND RUN (when input))
-
-        if (this.state.isExecutingOnServer) {
+        if (this.state.isExecutingOnServer) { // TODO allow to stop it if the button is pressed a second time? show stop icon and ask for confirmation?
             return;
         }
 
         if (!this.props.didChangeCode && !this.state.containsReadIn) {
+            this.props.setHighlighting({
+                node: this.state.result.node_data[this.state.result.steps[0].id],
+                step: this.state.result.steps[0]
+            });
             this.setState({
                 step: 0
             });
-            timeout = setTimeout(this.simulateNextStep, this.state.delay);
+            if (timeout !== null) {
+                this.pauseSimulation();
+            }
+            timeout = setTimeout(this.simulateNextStep, this.state.delay + 64);
             log("Rerun code!");
             return;
         }
@@ -284,7 +288,6 @@ export default class ExerciseExecuter extends Component {
         Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/exercise/run', data, options)
             .then(response => {
                 if (response.status === 200) {
-                    log(response);
                     this.saveCodeResponse(response.data.compressedJson, 0);
                 }
             })
@@ -310,21 +313,26 @@ export default class ExerciseExecuter extends Component {
                 return;
             }
         } else {
+            logError("No json as response available!");
             return;
         }
 
         log(json);
 
         if (json && json.steps && json.steps.length > 0) {
+            if (timeout !== null) {
+                this.pauseSimulation();
+            }
             if (startAtStep === 0) {
                 this.setState({
                     resetConsoleCache: true,
                     step: 0
                 });
             }
-            if (timeout !== null) {
-                clearTimeout(timeout);
-            }
+            this.props.setHighlighting({
+                node: json.node_data[json.steps[startAtStep].id],
+                step: json.steps[startAtStep]
+            });
             this.setState({
                 result: json,
                 step: startAtStep,
@@ -332,7 +340,7 @@ export default class ExerciseExecuter extends Component {
                 resetConsoleCache: false
             });
             this.props.onRanCode();
-            timeout = setTimeout(this.simulateNextStep, this.state.delay);
+            timeout = setTimeout(this.simulateNextStep, this.state.delay + (startAtStep === 0 ? 64 : 0));
         }
         
     }
@@ -427,7 +435,7 @@ export default class ExerciseExecuter extends Component {
                 }
             }
         } else {
-            this.runCode(); // is this user friendly?
+            this.runCode();
         }
     }
     
