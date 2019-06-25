@@ -82,7 +82,7 @@ export default class ExerciseConsole extends Component {
                         style={{minHeight: '75px', maxHeight: '700px', boxShadow: 'none', fontFamily: 'Consolas, "Courier New", Courier, monospace', color: '#FFFFFF', backgroundColor: '#000000'}}
                         autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck="false"
                         as="textarea"
-                        rows="8"
+                        rows="6"
                         name="console_output_textarea"
                         value={consoleMessages}
                         onChange={this.onChange}
