@@ -21,7 +21,6 @@ export default class ExerciseCode extends Component {
                         theme="monokai"
                         name={this.props.content._id}
                         value={this.props.content.code}
-                        fontSize='18px'
                         width='100%'
                         height='100%'
                         readOnly={true}
@@ -31,7 +30,9 @@ export default class ExerciseCode extends Component {
                             wrap: true,
                             minLines: (this.props.content.settings ? this.props.content.settings.minLines || 1 : 1) ,
                             maxLines: Infinity,
-                            printMarginColumn: 200
+                            printMarginColumn: 200,
+                            fontSize: '18px',
+                            fontFamily: 'Consolas, "Courier New", Courier, monospace'
                         }}
                     />
                 </div>
@@ -43,7 +44,6 @@ export default class ExerciseCode extends Component {
                             mode="java"
                             theme="monokai"
                             name={this.props.content._id}
-                            fontSize='18px'
                             width='100%'
                             value={this.props.content.code}
                             readOnly={false} // because edit mode
@@ -54,7 +54,9 @@ export default class ExerciseCode extends Component {
                                 wrap: true,
                                 minLines: 1,
                                 maxLines: Infinity,
-                                printMarginColumn: 200
+                                printMarginColumn: 200,
+                                fontSize: '18px',
+                                fontFamily: 'Consolas, "Courier New", Courier, monospace'
                             }}
                         />
                     </div>

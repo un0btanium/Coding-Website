@@ -14,6 +14,7 @@ import ExerciseList from "./components/exercise/exercise-list.component";
 import ExerciseCreate from "./components/exercise/exercise-create.component";
 import ExerciseView from "./components/exercise/exercise-view.component";
 
+import { setLetterHeight, setLetterWidth } from './services/FontDetector';
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./theme/bootstrap.min.css";
@@ -33,6 +34,9 @@ class App extends Component {
 
   constructor(props) {
     super(props);
+
+    this.fontDetector = React.createRef();
+
     this.state = {
       user: null
     };
@@ -52,6 +56,11 @@ class App extends Component {
           }
       }, null);
     }
+
+    
+    const node = this.fontDetector.current;
+    setLetterWidth(node.children[0].offsetWidth/100);
+    setLetterHeight(node.children[0].offsetHeight);
   }
 
   updateUserData(userData) {
@@ -128,7 +137,9 @@ class App extends Component {
     return (
       <Router>
         <div>
-          <Navbar bg={BG} variant={VARIANT}>
+          <span ref={this.fontDetector} style={{ fontFamily: 'Consolas, "Courier New", Courier, monospace', position: 'absolute', width: 'auto', height: 'auto', margin: '0px', padding: '0px', fontSize: '18px', left: '-9999px' }}><span>WIwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwi</span></span>
+
+          <Navbar bg={BG} variant={VARIANT} style={{ boxShadow: '0px 2px 5px #000000'}}>
             <Container>
               <Navbar.Toggle aria-controls="responsive-navbar-nav" />
               <Navbar.Brand as={Link} to="/">

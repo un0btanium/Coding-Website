@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 
 import { Form, Container, Row, Col, OverlayTrigger, Popover } from 'react-bootstrap';
 
+import { getLetterHeight, getLetterWidth } from '../../../services/FontDetector';
+
 // import brace from 'brace';
 import AceEditor from 'react-ace';
 import 'brace/mode/java';
@@ -10,22 +12,17 @@ import 'brace/snippets/java';
 import 'brace/ext/language_tools';
 import 'brace/ext/searchbox';
 
+
 export default class ExerciseEditor extends Component {
     
     render () {
         
-        // TODO second first overlay box which displays the value of a variable or expression
-        // TODO add editor id name of node highlighting!! add check!
-
-
         let highlightOverlay = null;
         if (this.props.highlighting && this.props.highlighting.node !== undefined && this.props.highlighting.node.identifier === this.props.content.identifier) {
-            // for (let i = 0; i < this.props.console_output.length; i++) {
-            //     this.result.console_output[this.props.step]
-            // }
+
             let node = this.props.highlighting.node;
-            let sizeColumn = 9.9; //10.04166666666667;
-            let sizeLine = 22;
+            let sizeColumn = getLetterWidth();
+            let sizeLine = getLetterHeight();
 
             let x = 46 + sizeColumn * (node.columnStart-1) + sizeColumn * (('' + ((this.props.content.code.match(/\r\n|\r|\n/g) || '').length + 1)).length-1);
             let y = sizeLine * node.lineStart;
@@ -90,7 +87,6 @@ export default class ExerciseEditor extends Component {
                         theme="monokai"
                         name={this.props.content._id}
                         value={this.props.content.code}
-                        fontSize='18px'
                         width='100%'
                         // cursorStart={1}
                         onChange={(value, e) => { this.props.onChange(e, value, this.props.content._id); }}
@@ -106,7 +102,9 @@ export default class ExerciseEditor extends Component {
                             wrap: false,
                             animatedScroll: true,
                             autoScrollEditorIntoView: true,
-                            printMarginColumn: 200
+                            printMarginColumn: 200,
+                            fontSize: '18px',
+                            fontFamily: 'Consolas, "Courier New", Courier, monospace'
                         }}
                     />
                 </Row>
@@ -140,7 +138,6 @@ export default class ExerciseEditor extends Component {
                             mode="java"
                             theme="monokai"
                             name={this.props.content._id}
-                            fontSize='18px'
                             width='100%'
                             value={this.props.content.code}
                             onChange={(value, e) => { this.props.onChange(e, value, this.props.content._id); }}
@@ -156,7 +153,9 @@ export default class ExerciseEditor extends Component {
                                 wrap: false,
                                 animatedScroll: true,
                                 autoScrollEditorIntoView: true,
-                                printMarginColumn: 200
+                                printMarginColumn: 200,
+                                fontSize: '18px',
+                                fontFamily: 'Consolas, "Courier New", Courier, monospace'
                             }}
                         />
                     </Row>

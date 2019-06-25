@@ -62,7 +62,7 @@ export default class ExerciseConsole extends Component {
                             <Col sm={7}>
                                 <Form.Control 
                                     autoFocus
-                                    style={{marginTop: '15px', color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
+                                    style={{marginTop: '15px', fontFamily: 'Consolas, "Courier New", Courier, monospace', color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
                                     plaintext="true"
                                     autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck="false"
                                     type="text"
@@ -79,7 +79,7 @@ export default class ExerciseConsole extends Component {
             return (
                 <div  as={Row} style={{'width': '100%'}}>
                     <Form.Control 
-                        style={{minHeight: '75px', maxHeight: '700px', boxShadow: 'none', 'fontFamily': 'Consolas,monaco,monospace', color: '#FFFFFF', backgroundColor: '#000000'}}
+                        style={{minHeight: '75px', maxHeight: '700px', boxShadow: 'none', fontFamily: 'Consolas, "Courier New", Courier, monospace', color: '#FFFFFF', backgroundColor: '#000000'}}
                         autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck="false"
                         as="textarea"
                         rows="8"
