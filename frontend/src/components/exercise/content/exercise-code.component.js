@@ -15,7 +15,7 @@ export default class ExerciseCode extends Component {
     render () {
         if (this.props.mode === "solve") {
             return (
-                <div as={Row} style={{'marginBottom': '15px', 'marginTop': '15px', 'borderColor': '#4472c4', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%'}}>
+                <div as={Row} style={{'marginBottom': '15px', 'marginTop': '15px', 'borderColor': '#4472c4', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%', boxShadow: '2px 2px 5px #000000'}}>
                     <AceEditor
                         mode="java"
                         theme="monokai"
@@ -39,7 +39,7 @@ export default class ExerciseCode extends Component {
             );
         } else if (this.props.mode === "edit") {
             return (
-                    <div style={{'borderColor': '#4472c4', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%'}}>
+                    <div style={{'borderColor': '#4472c4', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%', boxShadow: '2px 2px 5px #000000'}}>
                         <AceEditor
                             mode="java"
                             theme="monokai"

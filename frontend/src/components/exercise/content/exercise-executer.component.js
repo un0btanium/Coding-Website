@@ -158,7 +158,7 @@ export default class ExerciseExecuter extends Component {
         
         
         let hudWrapper =
-            <div  as={Row} style={{ position: 'sticky', zIndex: '10', bottom: '-8px', backgroundColor: '#2b3e50', borderColor: '#df691a', borderRadius: '0px', borderWidth: '8px', borderStyle: 'solid'}}>
+            <div  as={Row} style={{ position: 'sticky', zIndex: '10', bottom: '-8px', backgroundColor: '#2b3e50', borderColor: '#df691a', borderRadius: '0px', borderWidth: '8px', borderStyle: 'solid', boxShadow: '2px 2px 5px #000000'}}>
                 {hud}
             </div>
         

@@ -68,7 +68,7 @@ export default class ExerciseSourceFiles extends Component {
                     </Row>
                     </Container>
                     
-                    <Row style={{'borderColor': '#538135', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%'}}>
+                    <Row style={{'borderColor': '#538135', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%', boxShadow: '2px 2px 5px #000000'}}>
                         <AceEditor
                             mode="java"
                             theme="monokai"
