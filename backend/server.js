@@ -202,8 +202,44 @@ app.route('/api/exercise')
     .post((req, res, next) => checkAuth(req, res, next, ["admin", "maintainer"]), function (req, res) {
         let document = {
             name: req.body.name,
-            content: req.body.content || [],
-            source_files: req.body.source_files || []
+            content: req.body.content || [
+				{
+					type: "title",
+					text: ""
+				},
+				{
+					type: "text",
+					text: ""
+				},
+				{
+					type: "editor",
+					identifier: "main_method_body",
+					code: "",
+					solution: "",
+					settings: {
+						minLines: 5
+					}
+				}
+			],
+            source_files: req.body.source_files || [{
+				package: "main",
+				name: "Main",
+				code: "package main;\n" + 
+				"\n" + 
+				"import java.util.*;\n" + 
+				"import java.io.*;\n" + 
+				"import java.math.*;\n" + 
+				"\n" + 
+				"import java.io.Console;\n" + 
+				"\n" + 
+				"public class Main {\n" + 
+				"    \n" + 
+				"    public static void main(String[] args) {\n" + 
+				"// main_method_body\n" + 
+				"    }\n" + 
+				"    \n" + 
+				"}"
+			}]
         };
         let exercise = new Exercise(document);
         exercise.save()
