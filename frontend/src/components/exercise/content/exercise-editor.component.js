@@ -12,7 +12,8 @@ import 'brace/snippets/java';
 import 'brace/ext/language_tools';
 import 'brace/ext/searchbox';
 
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPen } from '@fortawesome/free-solid-svg-icons'
 export default class ExerciseEditor extends Component {
     
     render () {
@@ -79,7 +80,10 @@ export default class ExerciseEditor extends Component {
         }
 
         if (this.props.mode === "solve") {
-            return (
+            return (<>
+				<div style={{ position: 'relative', left: '-25px', top: '45px', marginTop: '-40px' }}>
+					<FontAwesomeIcon icon={faPen} style={{ margin: '0px', color:'#538135' }} />
+                </div>
                 <Row style={{'marginLeft': '0px', 'marginBottom': '15px', 'marginTop': '15px', 'borderColor': '#538135', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%', boxShadow: '2px 2px 5px #000000'}}>
                 {highlightOverlay}
                     <AceEditor
@@ -108,6 +112,7 @@ export default class ExerciseEditor extends Component {
                         }}
                     />
                 </Row>
+			</>
             );
         } else if (this.props.mode === "edit") {
             return (
@@ -132,6 +137,9 @@ export default class ExerciseEditor extends Component {
                             </Col>
                         </Row>
                     </Container>
+					<div style={{ position: 'relative', left: '-25px', top: '45px', marginTop: '-40px' }}>
+						<FontAwesomeIcon icon={faPen} style={{ margin: '0px', color:'#538135' }} />
+					</div>
                     <Row style={{'marginLeft': '0px', 'borderColor': '#538135', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%', boxShadow: '2px 2px 5px #000000'}}>
                         {highlightOverlay}
                         <AceEditor

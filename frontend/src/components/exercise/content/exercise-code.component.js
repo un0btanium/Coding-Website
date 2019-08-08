@@ -10,13 +10,20 @@ import 'brace/snippets/java';
 import 'brace/ext/language_tools';
 import 'brace/ext/searchbox';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons'
+
+
 export default class ExerciseCode extends Component {
 
     render () {
         if (this.props.mode === "solve") {
-            return (
-                <div as={Row} style={{'marginBottom': '15px', 'marginTop': '15px', 'borderColor': '#4472c4', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%', boxShadow: '2px 2px 5px #000000'}}>
-                    <AceEditor
+            return (<>
+				<div style={{ position: 'relative', left: '-25px', top: '45px', marginTop: '-40px' }}>
+					<FontAwesomeIcon icon={faInfoCircle} style={{ margin: '0px', color:'#4472c4' }} />
+                </div>
+				<div as={Row} style={{'marginBottom': '15px', 'marginTop': '15px', 'borderColor': '#4472c4', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%', boxShadow: '2px 2px 5px #000000'}}>
+				<AceEditor
                         mode="java"
                         theme="monokai"
                         name={this.props.content._id}
@@ -36,31 +43,35 @@ export default class ExerciseCode extends Component {
                         }}
                     />
                 </div>
+			</>
             );
         } else if (this.props.mode === "edit") {
-            return (
-                    <div style={{'borderColor': '#4472c4', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%', boxShadow: '2px 2px 5px #000000'}}>
-                        <AceEditor
-                            mode="java"
-                            theme="monokai"
-                            name={this.props.content._id}
-                            width='100%'
-                            value={this.props.content.code}
-                            readOnly={false} // because edit mode
-                            onChange={(value, e) => { this.props.onChange(e, value, this.props.content._id); }} // TODO maybe do it different event handling?
-                            editorProps={{$blockScrolling: Infinity}}
-                            setOptions={{
-                                showLineNumbers: true,
-                                wrap: true,
-                                minLines: 1,
-                                maxLines: Infinity,
-                                printMarginColumn: 200,
-                                fontSize: '18px',
-                                fontFamily: 'Consolas, "Courier New", Courier, monospace'
-                            }}
-                        />
-                    </div>
-            );
+            return (<>
+				<div style={{ position: 'relative', left: '-135px', top: '55px', marginTop: '-40px' }}>
+					<FontAwesomeIcon icon={faInfoCircle} style={{ margin: '0px', color:'#4472c4' }} />
+                </div>
+				<div style={{'borderColor': '#4472c4', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%', boxShadow: '2px 2px 5px #000000'}}>
+					<AceEditor
+						mode="java"
+						theme="monokai"
+						name={this.props.content._id}
+						width='100%'
+						value={this.props.content.code}
+						readOnly={false} // because edit mode
+						onChange={(value, e) => { this.props.onChange(e, value, this.props.content._id); }} // TODO maybe do it different event handling?
+						editorProps={{$blockScrolling: Infinity}}
+						setOptions={{
+							showLineNumbers: true,
+							wrap: true,
+							minLines: 1,
+							maxLines: Infinity,
+							printMarginColumn: 200,
+							fontSize: '18px',
+							fontFamily: 'Consolas, "Courier New", Courier, monospace'
+						}}
+					/>
+				</div>
+            </>);
         }
     }
 }
