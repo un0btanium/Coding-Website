@@ -37,7 +37,6 @@ const MONGODB_PORT = 27017;
 const { spawn } = require('child_process');
 
 let Course = require('./models/course.model');
-let Exercise = require('./models/exercise.model');
 let User = require('./models/user.model');
 
 
