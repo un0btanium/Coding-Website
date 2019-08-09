@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import Axios from 'axios';
+import update from 'immutability-helper';
 
 import ExerciseContent from './content/exercise-content.component';
 import ExerciseExecuter from './content/exercise-executer.component';
@@ -113,9 +114,22 @@ export default class ExerciseSolve extends Component {
         let index = this.getIndexOfContent(id);
 
         if (index > 0 && key === "code") {
-            const newContent = [...this.state.content]
-            newContent[index][key] = value;
-            this.setState({content: newContent});
+            this.setState({
+				subExercises: update(
+					this.state.subExercises,
+					{
+						[this.state.subExercisesIndex]: {
+							content: {
+								[index]: {
+									[key]: {
+										$set: value
+									}
+								}
+							}
+						}
+					}
+				)
+			});
             if (key === "code" || key === "solution") {
                 this.setState({didChangeCode: true});
                 this.setHighlighting(null);
@@ -126,7 +140,7 @@ export default class ExerciseSolve extends Component {
     getIndexOfContent(id) {
         let index = -1;
         let i = 0;
-        for (let currentContent of this.state.content) {
+        for (let currentContent of this.state.subExercises[this.state.subExercisesIndex].content) {
             if (currentContent._id === id) {
                 index = i;
                 break;
