@@ -52,9 +52,30 @@ export default class ExerciseSolve extends Component {
 
         return (
             <div style={{marginTop: '60px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
-                <h3>{this.state.name}</h3>
+				<div style={{textAlign: "center"}}>
+                	<h3>{this.state.name}</h3>
+				</div>
 
                 <br />
+
+				<div style={{ width: "100%", textAlign: "center"}}>
+						{
+							this.state.subExercises.map((value, i) => {
+								const arrowWidth = Math.min(((((1/this.state.subExercises.length)*100))-(2.5)), 6)+"%";
+								let style = { width:arrowWidth, marginLeft:"5px", };
+								return <div
+									style={style}
+									className="progress-arrow"
+									key={"SelectorSubExercises"+i}
+									onClick={() => {
+										this.setState({ subExercisesIndex: i });
+									}}
+									onContextMenu={(e) => this.deleteSubExcerise(e, i)}
+								></div>
+							})
+						}
+					</div>
+
                 <br />
 
                 <ExerciseContent

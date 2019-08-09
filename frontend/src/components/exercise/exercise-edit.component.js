@@ -74,9 +74,14 @@ export default class ExerciseEdit extends Component {
 
         return (
             <div style={{marginTop: '50px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
-                <h3>Edit Exercise {this.state.name}</h3>
+                
+				<div style={{textAlign: "center"}}>
+					<h3>Edit Exercise {this.state.name}</h3>
+				</div>
+
+				<hr style={{backgroundColor: "rgb(223, 105, 26)"}}/>
                 <br />
-                <br />
+
                 <Form onSubmit={this.onSubmit}>
                     <Form.Group as={Row} className="form-group">
                         <Form.Label column sm={2} style={{textAlign: 'right'}}><h5>Name:</h5></Form.Label>
@@ -112,8 +117,35 @@ export default class ExerciseEdit extends Component {
                         </Col>
                     </Form.Group>
 
+					<hr style={{backgroundColor: "rgb(223, 105, 26)"}}/>
                     <br />
+
+					<div style={{ width: "100%", textAlign: "center"}}>
+						{
+							this.state.subExercises.map((value, i) => {
+								const arrowWidth = Math.min(((((1/this.state.subExercises.length)*100))-(2.5)), 6)+"%";
+								let style = { width:arrowWidth, marginLeft:"5px", };
+								return <div
+									style={style}
+									className="progress-arrow"
+									key={"SelectorSubExercises"+i}
+									onClick={() => {
+										this.setState({ subExercisesIndex: i });
+									}}
+									onContextMenu={(e) => this.deleteSubExcerise(e, i)}
+								></div>
+							})
+						}
+						<Button
+							key="AddNewSubExercise"
+							style={{ marginTop: "-28px", marginLeft: "20px"}}
+							variant="success"
+							onClick={() => this.addNewSubExercise()}
+						>+</Button>
+					</div>
+
                     <br />
+					<hr style={{backgroundColor: "rgb(223, 105, 26)"}}/>
 
                     <Tabs
                         id="controlled-tab-exercise"
@@ -136,7 +168,7 @@ export default class ExerciseEdit extends Component {
                             <br />
 
                             <Form.Group as={Row} className="form-group">
-                                <Col>
+                                <Col style={{ textAlign: "center" }}>
                                     <Button variant="outline-primary" onClick={this.addNewTitle} style={{width: '150px'}}>+Title</Button>
                                     <Button variant="outline-primary" onClick={this.addNewText} style={{width: '150px'}}>+Text</Button>
                                     <Button variant="outline-primary" onClick={this.addNewCode} style={{width: '150px'}}>+Code</Button>
@@ -158,7 +190,7 @@ export default class ExerciseEdit extends Component {
                             <br />
 
                             <Form.Group as={Row} className="form-group">
-                                <Col>
+                                <Col style={{ textAlign: "center" }}>
                                     <Button variant="outline-primary" onClick={this.addNewSourceFile} style={{width: '150px'}}>+Source File</Button>
                                 </Col>
                             </Form.Group>
@@ -190,7 +222,82 @@ export default class ExerciseEdit extends Component {
             </div>);
     }
 
+	addNewSubExercise() {
 
+
+		this.setState({
+			contentIDCounter: this.state.contentIDCounter+4,
+			subExercises: update(this.state.subExercises, {
+				$push: [
+					{
+						content: [
+							{
+								_id: "NEW " + this.state.contentIDCounter,
+								type: "title",
+								text: ""
+							},
+							{
+								_id: "NEW " + this.state.contentIDCounter+1,
+								type: "text",
+								text: ""
+							},
+							{
+								_id: "NEW " + this.state.contentIDCounter+2,
+								type: "editor",
+								identifier: "main_method_body",
+								code: "",
+								solution: "",
+								settings: {
+									minLines: 5
+								}
+							}
+						],
+						sourceFiles: [{
+							_id: "NEW " + this.state.contentIDCounter+3,
+							package: "main",
+							name: "Main",
+							code: "package main;\n" + 
+							"\n" + 
+							"import java.util.*;\n" + 
+							"import java.io.*;\n" + 
+							"import java.math.*;\n" + 
+							"\n" + 
+							"import java.io.Console;\n" + 
+							"\n" + 
+							"public class Main {\n" + 
+							"    \n" + 
+							"    public static void main(String[] args) {\n" + 
+							"// main_method_body\n" + 
+							"    }\n" + 
+							"    \n" + 
+							"}"
+						}]
+					}
+				]
+			})
+		})
+	}
+
+	deleteSubExcerise(e, index) {
+		e.preventDefault();
+
+		if (this.state.subExercises.length === 1) {
+			return;
+		}
+
+		let subExercisesIndex = this.state.subExercisesIndex
+		if (this.state.subExercisesIndex === index && this.state.subExercisesIndex !== 0) {
+			subExercisesIndex = this.state.subExercisesIndex-1;
+		}
+		subExercisesIndex = Math.min(subExercisesIndex, this.state.subExercises.length-2);
+
+        this.setState({
+			subExercisesIndex: subExercisesIndex,
+			subExercises: update(this.state.subExercises, {
+				$splice: [[index, 1]]
+			})
+        });
+	}
 
     addNewSourceFile() {
         if (this.state.subExercises[this.state.subExercisesIndex].sourceFiles.length === 0) {
