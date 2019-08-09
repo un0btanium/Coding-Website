@@ -124,7 +124,7 @@ export default class CourseCreate extends Component {
         //console.log(Axios.defaults.headers.common);
         Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/course', newCourse)
             .then(res => {
-                this.props.history.push('/course/exercises', {courseID: res.data.id});
+                this.props.history.push('/course/' + res.data.id + '/exercises');
             });
 
         
