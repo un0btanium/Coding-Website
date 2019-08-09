@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import { Form, Container, Row, Col, OverlayTrigger, Popover } from 'react-bootstrap';
+import { Form, Container, Row, Col, OverlayTrigger, Popover, Tabs, Tab } from 'react-bootstrap';
 
 import { getLetterHeight, getLetterWidth } from '../../../services/FontDetector';
 
@@ -15,7 +15,15 @@ import 'brace/ext/searchbox';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPen } from '@fortawesome/free-solid-svg-icons'
 export default class ExerciseEditor extends Component {
-    
+	
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			tabKey: "code"
+		}
+	}
+
     render () {
         
         let highlightOverlay = null;
@@ -137,36 +145,43 @@ export default class ExerciseEditor extends Component {
                             </Col>
                         </Row>
                     </Container>
-					<div style={{ position: 'relative', left: '-25px', top: '45px', marginTop: '-40px' }}>
-						<FontAwesomeIcon icon={faPen} style={{ margin: '0px', color:'#538135' }} />
+					
+                    <Tabs
+						style={{width: "100%"}}
+                        id="controlled-tab-exercise"
+                        activeKey={this.state.tabKey}
+                        onSelect={(tabKey) => this.setState({ tabKey })}
+                    >
+						<Tab variant="primary" eventKey="code" title="Code" style={{width: "100%"}}></Tab>
+						<Tab variant="primary" eventKey="solution" title="Solution" style={{width: "100%"}}></Tab>
+					</Tabs>
+					<div style={{'marginLeft': '0px', 'borderColor': (this.state.tabKey === "code" ? '#538135' : '#53CC35'), 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%', boxShadow: '2px 2px 5px #000000'}}>
+						{highlightOverlay}
+						<AceEditor
+							mode="java"
+							theme="monokai"
+							name={this.props.content._id}
+							width='100%'
+							value={this.props.content[this.state.tabKey]}
+							onChange={(value, e) => { this.props.onChange(e, value, this.props.content._id, this.state.tabKey); }}
+							// cursorStart={1}
+							editorProps={{$blockScrolling: Infinity}}
+							setOptions={{
+								enableBasicAutocompletion: true,
+								// enableLiveAutocompletion: true,
+								enableSnippets: true,
+								showLineNumbers: true,
+								minLines: (this.props.content.settings ? this.props.content.settings.minLines || 5 : 5),
+								maxLines: Infinity,
+								wrap: false,
+								animatedScroll: true,
+								autoScrollEditorIntoView: true,
+								printMarginColumn: 200,
+								fontSize: '18px',
+								fontFamily: 'Consolas, "Courier New", Courier, monospace'
+							}}
+						/>
 					</div>
-                    <Row style={{'marginLeft': '0px', 'borderColor': '#538135', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%', boxShadow: '2px 2px 5px #000000'}}>
-                        {highlightOverlay}
-                        <AceEditor
-                            mode="java"
-                            theme="monokai"
-                            name={this.props.content._id}
-                            width='100%'
-                            value={this.props.content.code}
-                            onChange={(value, e) => { this.props.onChange(e, value, this.props.content._id); }}
-                            // cursorStart={1}
-                            editorProps={{$blockScrolling: Infinity}}
-                            setOptions={{
-                                enableBasicAutocompletion: true,
-                                // enableLiveAutocompletion: true,
-                                enableSnippets: true,
-                                showLineNumbers: true,
-                                minLines: (this.props.content.settings ? this.props.content.settings.minLines || 5 : 5),
-                                maxLines: Infinity,
-                                wrap: false,
-                                animatedScroll: true,
-                                autoScrollEditorIntoView: true,
-                                printMarginColumn: 200,
-                                fontSize: '18px',
-                                fontFamily: 'Consolas, "Courier New", Courier, monospace'
-                            }}
-                        />
-                    </Row>
                 </>
             );
         }

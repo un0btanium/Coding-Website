@@ -266,7 +266,9 @@ export default class ExerciseExecuter extends Component {
         }
 
         let data = {
-            id: this.props.exerciseID,
+			courseID: this.props.courseID,
+			exerciseID: this.props.exerciseID,
+			subExercisesIndex: this.props.subExercisesIndex,
             code_snippets: code_snippets
         }
 

@@ -1,13 +1,11 @@
 
 
 - Encrypt password when sending via http
-- Fix editor highlighting when line numbers increase
 
 Code Simulator:
 - More code element highlighting
 - Memory Inspector
 -- Object-Handling
-- Tooltip on mouse hover
 - Code Replacement Feature?
 - robuster machen (symbol solver mit verwenden)
 
@@ -18,9 +16,8 @@ Features:
 - Add solution code (toggle viewable by admin)
 - Add image element
 - Add formula element
-- Custom Error Message Explanations
+- Custom Error Message Explanations (based on statistics and their probability one after another in case the custom error message does not apply for the user)
 - Fireworks on completion (Canvas)
-- Live Environment
 - Overall code cleanup and documentation
 
 Backend:

@@ -32,14 +32,23 @@ export default class ExerciseView extends Component {
             return (
                 <>
                     {modeToggle}
-                    <ExerciseEdit  exerciseID={this.props.match.params.id} setModeToSolve={this.setModeToSolve} />
+					<ExerciseEdit 
+						exerciseID={this.props.match.params.exerciseID}
+						courseID={this.props.match.params.courseID}
+						setModeToSolve={this.setModeToSolve}
+						history={this.props.history}
+					/>
                 </>
             );
         } else {
             return (
                 <>
                     {modeToggle}
-                    <ExerciseSolve exerciseID={this.props.match.params.id} />
+                    <ExerciseSolve
+						exerciseID={this.props.match.params.exerciseID}
+						courseID={this.props.match.params.courseID}
+						history={this.props.history}
+					/>
                 </>
             );
         }

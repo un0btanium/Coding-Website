@@ -36,6 +36,7 @@ const MONGODB_PORT = 27017;
 
 const { spawn } = require('child_process');
 
+let Course = require('./models/course.model');
 let Exercise = require('./models/exercise.model');
 let User = require('./models/user.model');
 
@@ -152,40 +153,84 @@ app.post('/api/signup', (req, res, next) => {
 
 });
 
-app.get('/api/exercises/:page', function (req, res) {
-    const page = parseInt(req.params.page) || 0;
+
+				/* COURSES */
+
+app.get('/api/courses/:page', function (req, res) {
+    const page = req.params.page || 0;
     // const options = { limit: 10, skip: page*10 };
     const options = {};
-    Exercise.find({}, 'name', options, function (err, exercises) {
+    Course.find({}, "name isVisibleToStudents", options, function (err, courses) {
         if (err) {
             console.log(err);
             res.status(404).send("something went wrong");
         } else {
-            res.json({ 'exercises': exercises, 'page': page });
+            res.json({ 'courses': courses, 'page': page });
         }
     })
 });
 
 
+app.route('/api/course')
 
-app.route('/api/exercise/:id')
+	.post((req, res, next) => checkAuth(req, res, next, ["admin", "maintainer"]), function (req, res) {
+		let document = {
+			name: req.body.name,
+			isVisibleToStudents: req.body.isVisibleToStudents,
+			exercises: req.body.exercises
+		};
+		let course = new Course(document);
+		course.save()
+			.then(newCourse => {
+				res.status(200).json({ id: newCourse._id });
+			})
+			.catch(err => {
+				res.status(400, 'Adding new course failed');
+			});
+	})
+
+	.put((req, res, next) => checkAuth(req, res, next, ["admin", "maintainer"]), function (req, res) {
+		Course.findById(req.body.id, function (err, course) {
+			if (!course) {
+				res.status(404).send('course was not found');
+			} else {
+				course.name = req.body.name;
+				course.isVisibleToStudents = req.body.isVisibleToStudents;
+				course.exercises = req.body.exercises;
+
+				course
+					.save()
+					.then(course => {
+						res.status(200).json('Course updated');
+					})
+					.catch(err => {
+						res.status(400).send("Updating course failed");
+					});
+			}
+		});
+	});
+
+app.route('/api/course/:id')
 
     .get(function (req, res) {
         let id = req.params.id;
-        Exercise.findById(id, function (err, exercise) {
+        Course.findById(id, function (err, course) {
             if (err) {
-                console.log(err);
-                res.status(404, 'Exercise not found!');
+                console.log("Course " + id + " not found!");
+                res.status(404).send('Course not found!');
             } else {
-                res.json(exercise);
+                res.json({course: course});
             }
         })
-    })
-
+	})
+	
     .delete((req, res, next) => checkAuth(req, res, next, ["admin", "maintainer"]), function (req, res) {
         let id = req.params.id;
-        Exercise.findByIdAndDelete(id, function (err) {
+        Course.findByIdAndDelete(id, function (err) {
             if (!err) {
+
+				// TODO remove Code Snippet Saves from Users to avoid data remnants
+
                 res.sendStatus(200);
             } else {
                 res.status(500).json({
@@ -197,79 +242,150 @@ app.route('/api/exercise/:id')
 
 
 
-app.route('/api/exercise')
+
+				/* EXERCISES */
+
+
+app.route('/api/course/:courseID/exercise/:exerciseID')
+
+    .get(function (req, res) {
+		Course.findById(req.params.courseID, function (err, course) {
+			if (err) {
+				console.log("Course " + req.params.courseID + " not found!");
+                res.status(404).send('Course not found!');
+			} else {
+				
+				let exercise = course.exercises.id(req.params.exerciseID)
+
+				if (exercise) {
+					res.json(exercise);
+				} else {
+					console.log("Exercise " + req.params.exerciseID + " not found!");
+					res.status(404).send('Exercise not found!');
+				}
+
+			}
+		});
+    })
+
+    .delete((req, res, next) => checkAuth(req, res, next, ["admin", "maintainer"]), function (req, res) {
+		Course.findById(req.params.courseID, function (err, course) {
+			if (err) {
+				console.log("Course " + req.params.courseID + " not found!");
+				res.status(404).send('Course not found!');
+			} else {
+				
+				course.exercises.pull(req.params.exerciseID)
+
+				course.save(function(err) {
+					if (err) {
+						console.log("Unable to delete Excercise " + req.params.exerciseID + "!");
+						res.status(500).send('Unable to delete Excercise!');
+					} else {
+						res.status(200).send();
+					}
+				})
+
+			}
+		});
+	})
+
+
+app.route('/api/course/exercise')
 
     .post((req, res, next) => checkAuth(req, res, next, ["admin", "maintainer"]), function (req, res) {
-        let document = {
-            name: req.body.name,
-            content: req.body.content || [
-				{
-					type: "title",
-					text: ""
-				},
-				{
-					type: "text",
-					text: ""
-				},
-				{
-					type: "editor",
-					identifier: "main_method_body",
-					code: "",
-					solution: "",
-					settings: {
-						minLines: 5
-					}
-				}
-			],
-            source_files: req.body.source_files || [{
-				package: "main",
-				name: "Main",
-				code: "package main;\n" + 
-				"\n" + 
-				"import java.util.*;\n" + 
-				"import java.io.*;\n" + 
-				"import java.math.*;\n" + 
-				"\n" + 
-				"import java.io.Console;\n" + 
-				"\n" + 
-				"public class Main {\n" + 
-				"    \n" + 
-				"    public static void main(String[] args) {\n" + 
-				"// main_method_body\n" + 
-				"    }\n" + 
-				"    \n" + 
-				"}"
-			}]
-        };
-        let exercise = new Exercise(document);
-        exercise.save()
-            .then(newExercise => {
-                res.status(200).json({ id: newExercise._id });
-            })
-            .catch(err => {
-                res.status(400, 'Adding new exercise failed');
-            });
+		Course.findById(req.body.courseID, function (err, course) {
+			if (err) {
+				console.log(err);
+				res.status(404, 'Course not found!');
+			} else {
+				
+				let exercise = {
+					name: req.body.name,
+					isVisibleToStudents: req.body.isVisibleToStudents || true,
+					subExercises: req.body.subExercises || [
+						{
+							content: [
+								{
+									type: "title",
+									text: ""
+								},
+								{
+									type: "text",
+									text: ""
+								},
+								{
+									type: "editor",
+									identifier: "main_method_body",
+									code: "",
+									solution: "",
+									settings: {
+										minLines: 5
+									}
+								}
+							],
+							sourceFiles: [{
+								package: "main",
+								name: "Main",
+								code: "package main;\n" + 
+								"\n" + 
+								"import java.util.*;\n" + 
+								"import java.io.*;\n" + 
+								"import java.math.*;\n" + 
+								"\n" + 
+								"import java.io.Console;\n" + 
+								"\n" + 
+								"public class Main {\n" + 
+								"    \n" + 
+								"    public static void main(String[] args) {\n" + 
+								"// main_method_body\n" + 
+								"    }\n" + 
+								"    \n" + 
+								"}"
+							}]
+						}
+					]
+				};
+
+				course.exercises.push(exercise);
+
+				var newExercise = course.exercises[course.exercises.length-1];
+
+				course.save()
+					.then(course => {
+						res.status(200).json({ id: newExercise._id });
+					})
+					.catch(err => {
+						res.status(400, 'Adding new exercise failed');
+					});
+			}
+		});
     })
 
     .put((req, res, next) => checkAuth(req, res, next, ["admin", "maintainer"]), function (req, res) {
-        Exercise.findById(req.body.id, function (err, exercise) {
-            if (!exercise) {
-                res.status(404).send('exercise was not found');
-            } else {
-                exercise.name = req.body.name;
-                exercise.content = req.body.content;
-                exercise.source_files = req.body.source_files;
+		Course.findById(req.body.courseID, function (err, course) {
+			if (err) {
+				console.log(err);
+				res.status(404, 'Course not found!');
+			} else {
+				
+				let exercise = course.exercises.id(req.body.exerciseID);
 
-                exercise
-                .save()
-                .then(exercise => {
-                    res.status(200).json('Exercise updated');
-                })
-                .catch(err => {
-                    res.status(400).send("Update not possible");
-                });
-            }
-        });
+				exercise.name = req.body.name;
+				exercise.isVisibleToStudents = req.body.isVisibleToStudents;
+                exercise.subExercises = req.body.subExercises;
+
+                course
+					.save()
+					.then(course => {
+						res.status(200).json('Exercise updated');
+					})
+					.catch(err => {
+						console.log(err)
+						res.status(400).send("Update not possible");
+					});
+			}
+		});
     });
 
 
@@ -279,9 +395,9 @@ app.route("/api/exercise/input")
         let input = req.body.input;
         let userData = req.tokenData;
 
-        if (input !== null && javaProcesses[userData.userId] !== undefined && javaProcesses[userData.userId] !== null && !javaProcesses[userData.userId].killed) {
+        if (input !== null && javaProcesses[userData.userId] !== undefined && javaProcesses[userData.userId] !== null && !javaProcesses[userData.userId].process.killed) {
             console.log("Writing input '" + input + "' to java process!");
-            let javaChild = javaProcesses[userData.userId]
+            let javaChild = javaProcesses[userData.userId].process
 
             res.dataArray = [];
 
@@ -336,7 +452,7 @@ app.route("/api/exercise/input")
                     return;
                 }
 
-                javaProcesses[userData.userId] = null;
+                javaProcesses[userData.userId] = undefined;
 
                 if (exitCode === null) {
                     console.log("canceled response (exitCode ist null)");
@@ -387,27 +503,34 @@ app.route("/api/exercise/run")
 
     .post((req, res, next) => checkAuth(req, res, next), function (req, res) {
         let code_snippets = req.body.code_snippets;
-        let id = req.body.id;
+		let courseID = req.body.courseID;
+		let exerciseID = req.body.exerciseID;
+		let subExercisesIndex = req.body.subExercisesIndex;
         let userData = req.tokenData;
 
-        // TODO save code for user
-        // TODO save child process in table by user id. cancel running process before new one is started. set process timeout to 30 min or something. also use this for input commands from user.
 
-        Exercise.findById(id, function (err, exercise) {
-            if (!exercise) {
-                res.status(404).send('exercise was not found');
+        Course.findById(courseID, function (err, course) {
+            if (!course) {
+                res.status(404).send('Course not found');
             } else {
-                // console.log(id);
-                // console.log(code_snippets);
 
-                let source_files = [];
-                for (let sourceFile of exercise.source_files) {
-                    source_files.push(sourceFile);
+				let exercise = course.exercises.id(exerciseID);
+
+				if (exercise === undefined || exercise === null) {
+					res.status(404).send('Exercise not found');
+					return;
+				}
+
+				// TODO save code for user
+
+                let sourceFiles = [];
+                for (let sourceFile of exercise.subExercises[subExercisesIndex].sourceFiles) {
+                    sourceFiles.push(sourceFile);
                 }
 
                 let arg = {
                     code_snippets: code_snippets,
-                    source_files: source_files
+                    source_files: sourceFiles
                 }
 
                 let javaExe = "java";
@@ -419,9 +542,9 @@ app.route("/api/exercise/run")
 
                 if (javaProcesses[userData.userId] !== undefined && javaProcesses[userData.userId] !== null) {
                     console.log("Killing java process!");
-                    javaProcesses[userData.userId].kill('SIGINT');
-                    console.log(javaProcesses[userData.userId].killed ? "Killed java process!" : "Didnt kill java process!");
-                    javaProcesses[userData.userId] = null;
+                    javaProcesses[userData.userId].process.kill('SIGINT');
+                    console.log(javaProcesses[userData.userId].process.killed ? "Killed java process!" : "Didnt kill java process!");
+                    javaProcesses[userData.userId] = undefined;
                 }
 
                 res.dataArray = [];
@@ -429,7 +552,19 @@ app.route("/api/exercise/run")
 
                 let javaChild = spawn(javaExe, ["-jar", __dirname + path.sep + "java" + path.sep + "executer.jar", JSON.stringify(arg)], javaOptions);
 
-                javaProcesses[userData.userId] = javaChild;
+                javaProcesses[userData.userId] = {
+					exercise: {
+						name: exercise.name,
+						subExerciseIndex: subExercisesIndex,
+						code_snippets: code_snippets
+					},
+					userData: {
+						userId: userData.userId,
+						email: userData.email,
+						role: userData.role,
+					},
+					process: javaChild
+				};
 
                 javaChild.stdout.on('data', function (data) {
                     console.log("stdout run");
@@ -482,7 +617,7 @@ app.route("/api/exercise/run")
                         return;
                     }
 
-                    javaProcesses[userData.userId] = null;
+                    javaProcesses[userData.userId] = undefined;
 
                     if (exitCode === null) {
                         console.log("canceled response (exitCode ist null)");

@@ -6,20 +6,17 @@ import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-export default class ExerciseCreate extends Component {
+export default class CourseCreate extends Component {
 
     constructor(props) {
         super(props);
 
-        this.onChangeExerciseName = this.onChangeExerciseName.bind(this);
-        this.onChangeExerciseImportString = this.onChangeExerciseImportString.bind(this);
+        this.onChangeCourseName = this.onChangeCourseName.bind(this);
+        this.onChangeCourseImportString = this.onChangeCourseImportString.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
 
         this.state = {
-			courseID: this.props.match.params.courseID,
-			courseName: this.props.location.state.courseName || "",
-			name: '',
-			isVisibleToStudents: true,
+            name: '',
             importString: ''
         }
     }
@@ -27,11 +24,7 @@ export default class ExerciseCreate extends Component {
     render () {
         return (
             <div style={{marginTop: '50px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
-				<h2>Course {this.state.courseName}</h2>
-                
-				<br />
-
-                <h4>New Exercise</h4>
+                <h3>New Course</h3>
                 
                 <br />
                 <br />
@@ -47,41 +40,18 @@ export default class ExerciseCreate extends Component {
                                 autoFocus
                                 type="text"
                                 className="form-control"
-                                placeholder="Enter exercise name"
+                                placeholder="Enter course name"
                                 value={this.state.name}
-                                onChange={this.onChangeExerciseName}
+                                onChange={this.onChangeCourseName}
                             />
                         </Col>
                     </Form.Group>
-
-					<Form.Group as={Row} className="form-group">
-                        <Form.Label column sm={2} style={{textAlign: 'right'}}><h5>Visible:</h5></Form.Label>
-                        <Col sm={6}>
-							<Form.Check
-								style={{marginTop: "10px"}} 
-								id="toggleIsVisibleForStudents"
-								draggable={false}
-								type="checkbox"
-								className="custom-switch"
-								custom="true"
-								label=""
-								checked={this.state.isVisibleToStudents}
-								onChange={(e) => {this.setState({ isVisibleToStudents: !this.state.isVisibleToStudents })}}
-							/>
-                        </Col>
-                    </Form.Group>
-
-					
                     
                     <br/>
                     <br/>
 
-					<h4>Or Import:</h4>
-					
-                    <br/>
-
                     <Form.Group as={Row} className="form-group">
-                        <Form.Label column sm={2} style={{textAlign: 'right'}}><h5>JSON String:</h5></Form.Label>
+                        <Form.Label column sm={2} style={{textAlign: 'right'}}><h5>Import:</h5></Form.Label>
                         <Col sm={6}>
                             <Form.Control 
                                 style={{color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
@@ -89,9 +59,9 @@ export default class ExerciseCreate extends Component {
                                 autoComplete="off"
                                 type="text"
                                 className="form-control"
-                                placeholder="Or enter exercise json import string"
+                                placeholder="Or enter course json import string"
                                 value={this.state.importString}
-                                onChange={this.onChangeExerciseImportString}
+                                onChange={this.onChangeCourseImportString}
                             />
                         </Col>
                     </Form.Group>
@@ -107,13 +77,13 @@ export default class ExerciseCreate extends Component {
         )
     }
 
-    onChangeExerciseName(e) {
+    onChangeCourseName(e) {
         this.setState({
             name: e.target.value
         });
     }
 
-    onChangeExerciseImportString(e) {
+    onChangeCourseImportString(e) {
         this.setState({
             importString: e.target.value
         });
@@ -126,44 +96,35 @@ export default class ExerciseCreate extends Component {
             return;
         }
 
-		let name = this.state.name;
-		let isVisibleToStudents = this.state.isVisibleToStudents;
-        let subExercises = undefined;
+        let name = this.state.name;
+        let isVisibleToStudents = true;
+        let exercises = [];
         if (this.state.importString !== '') {
             try {
                 let json = JSON.parse(this.state.importString);
 
 				name = json.name;
-				isVisibleToStudents = json.isVisibleToStudents || true;
-
-				if (json.content !== undefined && json.source_files !== undefined) {
-					subExercises = [{
-						content: json.content,
-						sourceFiles: json.source_files
-					}];
-				} else {
-					subExercises = json.subExercises;
-				}
+				isVisibleToStudents = json.isVisibleToStudents;
+                exercises = json.exercises;
             } catch (e) {
                 console.log(e);
                 return;
-            } 
+            }
         }
 
-        //console.log(`New exercise created!`);
-        //console.log(`Exercise Name: ${name}`);
+        //console.log(`New Course created!`);
+        //console.log(`Course Name: ${name}`);
         
-        const data = {
-			courseID: this.state.courseID,
-			name: name,
-			isVisibleToStudents: isVisibleToStudents,
-			subExercises: subExercises
+        const newCourse = {
+            name: name,
+            isVisibleToStudents: isVisibleToStudents,
+            exercises: exercises
         }
         
         //console.log(Axios.defaults.headers.common);
-        Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/course/exercise', data)
+        Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/course', newCourse)
             .then(res => {
-                this.props.history.push('/course/' + this.state.courseID + '/exercise/' + res.data.id + '/edit');
+                this.props.history.push('/course/exercises', {courseID: res.data.id});
             });
 
         

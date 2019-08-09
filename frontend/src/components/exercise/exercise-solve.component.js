@@ -18,10 +18,11 @@ export default class ExerciseSolve extends Component {
         this.setHighlighting = this.setHighlighting.bind(this);
 
         this.state = {
-            exerciseID: '',
-            name: '',
-            sourceFiles: [],
-            content: [],
+			courseID: this.props.courseID,
+            exerciseID: this.props.exerciseID,
+			name: '',
+			subExercises: [],
+			subExercisesIndex: 0,
             highlighting: null,
 
             didChangeCode: true
@@ -29,21 +30,26 @@ export default class ExerciseSolve extends Component {
     }
 
     componentDidMount() {
-        Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/exercise/' + this.props.exerciseID)
+        Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/course/' + this.state.courseID + '/exercise/' + this.state.exerciseID)
             .then(response => {
-                this.setState({
-                    exerciseID: response.data._id,
-                    name: response.data.name,
-                    content: response.data.content,
-                    sourceFiles: response.data.source_files
-                });
+				this.setState({
+					exerciseID: response.data._id,
+					name: response.data.name,
+					subExercises: response.data.subExercises
+				});
             })
-            .catch(function (error) {
-                console.log(error);
+            .catch((error) => {
+                console.error("Course or Exercise not found!");
+				this.props.history.push('/');
             });
     }
 
     render () {
+
+		if (this.state.subExercises.length === 0) {
+			return null;
+		}
+
         return (
             <div style={{marginTop: '60px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
                 <h3>{this.state.name}</h3>
@@ -52,7 +58,7 @@ export default class ExerciseSolve extends Component {
                 <br />
 
                 <ExerciseContent
-                    content={this.state.content}
+                    content={this.state.subExercises[this.state.subExercisesIndex].content}
                     mode="solve"
                     onChangeExerciseContent={this.onChangeExerciseContent}
                     onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
@@ -66,8 +72,10 @@ export default class ExerciseSolve extends Component {
                 <br />
 
                 <ExerciseExecuter
-                    exerciseID={this.state.exerciseID}
-                    content={this.state.content}
+					courseID={this.state.courseID}
+					exerciseID={this.state.exerciseID}
+					subExercisesIndex={this.state.subExercisesIndex}
+                    content={this.state.subExercises[this.state.subExercisesIndex].content}
                     didChangeCode={this.state.didChangeCode}
                     onRanCode={this.onRanCode}
                     setHighlighting={this.setHighlighting}
