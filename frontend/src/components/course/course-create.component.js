@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import Axios from 'axios';
+import lzstring from 'lz-string';
 
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -16,7 +17,8 @@ export default class CourseCreate extends Component {
         this.onSubmit = this.onSubmit.bind(this);
 
         this.state = {
-            name: '',
+			name: '',
+			isVisibleToStudents: true,
             importString: ''
         }
     }
@@ -46,12 +48,33 @@ export default class CourseCreate extends Component {
                             />
                         </Col>
                     </Form.Group>
-                    
+
+					<Form.Group as={Row} className="form-group">
+                        <Form.Label column sm={2} style={{textAlign: 'right'}}><h5>Visible:</h5></Form.Label>
+                        <Col sm={6}>
+							<Form.Check
+								style={{marginTop: "10px"}} 
+								id="toggleIsVisibleForStudents"
+								draggable={false}
+								type="checkbox"
+								className="custom-switch"
+								custom="true"
+								label=""
+								checked={this.state.isVisibleToStudents}
+								onChange={(e) => {this.setState({ isVisibleToStudents: !this.state.isVisibleToStudents })}}
+							/>
+                        </Col>
+                    </Form.Group>
+
                     <br/>
                     <br/>
 
+					<h4>Or Import:</h4>
+
+					<br/>
+
                     <Form.Group as={Row} className="form-group">
-                        <Form.Label column sm={2} style={{textAlign: 'right'}}><h5>Import:</h5></Form.Label>
+                        <Form.Label column sm={2} style={{textAlign: 'right'}}><h5>Import String:</h5></Form.Label>
                         <Col sm={6}>
                             <Form.Control 
                                 style={{color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
@@ -59,7 +82,7 @@ export default class CourseCreate extends Component {
                                 autoComplete="off"
                                 type="text"
                                 className="form-control"
-                                placeholder="Or enter course json import string"
+                                placeholder="Or enter course import string"
                                 value={this.state.importString}
                                 onChange={this.onChangeCourseImportString}
                             />
@@ -97,15 +120,21 @@ export default class CourseCreate extends Component {
         }
 
         let name = this.state.name;
-        let isVisibleToStudents = true;
+        let isVisibleToStudents = this.state.isVisibleToStudents;
         let exercises = [];
         if (this.state.importString !== '') {
             try {
-                let json = JSON.parse(this.state.importString);
+                let json = JSON.parse(lzstring.decompressFromBase64(this.state.importString));
 
-				name = json.name;
-				isVisibleToStudents = json.isVisibleToStudents;
-                exercises = json.exercises;
+				if (json.name !== "" && json.exercises !== undefined) {
+					name = json.name;
+					isVisibleToStudents = json.isVisibleToStudents || false;
+					exercises = json.exercises;
+				} else {
+					console.log("Faulty course import string!")
+					return;
+				}
+
             } catch (e) {
                 console.log(e);
                 return;

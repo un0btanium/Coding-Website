@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import Axios from 'axios';
+import lzstring from 'lz-string';
 
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -81,7 +82,7 @@ export default class ExerciseCreate extends Component {
                     <br/>
 
                     <Form.Group as={Row} className="form-group">
-                        <Form.Label column sm={2} style={{textAlign: 'right'}}><h5>JSON String:</h5></Form.Label>
+                        <Form.Label column sm={2} style={{textAlign: 'right'}}><h5>Import String:</h5></Form.Label>
                         <Col sm={6}>
                             <Form.Control 
                                 style={{color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
@@ -89,7 +90,7 @@ export default class ExerciseCreate extends Component {
                                 autoComplete="off"
                                 type="text"
                                 className="form-control"
-                                placeholder="Or enter exercise json import string"
+                                placeholder="Or enter exercise import string"
                                 value={this.state.importString}
                                 onChange={this.onChangeExerciseImportString}
                             />
@@ -131,8 +132,8 @@ export default class ExerciseCreate extends Component {
         let subExercises = undefined;
         if (this.state.importString !== '') {
             try {
-                let json = JSON.parse(this.state.importString);
-
+                let json = JSON.parse(lzstring.decompressFromBase64(this.state.importString));
+				
 				name = json.name;
 				isVisibleToStudents = json.isVisibleToStudents || true;
 
@@ -141,8 +142,11 @@ export default class ExerciseCreate extends Component {
 						content: json.content,
 						sourceFiles: json.source_files
 					}];
-				} else {
+				} else if (json.subExercises !== undefined) {
 					subExercises = json.subExercises;
+				} else {
+					console.log("Faulty exercise import string!")
+					return;
 				}
             } catch (e) {
                 console.log(e);

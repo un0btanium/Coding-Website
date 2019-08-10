@@ -38,6 +38,7 @@ export default class ExerciseExecuter extends Component {
         
 
         this.state = {
+			ranSubExercisesIndex: 0,
             isExecutingOnServer: false,
             result: null,
             step: 0,
@@ -240,7 +241,7 @@ export default class ExerciseExecuter extends Component {
             return;
         }
 
-        if (!this.props.didChangeCode && !this.state.containsReadIn) {
+        if (!this.props.didChangeCode && !this.state.containsReadIn && this.state.ranSubExercisesIndex === this.props.subExercisesIndex) {
             this.props.setHighlighting({
                 node: this.state.result.node_data[this.state.result.steps[0].id],
                 step: this.state.result.steps[0]
@@ -284,7 +285,8 @@ export default class ExerciseExecuter extends Component {
         };
         
         this.setState({
-            isExecutingOnServer: true
+			isExecutingOnServer: true,
+			ranSubExercisesIndex: this.props.subExercisesIndex
         });
 
         Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/exercise/run', data, options)
