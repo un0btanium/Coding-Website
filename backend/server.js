@@ -152,6 +152,71 @@ app.post('/api/signup', (req, res, next) => {
 
 });
 
+				/* USERS */
+
+app.get('/api/users/:page', (req, res, next) => checkAuth(req, res, next, ["admin"]), function (req, res) {
+    const page = req.params.page || 0;
+    // const options = { limit: 10, skip: page*10 };
+    const options = {};
+    User.find({}, "email role", options, function (err, users) {
+        if (err) {
+            console.log(err);
+            res.status(404).send("something went wrong");
+        } else {
+            res.status(200).json({ 'users': users, 'page': page });
+        }
+    })
+});
+
+
+app.put('/api/user/role', (req, res, next) => checkAuth(req, res, next, ["admin"]), function (req, res) {
+    User.findById(req.body.id, function (err, user) {
+        if (err) {
+            console.log(err);
+            res.status(404).send("something went wrong");
+        } else {
+			user.role = req.body.role;
+			console.log("Changed user role ")
+			user.save()
+				.then(user => {
+					console.log("Changed user role of " + user.email + " to " + user.role)
+					res.status(200).json({ 'role': user.role });
+				})
+				.catch(err => {
+					res.status(400, 'Adding new course failed');
+				});
+        }
+    })
+});
+
+				/* PROCESSES */
+
+app.get('/api/processes', (req, res, next) => checkAuth(req, res, next, ["admin"]), function (req, res) {
+	let processes = [];
+	for (let name in javaProcesses) {
+		let process = javaProcesses[name];
+		if (process !== undefined) {
+			processes.push({
+				exerciseData: process.exerciseData,
+				userData: process.userData,
+				started: process.started
+			});
+		}
+	}
+	res.status(200).json({ 'processes': processes, currentDate: new Date() });
+});	
+
+app.put('/api/process/terminate', (req, res, next) => checkAuth(req, res, next, ["admin"]), function (req, res) {
+	
+	if (javaProcesses[req.body.userID] !== undefined && javaProcesses[req.body.userID].process !== undefined) {
+		javaProcesses[req.body.userID].process.kill('SIGINT');
+		javaProcesses[req.body.userID] = undefined;
+		res.status(200).send();
+	} else {
+		res.status(404).send("Process is not running!");
+	}
+});	
+
 
 				/* COURSES */
 
@@ -568,7 +633,8 @@ app.route("/api/exercise/input")
                 console.log(e);
             }
         } else {
-            console.warn("No java process available anymore to write to!");
+			console.warn("No java process available anymore to write to!");
+			// TODO send response to cancel code execution clientside
         }
     });
 
@@ -627,16 +693,19 @@ app.route("/api/exercise/run")
                 let javaChild = spawn(javaExe, ["-jar", __dirname + path.sep + "java" + path.sep + "executer.jar", JSON.stringify(arg)], javaOptions);
 
                 javaProcesses[userData.userId] = {
-					exercise: {
-						name: exercise.name,
+					exerciseData: {
+						courseName: course.name,
+						courseID: courseID,
+						exerciseName: exercise.name,
+						exerciseID: exerciseID,
 						subExerciseIndex: subExerciseIndex,
 						code_snippets: code_snippets
 					},
 					userData: {
 						userId: userData.userId,
-						email: userData.email,
-						role: userData.role,
+						email: userData.email
 					},
+					started: new Date(),
 					process: javaChild
 				};
 
