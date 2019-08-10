@@ -77,7 +77,7 @@ export default class ExerciseConsole extends Component {
             }
 
             return (
-                <div  as={Row} style={{'width': '100%'}}>
+                <div as={Row} style={{'width': '100%'}}>
                     <Form.Control 
                         style={{minHeight: '75px', maxHeight: '700px', boxShadow: 'none', fontFamily: 'Consolas, "Courier New", Courier, monospace', color: '#FFFFFF', backgroundColor: '#000000'}}
                         autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck="false"

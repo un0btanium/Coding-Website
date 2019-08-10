@@ -159,12 +159,23 @@ app.get('/api/courses/:page', function (req, res) {
     const page = req.params.page || 0;
     // const options = { limit: 10, skip: page*10 };
     const options = {};
-    Course.find({}, "name isVisibleToStudents", options, function (err, courses) {
+    Course.find({}, options, function (err, courses) {
         if (err) {
             console.log(err);
             res.status(404).send("something went wrong");
         } else {
-            res.json({ 'courses': courses, 'page': page });
+			let simplifiedCourses = courses.map((course) => {
+				return {
+					_id: course._id,
+					name: course.name,
+					isVisibleToStudents: course.isVisibleToStudents,
+					exercisesAmount: course.exercises.length,
+					subExercisesAmount: course.exercises.reduce(function(prev, cur) {
+						return prev + cur.subExercises.length;
+					}, 0)
+				}
+			});
+            res.json({ 'courses': simplifiedCourses, 'page': page });
         }
     })
 });
@@ -201,6 +212,29 @@ app.route('/api/course')
 					.save()
 					.then(course => {
 						res.status(200).json('Course updated');
+					})
+					.catch(err => {
+						res.status(400).send("Updating course failed");
+					});
+			}
+		});
+	});
+
+app.route('/api/course/visibility')
+
+	.put((req, res, next) => checkAuth(req, res, next, ["admin", "maintainer"]), function (req, res) {
+		Course.findById(req.body.id, function (err, course) {
+			if (!course) {
+				res.status(404).send('course was not found');
+			} else {
+				if (course.isVisibleToStudents !== req.body.isVisibleToStudents) {
+					course.isVisibleToStudents = req.body.isVisibleToStudents;
+				}
+
+				course
+					.save()
+					.then(course => {
+						res.status(200).json({ isVisibleToStudents: course.isVisibleToStudents});
 					})
 					.catch(err => {
 						res.status(400).send("Updating course failed");

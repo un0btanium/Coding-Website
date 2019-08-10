@@ -25,8 +25,10 @@ export default class ExerciseView extends Component {
     render () {
         let modeToggle = null;
         if (isAuthenticated(["admin", "maintainer"])) {
-            modeToggle = <Form.Check id="modeToggleSwitch" type="checkbox" className="custom-switch" custom="true" label="Edit Mode" checked={this.state.mode === "edit"} onChange={this.onChangeMode} />
-        }
+            modeToggle = <div className="disableSelection">
+				<Form.Check draggable={false} id="modeToggleSwitch" type="checkbox" className="custom-switch" custom="true" label="Edit Mode" checked={this.state.mode === "edit"} onChange={this.onChangeMode} />
+			</div>
+		}
 
         if (this.state.mode === "edit") {
             return (

@@ -143,24 +143,25 @@ class App extends Component {
           <span ref={this.fontDetector} style={{ fontFamily: 'Consolas, "Courier New", Courier, monospace', position: 'absolute', width: 'auto', height: 'auto', margin: '0px', padding: '0px', fontSize: '18px', left: '-9999px' }}><span>WIwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwiwi</span></span>
 
           <Navbar bg={BG} variant={VARIANT} style={{ boxShadow: '0px 2px 5px #000000'}}>
-				<Container>
-				<Navbar.Toggle aria-controls="responsive-navbar-nav" />
-				<Navbar.Brand as={Link} to="/">
-					<img src={logo} width="30" height="30" alt="Logo" />
-					{' Coding Buddy'}
-				</Navbar.Brand>
-				
-				<div className="collapse navbar-collapse">
+				<Container className="disableSelection">
+					<Navbar.Toggle aria-controls="responsive-navbar-nav" />
+					<Navbar.Brand as={Link} to="/">
+						<img src={logo} width="30" height="30" alt="Logo" />
+						{' Coding Buddy'}
+					</Navbar.Brand>
+					
+					<div className="collapse navbar-collapse">
 
-					<Nav className="mr-auto">
-					<Nav.Link as={Link} variant="light" to="/courses">Courses</Nav.Link>
-					</Nav>
+						<Nav className="mr-auto">
+						<Nav.Link as={Link} variant="light" to="/courses">Courses</Nav.Link>
+						</Nav>
 
-					{rightNavbar}
+						{rightNavbar}
 
-				</div>
+					</div>
 				</Container>
 			</Navbar>
+
 			<br />
 
 			<Container>

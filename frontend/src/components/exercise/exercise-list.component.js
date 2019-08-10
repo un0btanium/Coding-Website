@@ -8,18 +8,25 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import Alert from 'react-bootstrap/Alert'
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons'
+
 export default class ExerciseList extends Component {
     
     constructor(props) {
 		super(props);
+		
         this.state = {
 			course: {
 				name: "Loading...",
 				exercises: []
 			},
-            alerts: [],
-            showDeleteModal: false,
-            markedExercise: {}
+			
+            showDeleteModalExercise: false,
+			markedExercise: {},
+			
+            showDeleteModalCourse: false,
+            markedCourse: {}
         };
     }
 
@@ -43,8 +50,14 @@ export default class ExerciseList extends Component {
                 
                 <h3>{this.state.course.name || "Loading..."}</h3>
 				
-				{isAuthenticated(["admin", "maintainer"]) && <Button variant="success" onClick={() => this.newExercise()}>Create New Exercise</Button>}
-                    
+				{isAuthenticated(["admin", "maintainer"]) &&
+					[
+					<Button variant="success" onClick={() => this.newExercise()} key="CreateExerciseButton">Create New Exercise</Button>,
+					<Button variant="danger" onClick={() => this.showDeleteModalCourse(this.state.course)} key="DeleteCourseButton">Delete Course</Button>,
+					<Button variant="info" onClick={() => this.switchVisibilityCourse()} key="VisibilityCourseButton"><FontAwesomeIcon icon={this.state.course.isVisibleToStudents ? faLockOpen : faLock} /></Button>
+				]
+				}
+                
 
                 <table className="table table-striped" style={{ marginTop: 20 }}>
                     <thead>
@@ -57,16 +70,30 @@ export default class ExerciseList extends Component {
                         { this.exerciseList() }
                     </tbody>
                 </table>
-                <Modal centered show={this.state.showDeleteModal} onHide={() => this.closeDeleteModal()}>
+                <Modal centered show={this.state.showDeleteModalExercise} onHide={() => this.closeDeleteModalExercise()}>
                     <Modal.Header closeButton>
                         <Modal.Title>Delete Exercise {this.state.markedExercise.name}</Modal.Title>
                     </Modal.Header>
-                    <Modal.Body>Are you sure you want to delete the exercise?</Modal.Body>
+                    <Modal.Body>Are you sure you want to delete the <b>Exercise</b>?</Modal.Body>
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={() => this.closeDeleteModal()}>
+                        <Button variant="secondary" onClick={() => this.closeDeleteModalExercise()}>
                         Cancel
                         </Button>
-                        <Button variant="danger" onClick={() => this.delete(this.state.markedExercise._id)}>
+                        <Button variant="danger" onClick={() => this.deleteExercise(this.state.markedExercise._id)}>
+                        Delete
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
+                <Modal centered show={this.state.showDeleteModalCourse} onHide={() => this.closeDeleteModalCourse()}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Delete Course {this.state.markedCourse.name}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>Are you sure you want to delete the <b>Course</b>?</Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => this.closeDeleteModalExercise()}>
+                        Cancel
+                        </Button>
+                        <Button variant="danger" onClick={() => this.deleteCourse(this.state.markedCourse._id)}>
                         Delete
                         </Button>
                     </Modal.Footer>
@@ -75,26 +102,13 @@ export default class ExerciseList extends Component {
         )
     }
 
-
-
-    alertList() {
-        const TimedDeleteAlert = props => (
-            <Alert centered show={this.state.showDeleteAlert} variant="success" style={{height: '50px', textAlign: 'center'}}>
-                <p>currentAlert</p>
-            </Alert>
-        );
-        return this.state.alerts.map(function(currentAlert, i) {
-            return <TimedDeleteAlert alert={currentAlert} key={i} />;
-        });
-    }
-
     exerciseList() {
-        // TODO Excerise not as table but list with custom areas
+
         const Exercise = props => (
             <tr>
                 <td>
                     { isAuthenticated(["admin", "maintainer"]) && [
-                        <Button variant="danger" onClick={() => this.showDeleteModal(props.exercise)} key="DeleteExerciseButton">Delete</Button>,
+                        <Button variant="danger" onClick={() => this.showDeleteModalExercise(props.exercise)} key="DeleteExerciseButton">Delete</Button>,
                         <span key="span1"> </span>,
                         <Button variant="primary" onClick={() => this.editExercise(props.exercise._id)} key="EditExerciseButton">Edit</Button>,
                         <span key="span2"> </span>
@@ -133,17 +147,33 @@ export default class ExerciseList extends Component {
 
 
 
-    showDeleteModal(exercise) {
+    showDeleteModalExercise(exercise) {
         this.setState({
             markedExercise: exercise,
             showDeleteModal: true
         });
     }
 
-    closeDeleteModal() {
+    closeDeleteModalExercise() {
         this.setState({
             showDeleteModal: false,
             markedExercise: {}
+        });
+	}
+	
+	
+
+    showDeleteModalCourse(course) {
+        this.setState({
+            showDeleteModalCourse: true,
+            markedCourse: course
+        });
+    }
+
+    closeDeleteModalCourse() {
+        this.setState({
+            showDeleteModalCourse: false,
+            markedCourse: {}
         });
     }
 
@@ -161,7 +191,7 @@ export default class ExerciseList extends Component {
         this.props.history.push('/course/' + this.props.match.params.courseID + '/exercise/' + id + '/solve');
     }
 
-    delete(id) {
+    deleteExercise(id) {
         Axios.delete(process.env.REACT_APP_BACKEND_SERVER + '/course/' + this.props.match.params.courseID + '/exercise/' + id)
             .then(response => {
 
@@ -195,5 +225,34 @@ export default class ExerciseList extends Component {
 				// TODO show error message to user
                 console.log(error);
             });
-    }
+	}
+	
+	
+    deleteCourse(id) {
+        Axios.delete(process.env.REACT_APP_BACKEND_SERVER + '/course/'+id)
+            .then(response => {
+				this.history.push("/");
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+	}
+	
+
+
+	switchVisibilityCourse(course) {
+        Axios.put(process.env.REACT_APP_BACKEND_SERVER + '/course/visibility', { id: this.state.course._id, isVisibleToStudents: !this.state.course.isVisibleToStudents})
+            .then(response => {
+				this.setState({
+					course: update(this.state.course, {
+						isVisibleToStudents: {
+							$set: response.data.isVisibleToStudents
+						}
+					})
+				});
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+	}
 }

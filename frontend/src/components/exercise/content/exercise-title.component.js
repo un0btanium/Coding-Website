@@ -7,7 +7,7 @@ export default class ExerciseTitle extends Component {
     render () {
         if (this.props.mode === "solve") {
             return (
-                <h4 as={Row} style={{'marginBottom': '20px'}}>{this.props.content.text}</h4>
+                <h4 className="disableSelection" as={Row} style={{'marginBottom': '20px'}}>{this.props.content.text}</h4>
             );
         } else if (this.props.mode === "edit") {
             

@@ -80,7 +80,7 @@ export default class ExerciseEdit extends Component {
 		}
 
         return (
-            <div style={{marginTop: '50px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
+            <div className="disableSelection" style={{marginTop: '50px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
                 
 				<div style={{textAlign: "center"}}>
 					<h3>Edit Exercise {this.state.name}</h3>
@@ -157,7 +157,7 @@ export default class ExerciseEdit extends Component {
                     <Tabs
                         id="controlled-tab-exercise"
                         activeKey={this.state.tabKey}
-                        onSelect={(tabKey) => this.setState({ tabKey })}
+						onSelect={(tabKey) => this.setState({ tabKey })}
                     >
 
                         <Tab variant="primary" eventKey="content" title="Content Elements">

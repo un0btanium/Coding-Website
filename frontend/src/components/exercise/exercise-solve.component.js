@@ -55,7 +55,7 @@ export default class ExerciseSolve extends Component {
 		}
 
         return (
-            <div style={{marginTop: '60px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
+            <div className="disableSelection" style={{marginTop: '60px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
 				<div style={{textAlign: "center"}}>
                 	<h3>{this.state.name}</h3>
 				</div>
