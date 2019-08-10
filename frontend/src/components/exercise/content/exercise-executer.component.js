@@ -38,7 +38,7 @@ export default class ExerciseExecuter extends Component {
         
 
         this.state = {
-			ranSubExercisesIndex: 0,
+			ranSubExerciseIndex: 0,
             isExecutingOnServer: false,
             result: null,
             step: 0,
@@ -241,8 +241,9 @@ export default class ExerciseExecuter extends Component {
             return;
         }
 
-        if (!this.props.didChangeCode && !this.state.containsReadIn && this.state.ranSubExercisesIndex === this.props.subExercisesIndex) {
+        if (!this.props.didChangeCode && !this.state.containsReadIn && this.state.ranSubExerciseIndex === this.props.subExerciseIndex) {
             this.props.setHighlighting({
+				subExerciseIndex: this.state.ranSubExerciseIndex,
                 node: this.state.result.node_data[this.state.result.steps[0].id],
                 step: this.state.result.steps[0]
             });
@@ -269,7 +270,7 @@ export default class ExerciseExecuter extends Component {
         let data = {
 			courseID: this.props.courseID,
 			exerciseID: this.props.exerciseID,
-			subExercisesIndex: this.props.subExercisesIndex,
+			subExerciseIndex: this.props.subExerciseIndex,
             code_snippets: code_snippets
         }
 
@@ -286,7 +287,7 @@ export default class ExerciseExecuter extends Component {
         
         this.setState({
 			isExecutingOnServer: true,
-			ranSubExercisesIndex: this.props.subExercisesIndex
+			ranSubExerciseIndex: this.props.subExerciseIndex
         });
 
         Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/exercise/run', data, options)
@@ -334,6 +335,7 @@ export default class ExerciseExecuter extends Component {
                 });
             }
             this.props.setHighlighting({
+				subExerciseIndex: this.state.ranSubExerciseIndex,
                 node: json.node_data[json.steps[startAtStep].id],
                 step: json.steps[startAtStep]
             });
@@ -364,6 +366,7 @@ export default class ExerciseExecuter extends Component {
         if (this.state.result && this.state.result.steps && this.state.result.steps.length > 0 && (this.state.step+1) < this.state.result.steps.length) {
             log("step: " + this.state.step + " " + this.state.result.steps[this.state.step].valueType + " " + this.state.result.steps[this.state.step].value);
             this.props.setHighlighting({
+				subExerciseIndex: this.state.ranSubExerciseIndex,
                 node: this.state.result.node_data[this.state.result.steps[this.state.step+1].id],
                 step: this.state.result.steps[this.state.step+1]
             });
@@ -386,6 +389,7 @@ export default class ExerciseExecuter extends Component {
         }
         if (this.state.result && this.state.result.steps && this.state.result.steps.length > 0) {
             this.props.setHighlighting({
+				subExerciseIndex: this.state.ranSubExerciseIndex,
                 node: this.state.result.node_data[this.state.result.steps[0].id],
                 step: this.state.result.steps[0]
             });
@@ -402,6 +406,7 @@ export default class ExerciseExecuter extends Component {
         if (this.state.result && this.state.result.steps && this.state.result.steps.length > 0) {
             if ((this.state.step+1) < this.state.result.steps.length) {
                 this.props.setHighlighting({
+					subExerciseIndex: this.state.ranSubExerciseIndex,
                     node: this.state.result.node_data[this.state.result.steps[this.state.step+1].id],
                     step: this.state.result.steps[this.state.step+1]
                 });
@@ -410,6 +415,7 @@ export default class ExerciseExecuter extends Component {
                 });
             } else {
                 this.props.setHighlighting({
+					subExerciseIndex: this.state.ranSubExerciseIndex,
                     node: this.state.result.node_data[this.state.result.steps[0].id],
                     step: this.state.result.steps[0]
                 });
@@ -427,6 +433,7 @@ export default class ExerciseExecuter extends Component {
             } else {
                 if (this.state.step === this.state.result.steps.length-1) {
                     this.props.setHighlighting({
+						subExerciseIndex: this.state.ranSubExerciseIndex,
                         node: this.state.result.node_data[this.state.result.steps[0].id],
                         step: this.state.result.steps[0]
                     });
@@ -457,6 +464,7 @@ export default class ExerciseExecuter extends Component {
         if (this.state.result && this.state.result.steps && this.state.result.steps.length > 0) {
             if ((this.state.step-1) >= 0) {
                 this.props.setHighlighting({
+					subExerciseIndex: this.state.ranSubExerciseIndex,
                     node: this.state.result.node_data[this.state.result.steps[this.state.step-1].id],
                     step: this.state.result.steps[this.state.step-1]
                 });
@@ -465,6 +473,7 @@ export default class ExerciseExecuter extends Component {
                 });
             } else {
                 this.props.setHighlighting({
+					subExerciseIndex: this.state.ranSubExerciseIndex,
                     node: this.state.result.node_data[this.state.result.steps[this.state.result.steps.length-1].id],
                     step: this.state.result.steps[this.state.result.steps.length-1]
                 });
@@ -481,6 +490,7 @@ export default class ExerciseExecuter extends Component {
         }
         if (this.state.result && this.state.result.steps && this.state.result.steps.length > 0) {
             this.props.setHighlighting({
+				subExerciseIndex: this.state.ranSubExerciseIndex,
                 node: this.state.result.node_data[this.state.result.steps[this.state.result.steps.length-1].id],
                 step: this.state.result.steps[this.state.result.steps.length-1]
             });

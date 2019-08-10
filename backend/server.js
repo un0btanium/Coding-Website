@@ -504,7 +504,7 @@ app.route("/api/exercise/run")
         let code_snippets = req.body.code_snippets;
 		let courseID = req.body.courseID;
 		let exerciseID = req.body.exerciseID;
-		let subExercisesIndex = req.body.subExercisesIndex;
+		let subExerciseIndex = req.body.subExerciseIndex;
         let userData = req.tokenData;
 
 
@@ -523,7 +523,7 @@ app.route("/api/exercise/run")
 				// TODO save code for user
 
                 let sourceFiles = [];
-                for (let sourceFile of exercise.subExercises[subExercisesIndex].sourceFiles) {
+                for (let sourceFile of exercise.subExercises[subExerciseIndex].sourceFiles) {
                     sourceFiles.push(sourceFile);
                 }
 
@@ -554,7 +554,7 @@ app.route("/api/exercise/run")
                 javaProcesses[userData.userId] = {
 					exercise: {
 						name: exercise.name,
-						subExerciseIndex: subExercisesIndex,
+						subExerciseIndex: subExerciseIndex,
 						code_snippets: code_snippets
 					},
 					userData: {

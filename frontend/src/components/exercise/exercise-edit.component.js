@@ -43,7 +43,7 @@ export default class ExerciseEdit extends Component {
 				content: [],
 				sourceFiles: []
 			}],
-			subExercisesIndex: 0,
+			subExerciseIndex: 0,
 
             contentIDCounter: 0,
             tabKey: "content",
@@ -130,7 +130,7 @@ export default class ExerciseEdit extends Component {
 									className="progress-arrow"
 									key={"SelectorSubExercises"+i}
 									onClick={() => {
-										this.setState({ subExercisesIndex: i });
+										this.setState({ subExerciseIndex: i });
 									}}
 									onContextMenu={(e) => this.deleteSubExcerise(e, i)}
 								></div>
@@ -155,7 +155,7 @@ export default class ExerciseEdit extends Component {
 
                         <Tab variant="primary" eventKey="content" title="Content Elements">
                             <ExerciseContent
-                                content={this.state.subExercises[this.state.subExercisesIndex].content}
+                                content={this.state.subExercises[this.state.subExerciseIndex].content}
                                 mode="edit"
                                 onChangeExerciseContent={this.onChangeExerciseContent}
                                 onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
@@ -180,7 +180,7 @@ export default class ExerciseEdit extends Component {
                         <Tab variant="primary" eventKey="source-file" title="Source Files">
                             <ExerciseSourceFiles
                                 mode="edit"
-                                sourceFiles={this.state.subExercises[this.state.subExercisesIndex].sourceFiles}
+                                sourceFiles={this.state.subExercises[this.state.subExerciseIndex].sourceFiles}
                                 onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
                                 deleteSourceFile={this.deleteSourceFile}
                                 moveSourceFile={this.moveSourceFile}
@@ -285,14 +285,14 @@ export default class ExerciseEdit extends Component {
 			return;
 		}
 
-		let subExercisesIndex = this.state.subExercisesIndex
-		if (this.state.subExercisesIndex === index && this.state.subExercisesIndex !== 0) {
-			subExercisesIndex = this.state.subExercisesIndex-1;
+		let subExerciseIndex = this.state.subExerciseIndex;
+		if (this.state.subExerciseIndex === index && this.state.subExerciseIndex !== 0) {
+			subExerciseIndex = this.state.subExerciseIndex-1;
 		}
-		subExercisesIndex = Math.min(subExercisesIndex, this.state.subExercises.length-2);
+		subExerciseIndex = Math.min(subExerciseIndex, this.state.subExercises.length-2);
 
         this.setState({
-			subExercisesIndex: subExercisesIndex,
+			subExerciseIndex: subExerciseIndex,
 			subExercises: update(this.state.subExercises, {
 				$splice: [[index, 1]]
 			})
@@ -300,11 +300,11 @@ export default class ExerciseEdit extends Component {
 	}
 
     addNewSourceFile() {
-        if (this.state.subExercises[this.state.subExercisesIndex].sourceFiles.length === 0) {
+        if (this.state.subExercises[this.state.subExerciseIndex].sourceFiles.length === 0) {
             this.setState({
                 contentIDCounter: this.state.contentIDCounter+1,
 				subExercises: update(this.state.subExercises, {
-					[this.state.subExercisesIndex]: {
+					[this.state.subExerciseIndex]: {
 						sourceFiles: {
 							$push: [
 								{
@@ -336,7 +336,7 @@ export default class ExerciseEdit extends Component {
             this.setState({
 				contentIDCounter: this.state.contentIDCounter+1,
 				subExercises: update(this.state.subExercises, {
-					[this.state.subExercisesIndex]: {
+					[this.state.subExerciseIndex]: {
 						sourceFiles: {
 							$push: [
 								{
@@ -364,7 +364,7 @@ export default class ExerciseEdit extends Component {
         this.setState({
 			contentIDCounter: this.state.contentIDCounter+1,
 			subExercises: update(this.state.subExercises, {
-				[this.state.subExercisesIndex]: {
+				[this.state.subExerciseIndex]: {
 					content: {
 						$push: [
 							{
@@ -383,7 +383,7 @@ export default class ExerciseEdit extends Component {
         this.setState({
 			contentIDCounter: this.state.contentIDCounter+1,
 			subExercises: update(this.state.subExercises, {
-				[this.state.subExercisesIndex]: {
+				[this.state.subExerciseIndex]: {
 					content: {
 						$push: [
 							{
@@ -402,7 +402,7 @@ export default class ExerciseEdit extends Component {
         this.setState({
 			contentIDCounter: this.state.contentIDCounter+1,
 			subExercises: update(this.state.subExercises, {
-				[this.state.subExercisesIndex]: {
+				[this.state.subExerciseIndex]: {
 					content: {
 						$push: [
 							{
@@ -424,7 +424,7 @@ export default class ExerciseEdit extends Component {
         let identifier = "";
 
         let containsEditor = false;
-        for (let element of this.state.subExercises[this.state.subExercisesIndex].content) {
+        for (let element of this.state.subExercises[this.state.subExerciseIndex].content) {
             if (element.type === "editor") {
                 containsEditor = true;
                 break;
@@ -438,7 +438,7 @@ export default class ExerciseEdit extends Component {
         this.setState({
 			contentIDCounter: this.state.contentIDCounter+1,
 			subExercises: update(this.state.subExercises, {
-				[this.state.subExercisesIndex]: {
+				[this.state.subExerciseIndex]: {
 					content: {
 						$push: [
 							{
@@ -463,7 +463,7 @@ export default class ExerciseEdit extends Component {
     deleteContent(id) {
 		let index = -1;
 		let i = 0;
-		for (let c of this.state.subExercises[this.state.subExercisesIndex].content) {
+		for (let c of this.state.subExercises[this.state.subExerciseIndex].content) {
 			if (c._id === id) {
 				index = i;
 				break;
@@ -477,7 +477,7 @@ export default class ExerciseEdit extends Component {
 
         this.setState({
 			subExercises: update(this.state.subExercises, {
-				[this.state.subExercisesIndex]: {
+				[this.state.subExerciseIndex]: {
 					content: {
 						$splice: [[index, 1]]
 					}
@@ -491,7 +491,7 @@ export default class ExerciseEdit extends Component {
 
 		let index = -1;
 		let i = 0;
-		for (let sourceFile of this.state.subExercises[this.state.subExercisesIndex].sourceFiles) {
+		for (let sourceFile of this.state.subExercises[this.state.subExerciseIndex].sourceFiles) {
 			if (sourceFile._id === id) {
 				index = i;
 				break;
@@ -505,7 +505,7 @@ export default class ExerciseEdit extends Component {
 
         this.setState({
 			subExercises: update(this.state.subExercises, {
-				[this.state.subExercisesIndex]: {
+				[this.state.subExerciseIndex]: {
 					sourceFiles: {
 						$splice: [[index, 1]]
 					}
@@ -526,14 +526,14 @@ export default class ExerciseEdit extends Component {
 		
 		let newContent;
         if (moveUp) {
-            newContent = this.array_move(this.state.subExercises[this.state.subExercisesIndex].content, index, index-1);
+            newContent = this.array_move(this.state.subExercises[this.state.subExerciseIndex].content, index, index-1);
         } else {
-            newContent = this.array_move(this.state.subExercises[this.state.subExercisesIndex].content, index, index+1);
+            newContent = this.array_move(this.state.subExercises[this.state.subExerciseIndex].content, index, index+1);
 		}
 		
 		this.setState({
 			subExercises: update(this.state.subExercises, {
-				[this.state.subExercisesIndex]: {
+				[this.state.subExerciseIndex]: {
 					content: {
 						$set: newContent
 					}
@@ -553,14 +553,14 @@ export default class ExerciseEdit extends Component {
 
 		let newSourceFiles;
         if (moveUp) {
-            newSourceFiles = this.array_move(this.state.subExercises[this.state.subExercisesIndex].sourceFiles, index, index-1);
+            newSourceFiles = this.array_move(this.state.subExercises[this.state.subExerciseIndex].sourceFiles, index, index-1);
         } else {
-            newSourceFiles = this.array_move(this.state.subExercises[this.state.subExercisesIndex].sourceFiles, index, index+1);
+            newSourceFiles = this.array_move(this.state.subExercises[this.state.subExerciseIndex].sourceFiles, index, index+1);
 		}
 		
 		this.setState({
 			subExercises: update(this.state.subExercises, {
-				[this.state.subExercisesIndex]: {
+				[this.state.subExerciseIndex]: {
 					sourceFiles: {
 						$set: newSourceFiles
 					}
@@ -608,7 +608,7 @@ export default class ExerciseEdit extends Component {
             return;
         }
 
-        const newContent = [...this.state.subExercises[this.state.subExercisesIndex].content]
+        const newContent = [...this.state.subExercises[this.state.subExerciseIndex].content]
         newContent[index].text = e.target.value;
         this.setState({content: newContent});
     }
@@ -624,7 +624,7 @@ export default class ExerciseEdit extends Component {
                 console.error("No exercise content found!");
                 return;
             } else {
-                const newSourceFiles = [...this.state.subExercises[this.state.subExercisesIndex].sourceFiles]
+                const newSourceFiles = [...this.state.subExercises[this.state.subExerciseIndex].sourceFiles]
                 newSourceFiles[index][key] = value;
                 this.setState({
                     sourceFiles: newSourceFiles,
@@ -633,11 +633,11 @@ export default class ExerciseEdit extends Component {
             }
         } else {
             if (key === "settings") {
-                const newContent = [...this.state.subExercises[this.state.subExercisesIndex].content]
+                const newContent = [...this.state.subExercises[this.state.subExerciseIndex].content]
                 newContent[index].settings[keySettings] = value;
                 this.setState({content: newContent});
             } else {
-                const newContent = [...this.state.subExercises[this.state.subExercisesIndex].content]
+                const newContent = [...this.state.subExercises[this.state.subExerciseIndex].content]
                 newContent[index][key] = value;
                 this.setState({content: newContent});
                 if (key === "code" || key === "solution") {
@@ -652,7 +652,7 @@ export default class ExerciseEdit extends Component {
     getIndexOfContent(id) {
         let index = -1;
         let i = 0;
-        for (let currentContent of this.state.subExercises[this.state.subExercisesIndex].content) {
+        for (let currentContent of this.state.subExercises[this.state.subExerciseIndex].content) {
             if (currentContent._id === id) {
                 index = i;
                 break;
@@ -665,7 +665,7 @@ export default class ExerciseEdit extends Component {
     getIndexOfSourceFile(id) {
         let index = -1;
         let i = 0;
-        for (let currentSourceFile of this.state.subExercises[this.state.subExercisesIndex].sourceFiles) {
+        for (let currentSourceFile of this.state.subExercises[this.state.subExerciseIndex].sourceFiles) {
             if (currentSourceFile._id === id) {
                 index = i;
                 break;

@@ -16,6 +16,7 @@ export default class ExerciseContent extends Component {
             return <div></div>;
         }
 
+		const subExerciseIndex = this.props.subExerciseIndex;
         const onChangeExerciseAceEditor = this.props.onChangeExerciseAceEditor;
         const onChangeExerciseContent = this.props.onChangeExerciseContent;
         const deleteContent = this.props.deleteContent;
@@ -69,6 +70,7 @@ export default class ExerciseContent extends Component {
                         text = "Editor";
                         element =
                             <ExerciseEditor
+								subExerciseIndex={subExerciseIndex}
                                 onChange={onChangeExerciseAceEditor}
                                 deleteContent={deleteContent}
                                 moveContent={moveContent}

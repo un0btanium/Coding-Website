@@ -23,7 +23,7 @@ export default class ExerciseSolve extends Component {
             exerciseID: this.props.exerciseID,
 			name: '',
 			subExercises: [],
-			subExercisesIndex: 0,
+			subExerciseIndex: 0,
             highlighting: null,
 
             didChangeCode: true
@@ -69,7 +69,7 @@ export default class ExerciseSolve extends Component {
 									className="progress-arrow"
 									key={"SelectorSubExercises"+i}
 									onClick={() => {
-										this.setState({ subExercisesIndex: i });
+										this.setState({ subExerciseIndex: i });
 									}}
 									onContextMenu={(e) => this.deleteSubExcerise(e, i)}
 								></div>
@@ -80,7 +80,8 @@ export default class ExerciseSolve extends Component {
                 <br />
 
                 <ExerciseContent
-                    content={this.state.subExercises[this.state.subExercisesIndex].content}
+					subExerciseIndex={this.state.subExerciseIndex}
+                    content={this.state.subExercises[this.state.subExerciseIndex].content}
                     mode="solve"
                     onChangeExerciseContent={this.onChangeExerciseContent}
                     onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
@@ -96,8 +97,8 @@ export default class ExerciseSolve extends Component {
                 <ExerciseExecuter
 					courseID={this.state.courseID}
 					exerciseID={this.state.exerciseID}
-					subExercisesIndex={this.state.subExercisesIndex}
-                    content={this.state.subExercises[this.state.subExercisesIndex].content}
+					subExerciseIndex={this.state.subExerciseIndex}
+                    content={this.state.subExercises[this.state.subExerciseIndex].content}
                     didChangeCode={this.state.didChangeCode}
                     onRanCode={this.onRanCode}
                     setHighlighting={this.setHighlighting}
@@ -118,7 +119,7 @@ export default class ExerciseSolve extends Component {
 				subExercises: update(
 					this.state.subExercises,
 					{
-						[this.state.subExercisesIndex]: {
+						[this.state.subExerciseIndex]: {
 							content: {
 								[index]: {
 									[key]: {
@@ -140,7 +141,7 @@ export default class ExerciseSolve extends Component {
     getIndexOfContent(id) {
         let index = -1;
         let i = 0;
-        for (let currentContent of this.state.subExercises[this.state.subExercisesIndex].content) {
+        for (let currentContent of this.state.subExercises[this.state.subExerciseIndex].content) {
             if (currentContent._id === id) {
                 index = i;
                 break;
