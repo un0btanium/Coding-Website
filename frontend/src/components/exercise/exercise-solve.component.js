@@ -5,6 +5,7 @@ import update from 'immutability-helper';
 import ExerciseContent from './content/exercise-content.component';
 import ExerciseExecuter from './content/exercise-executer.component';
 
+import ProgressArrows from './progress-arrows/progress-arrows.component'
 
 export default class ExerciseSolve extends Component {
     
@@ -63,22 +64,14 @@ export default class ExerciseSolve extends Component {
                 <br />
 
 				<div style={{ width: "100%", textAlign: "center"}}>
-						{
-							this.state.subExercises.map((value, i) => {
-								const arrowWidth = Math.min(((((1/this.state.subExercises.length)*100))-(2.5)), 6)+"%";
-								let style = { width:arrowWidth, marginLeft:"5px", };
-								return <div
-									style={style}
-									className="progress-arrow progress-arrow-neutral"
-									key={"SelectorSubExercises"+i}
-									onClick={() => {
-										this.setState({ subExerciseIndex: i });
-									}}
-									onContextMenu={(e) => this.deleteSubExcerise(e, i)}
-								></div>
-							})
-						}
-					</div>
+					<ProgressArrows
+						arrows={this.state.subExercises}
+						onClick={(e, i) => {
+							console.log(i);
+							this.setState({ subExerciseIndex: i });
+						}}
+					/>
+				</div>
 
                 <br />
 

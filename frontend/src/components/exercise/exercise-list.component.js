@@ -10,6 +10,8 @@ import Modal from 'react-bootstrap/Modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faLockOpen, faTrashAlt, faEdit, faPlus } from '@fortawesome/free-solid-svg-icons'
 
+import ProgressArrows from './progress-arrows/progress-arrows.component'
+
 export default class ExerciseList extends Component {
     
     constructor(props) {
@@ -73,16 +75,9 @@ export default class ExerciseList extends Component {
 								]
 							}
 						</h4>
-						<div className="progress-arrows-wrap">
-							{
-								props.exercise.subExercises !== undefined &&
-									props.exercise.subExercises.map(function(value, i) {
-										const arrowWidth = Math.min(((((1/props.exercise.subExercises.length)*100))-(0.5)), 6)+"%";
-										let style = { width:arrowWidth, zIndex: 10, marginLeft:"5px", color: "#FF0000" };
-										return <div style={style} className="progress-arrow progress-arrow-neutral" key={i}></div>
-									})
-							}
-						</div>
+						<ProgressArrows
+							arrows={props.exercise.subExercises}
+						/>
 					</div>
 					
 				</div>

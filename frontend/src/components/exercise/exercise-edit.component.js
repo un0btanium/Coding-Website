@@ -5,9 +5,14 @@ import lzstring from 'lz-string';
 
 import { Form, Button, Row, Col, Tabs, Tab } from 'react-bootstrap';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPlus } from '@fortawesome/free-solid-svg-icons'
+
 import ExerciseContent from './content/exercise-content.component';
 import ExerciseSourceFiles from './content/exercise-source-files.component';
 import ExerciseExecuter from './content/exercise-executer.component';
+
+import ProgressArrows from './progress-arrows/progress-arrows.component'
 
 export default class ExerciseEdit extends Component {
     
@@ -91,7 +96,7 @@ export default class ExerciseEdit extends Component {
 
                 <Form onSubmit={this.onSubmit}>
                     <Form.Group as={Row} className="form-group">
-                        <Form.Label column sm={2} style={{textAlign: 'right'}}><h5>Name:</h5></Form.Label>
+                        <Form.Label column sm={3} style={{textAlign: 'right'}}><h5>Name:</h5></Form.Label>
                         <Col sm={8}>
                             <Form.Control 
                                 autoFocus
@@ -108,7 +113,7 @@ export default class ExerciseEdit extends Component {
                     </Form.Group>
 					
 					<Form.Group as={Row} className="form-group">
-                        <Form.Label column sm={2} style={{textAlign: 'right'}}><h5>Visible:</h5></Form.Label>
+                        <Form.Label column sm={3} style={{textAlign: 'right'}}><h5>Visible:</h5></Form.Label>
                         <Col sm={6}>
 							<Form.Check
 								style={{marginTop: "10px"}} 
@@ -123,32 +128,32 @@ export default class ExerciseEdit extends Component {
 							/>
                         </Col>
                     </Form.Group>
+					
+					<Form.Group as={Row} className="form-group">
+                        <Form.Label column sm={3} style={{textAlign: 'right'}}><h5>New Sub-Exercise:</h5></Form.Label>
+                        <Col sm={6}>
+							<Button
+								key="AddNewSubExercise"
+								variant="success"
+								onClick={(e) => this.addNewSubExercise()}
+							><FontAwesomeIcon icon={faPlus} /></Button>
+                        </Col>
+                    </Form.Group>
+					
+					
 
 					<hr style={{backgroundColor: "rgb(223, 105, 26)"}}/>
                     <br />
 
 					<div style={{ width: "100%", textAlign: "center"}}>
-						{
-							this.state.subExercises.map((value, i) => {
-								const arrowWidth = Math.min(((((1/this.state.subExercises.length)*100))-(2.5)), 6)+"%";
-								let style = { width:arrowWidth, marginLeft:"5px", };
-								return <div
-									style={style}
-									className="progress-arrow progress-arrow-neutral"
-									key={"SelectorSubExercises"+i}
-									onClick={() => {
-										this.setState({ subExerciseIndex: i });
-									}}
-									onContextMenu={(e) => this.deleteSubExcerise(e, i)}
-								></div>
-							})
-						}
-						<Button
-							key="AddNewSubExercise"
-							style={{ marginTop: "-28px", marginLeft: "20px"}}
-							variant="success"
-							onClick={() => this.addNewSubExercise()}
-						>+</Button>
+						<ProgressArrows
+							arrows={this.state.subExercises}
+							onClick={(e, i) => {
+								this.setState({ subExerciseIndex: i });
+							}}
+							onContextMenu={(e, i) => this.deleteSubExcerise(e, i)}
+							onNew={(e) => this.addNewSubExercise()}
+						/>
 					</div>
 
                     <br />

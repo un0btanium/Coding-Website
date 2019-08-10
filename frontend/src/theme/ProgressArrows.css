@@ -47,6 +47,11 @@
   transform: skew(-45deg);
 }
 
+.progress-arrow-boxshadow:before,
+.progress-arrow-boxshadow:after {
+	box-shadow: 2px 2px 5px #000000;
+}
+
 .progress-arrow-neutral:before,
 .progress-arrow-neutral:after {
 	background: rgb(10, 103, 190);
