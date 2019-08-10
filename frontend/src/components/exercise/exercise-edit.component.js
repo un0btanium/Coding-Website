@@ -7,6 +7,7 @@ import { Form, Button, Row, Col, Tabs, Tab } from 'react-bootstrap';
 
 import ExerciseContent from './content/exercise-content.component';
 import ExerciseSourceFiles from './content/exercise-source-files.component';
+import ExerciseExecuter from './content/exercise-executer.component';
 
 export default class ExerciseEdit extends Component {
     
@@ -31,7 +32,10 @@ export default class ExerciseEdit extends Component {
         this.moveSourceFile = this.moveSourceFile.bind(this);
 
         this.onSubmit = this.onSubmit.bind(this);
-        this.exportExerciseAsJSON = this.exportExerciseAsJSON.bind(this);
+		this.exportExerciseAsJSON = this.exportExerciseAsJSON.bind(this);
+		
+        this.onRanCode = this.onRanCode.bind(this);
+        this.setHighlighting = this.setHighlighting.bind(this);
 
 
         this.state = {
@@ -47,7 +51,10 @@ export default class ExerciseEdit extends Component {
 
             contentIDCounter: 0,
             tabKey: "content",
-            exerciseExportJSONString: null
+			exerciseExportJSONString: null,
+			
+            highlighting: null,
+            didChangeCode: true
         }
     }
 
@@ -155,13 +162,15 @@ export default class ExerciseEdit extends Component {
 
                         <Tab variant="primary" eventKey="content" title="Content Elements">
                             <ExerciseContent
+								subExerciseIndex={this.state.subExerciseIndex}
                                 content={this.state.subExercises[this.state.subExerciseIndex].content}
                                 mode="edit"
                                 onChangeExerciseContent={this.onChangeExerciseContent}
                                 onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
                                 deleteContent={this.deleteContent}
                                 moveContent={this.moveContent}
-                                highlighting={null}
+								setHighlighting={this.setHighlighting}
+								highlighting={this.state.highlighting}
                             />
                             
                             <br />
@@ -175,6 +184,18 @@ export default class ExerciseEdit extends Component {
                                     <Button variant="outline-primary" onClick={this.addNewEditor} style={{width: '150px'}}>+Editor</Button>
                                 </Col>
                             </Form.Group>
+
+							<ExerciseExecuter
+								courseID={this.state.courseID}
+								exerciseID={this.state.exerciseID}
+								subExerciseIndex={this.state.subExerciseIndex}
+								content={this.state.subExercises[this.state.subExerciseIndex].content}
+								sourceFiles={this.state.subExercises[this.state.subExerciseIndex].sourceFiles}
+								didChangeCode={this.state.didChangeCode}
+								onRanCode={this.onRanCode}
+								setHighlighting={this.setHighlighting}
+								largeMargin={false}
+							/>
                         </Tab>
 
                         <Tab variant="primary" eventKey="source-file" title="Source Files">
@@ -739,6 +760,20 @@ export default class ExerciseEdit extends Component {
 		.catch((error) => {
 			// TODO show error modal
 		})
+	}
+	
+	
+    onRanCode() {
+        this.setState({
+            didChangeCode: false
+        });
+    }
+
+
+    setHighlighting(highlighting) {
+        this.setState({
+            highlighting: highlighting
+        });
     }
     
 }

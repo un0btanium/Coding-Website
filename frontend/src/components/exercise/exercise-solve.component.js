@@ -22,7 +22,10 @@ export default class ExerciseSolve extends Component {
 			courseID: this.props.courseID,
             exerciseID: this.props.exerciseID,
 			name: '',
-			subExercises: [],
+			subExercises: [{
+				content: [],
+				sourceFiles: []
+			}],
 			subExerciseIndex: 0,
             highlighting: null,
 
@@ -85,8 +88,6 @@ export default class ExerciseSolve extends Component {
                     mode="solve"
                     onChangeExerciseContent={this.onChangeExerciseContent}
                     onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
-                    deleteContent={this.deleteContent}
-                    moveContent={this.moveContent}
                     setHighlighting={this.setHighlighting}
                     highlighting={this.state.highlighting}
                 />
@@ -101,7 +102,8 @@ export default class ExerciseSolve extends Component {
                     content={this.state.subExercises[this.state.subExerciseIndex].content}
                     didChangeCode={this.state.didChangeCode}
                     onRanCode={this.onRanCode}
-                    setHighlighting={this.setHighlighting}
+					setHighlighting={this.setHighlighting}
+					largeMargin={true}
                 />
             </div>
         );

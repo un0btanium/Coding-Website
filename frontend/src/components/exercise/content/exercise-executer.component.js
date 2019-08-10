@@ -166,7 +166,7 @@ export default class ExerciseExecuter extends Component {
         return (
             <>
             {hudWrapper}
-            <div style={{'marginBottom': '500px'}}>
+            <div style={{marginBottom: this.props.largeMargin ? '500px' : '50px' }}>
             </div>
             </>
         );
@@ -271,6 +271,7 @@ export default class ExerciseExecuter extends Component {
 			courseID: this.props.courseID,
 			exerciseID: this.props.exerciseID,
 			subExerciseIndex: this.props.subExerciseIndex,
+			sourceFiles: this.props.sourceFiles,
             code_snippets: code_snippets
         }
 

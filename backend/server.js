@@ -501,7 +501,8 @@ app.route("/api/exercise/input")
 app.route("/api/exercise/run")
 
     .post((req, res, next) => checkAuth(req, res, next), function (req, res) {
-        let code_snippets = req.body.code_snippets;
+		let code_snippets = req.body.code_snippets;
+		let sourceFilesUser = req.body.sourceFiles;
 		let courseID = req.body.courseID;
 		let exerciseID = req.body.exerciseID;
 		let subExerciseIndex = req.body.subExerciseIndex;
@@ -522,10 +523,10 @@ app.route("/api/exercise/run")
 
 				// TODO save code for user
 
-                let sourceFiles = [];
-                for (let sourceFile of exercise.subExercises[subExerciseIndex].sourceFiles) {
-                    sourceFiles.push(sourceFile);
-                }
+				let sourceFiles = exercise.subExercises[subExerciseIndex].sourceFiles;
+				if (sourceFilesUser !== undefined && sourceFilesUser !== null) { // user ran in Edit mode
+					sourceFiles = sourceFilesUser;
+				}
 
                 let arg = {
                     code_snippets: code_snippets,
