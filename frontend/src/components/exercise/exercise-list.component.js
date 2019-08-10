@@ -6,10 +6,9 @@ import { isAuthenticated } from "../../services/Authentication";
 
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import Alert from 'react-bootstrap/Alert'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons'
+import { faLock, faLockOpen, faTrashAlt, faEdit, faPlus } from '@fortawesome/free-solid-svg-icons'
 
 export default class ExerciseList extends Component {
     
@@ -45,31 +44,85 @@ export default class ExerciseList extends Component {
 
     render () {
 
+        const Exercise = props => (
+			<div
+				className="disableSelection"
+				onClick={() => this.solveExercise(props.exercise._id)}
+				style={{
+					order: props.index,
+					flexGrow: 4,
+					flexShrink: 2,
+					justifyContent: "space-evenly",
+					margin: "20px",
+					padding: "30px",
+					backgroundColor: "rgb(" + ((Math.random()*200)+55) +", " + ((Math.random()*200)+55) +", " + ((Math.random()*200)+55) +")",
+					borderRadius: "25px",
+					boxShadow: '2px 2px 5px #000000'
+				}}
+			>
+				
+				<div style={{ padding: "25px", backgroundColor: "rgba(0, 0, 0, 0.75)", borderRadius: "10px"}}>
+					<div>
+						<h4 style={{marginLeft: "20px"}}><b>{props.exercise.name}</b>
+							{ isAuthenticated(["admin", "maintainer"]) && [
+								<Button variant="danger" onClick={(e) => this.showDeleteModalExercise(e, props.exercise)} key="DeleteExerciseButton" style={{ marginLeft: "20px"}}><FontAwesomeIcon icon={faTrashAlt} /></Button>,
+								<span key="span1"> </span>,
+								<Button variant="primary" onClick={(e) => this.editExercise(e, props.exercise._id)} key="EditExerciseButton"><FontAwesomeIcon icon={faEdit} /></Button>,
+								<span key="span2"> </span>,
+								<Button variant="info" onClick={(e) => this.switchVisibilityExercise(e, props.exercise, props.index)} key="VisibilityExerciseButton"><FontAwesomeIcon icon={props.exercise.isVisibleToStudents ? faLockOpen : faLock} /></Button>
+								]
+							}
+						</h4>
+						<div className="progress-arrows-wrap">
+							{
+								props.exercise.subExercises !== undefined &&
+									props.exercise.subExercises.map(function(value, i) {
+										const arrowWidth = Math.min(((((1/props.exercise.subExercises.length)*100))-(0.5)), 6)+"%";
+										let style = { width:arrowWidth, zIndex: 10, marginLeft:"5px", color: "#FF0000" };
+										return <div style={style} className="progress-arrow progress-arrow-neutral" key={i}></div>
+									})
+							}
+						</div>
+					</div>
+					
+				</div>
+
+
+
+            </div>
+		);
+
+		let exercisesEntries = null;
+		if (this.state.course !== undefined) {
+			exercisesEntries = this.state.course.exercises.map(function(currentExercise, i) {
+				if (currentExercise.isVisibleToStudents || isAuthenticated(["admin", "maintainer"])) {
+					return <Exercise exercise={currentExercise} key={i} index={i} />;
+				} else {
+					return null;
+				}
+			});
+		}
+
         return (
             <div style={{marginTop: '50px'}}>
                 
-                <h3>{this.state.course.name || "Loading..."}</h3>
-				
+				<div style={{textAlign: "center"}}>
+                	<h1>{this.state.course.name || "Loading..."}</h1>
+				</div>
+
 				{isAuthenticated(["admin", "maintainer"]) &&
 					[
-					<Button variant="success" onClick={() => this.newExercise()} key="CreateExerciseButton">Create New Exercise</Button>,
-					<Button variant="danger" onClick={() => this.showDeleteModalCourse(this.state.course)} key="DeleteCourseButton">Delete Course</Button>,
-					<Button variant="info" onClick={() => this.switchVisibilityCourse()} key="VisibilityCourseButton"><FontAwesomeIcon icon={this.state.course.isVisibleToStudents ? faLockOpen : faLock} /></Button>
+					<Button variant="success" onClick={() => this.newExercise()} key="CreateExerciseButton"><FontAwesomeIcon icon={faPlus} /></Button>,
+					<Button variant="info" onClick={() => this.switchVisibilityCourse()} key="VisibilityCourseButton"><FontAwesomeIcon icon={this.state.course.isVisibleToStudents ? faLockOpen : faLock} /></Button>,
+					<Button variant="danger" onClick={() => this.showDeleteModalCourse(this.state.course)} key="DeleteCourseButton"><FontAwesomeIcon icon={faTrashAlt} /></Button>
 				]
 				}
-                
 
-                <table className="table table-striped" style={{ marginTop: 20 }}>
-                    <thead>
-                        <tr>
-                            <th style={{'width':'250px'}}>Actions</th>
-                            <th>Name</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        { this.exerciseList() }
-                    </tbody>
-                </table>
+				<div style={{ display: "flex", flexDirection: "column", flexWrap: "nowrap", marginTop: "20px" }}>
+					{exercisesEntries}
+				</div>
+
+
                 <Modal centered show={this.state.showDeleteModalExercise} onHide={() => this.closeDeleteModalExercise()}>
                     <Modal.Header closeButton>
                         <Modal.Title>Delete Exercise {this.state.markedExercise.name}</Modal.Title>
@@ -90,7 +143,7 @@ export default class ExerciseList extends Component {
                     </Modal.Header>
                     <Modal.Body>Are you sure you want to delete the <b>Course</b>?</Modal.Body>
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={() => this.closeDeleteModalExercise()}>
+                        <Button variant="secondary" onClick={() => this.closeDeleteModalCourse()}>
                         Cancel
                         </Button>
                         <Button variant="danger" onClick={() => this.deleteCourse(this.state.markedCourse._id)}>
@@ -100,63 +153,21 @@ export default class ExerciseList extends Component {
                 </Modal>
             </div>
         )
-    }
-
-    exerciseList() {
-
-        const Exercise = props => (
-            <tr>
-                <td>
-                    { isAuthenticated(["admin", "maintainer"]) && [
-                        <Button variant="danger" onClick={() => this.showDeleteModalExercise(props.exercise)} key="DeleteExerciseButton">Delete</Button>,
-                        <span key="span1"> </span>,
-                        <Button variant="primary" onClick={() => this.editExercise(props.exercise._id)} key="EditExerciseButton">Edit</Button>,
-                        <span key="span2"> </span>
-                        ]
-                    }
-                    <Button variant="info" onClick={() => this.solveExercise(props.exercise._id)}>Solve</Button>
-                </td>
-                <td>
-                    <h5 style={{'height': '20px', 'lineHeight': '37px'}}>{props.exercise.name}</h5>
-                    <div className="progress-arrows-wrap">
-                        {
-							props.exercise.subExercises !== undefined &&
-								props.exercise.subExercises.map(function(value, i) {
-									const arrowWidth = Math.min(((((1/props.exercise.subExercises.length)*100))-(0.5)), 6)+"%";
-									let style = { width:arrowWidth, marginLeft:"5px", };
-									return <div style={style} className="progress-arrow" key={i}></div>
-								})
-                        }
-                    </div>
-                </td>
-                
-            </tr>
-		);
-		if (this.state.course !== undefined) {
-			return this.state.course.exercises.map(function(currentExercise, i) {
-				if (currentExercise.isVisibleToStudents || isAuthenticated(["admin", "maintainer"])) {
-					return <Exercise exercise={currentExercise} key={i} />;
-				} else {
-					return null;
-				}
-			});
-		} else {
-			return null;
-		}
-    }
+	}
+	
 
 
-
-    showDeleteModalExercise(exercise) {
+    showDeleteModalExercise(e, exercise) {
+		e.stopPropagation();
         this.setState({
             markedExercise: exercise,
-            showDeleteModal: true
+            showDeleteModalExercise: true
         });
     }
 
     closeDeleteModalExercise() {
         this.setState({
-            showDeleteModal: false,
+            showDeleteModalExercise: false,
             markedExercise: {}
         });
 	}
@@ -183,7 +194,8 @@ export default class ExerciseList extends Component {
 		this.props.history.push('/course/' + this.props.match.params.courseID + '/exercise/create', {courseName: this.state.course.name})
 	}
 
-    editExercise(id) {
+    editExercise(e, id) {
+		e.stopPropagation();
         this.props.history.push('/course/' + this.props.match.params.courseID + '/exercise/' + id + '/edit');
     }
 
@@ -215,7 +227,7 @@ export default class ExerciseList extends Component {
 								$splice: [[index, 1]]
 							}
 						}),
-                        showDeleteModal: false,
+                        showDeleteModalExercise: false,
                         markedExercise: {}
                         // , alerts: this.state.alerts.push("Exercise '" + name + "'deleted!")
                     });
@@ -231,7 +243,7 @@ export default class ExerciseList extends Component {
     deleteCourse(id) {
         Axios.delete(process.env.REACT_APP_BACKEND_SERVER + '/course/'+id)
             .then(response => {
-				this.history.push("/");
+				this.props.history.push("/");
             })
             .catch(function (error) {
                 console.log(error);
@@ -247,6 +259,27 @@ export default class ExerciseList extends Component {
 					course: update(this.state.course, {
 						isVisibleToStudents: {
 							$set: response.data.isVisibleToStudents
+						}
+					})
+				});
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+	}
+
+	switchVisibilityExercise(e, exercise, index) {
+		e.stopPropagation();
+        Axios.put(process.env.REACT_APP_BACKEND_SERVER + '/exercise/visibility', { courseID: this.state.course._id, exerciseID: exercise._id, isVisibleToStudents: !exercise.isVisibleToStudents})
+            .then(response => {
+				this.setState({
+					course: update(this.state.course, {
+						exercises: {
+							[index]: {
+								isVisibleToStudents: {
+									$set: response.data.isVisibleToStudents
+								}
+							}
 						}
 					})
 				});

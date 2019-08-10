@@ -69,7 +69,7 @@ export default class ExerciseSolve extends Component {
 								let style = { width:arrowWidth, marginLeft:"5px", };
 								return <div
 									style={style}
-									className="progress-arrow"
+									className="progress-arrow progress-arrow-neutral"
 									key={"SelectorSubExercises"+i}
 									onClick={() => {
 										this.setState({ subExerciseIndex: i });

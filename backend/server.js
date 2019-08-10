@@ -225,11 +225,10 @@ app.route('/api/course/visibility')
 	.put((req, res, next) => checkAuth(req, res, next, ["admin", "maintainer"]), function (req, res) {
 		Course.findById(req.body.id, function (err, course) {
 			if (!course) {
-				res.status(404).send('course was not found');
+				res.status(404).send('Course was not found');
 			} else {
-				if (course.isVisibleToStudents !== req.body.isVisibleToStudents) {
-					course.isVisibleToStudents = req.body.isVisibleToStudents;
-				}
+
+				course.isVisibleToStudents = req.body.isVisibleToStudents;
 
 				course
 					.save()
@@ -404,6 +403,12 @@ app.route('/api/course/exercise')
 				
 				let exercise = course.exercises.id(req.body.exerciseID);
 
+				if (exercise === undefined || exercise === null) {
+					console.log("Exercise " + req.body.exerciseID + " not found!");
+					res.status(404).send("Exercise not found!");
+					return;
+				}
+
 				exercise.name = req.body.name;
 				exercise.isVisibleToStudents = req.body.isVisibleToStudents;
                 exercise.subExercises = req.body.subExercises;
@@ -420,6 +425,41 @@ app.route('/api/course/exercise')
 			}
 		});
     });
+
+
+
+app.route('/api/exercise/visibility')
+
+	.put((req, res, next) => checkAuth(req, res, next, ["admin", "maintainer"]), function (req, res) {
+		Course.findById(req.body.courseID, function (err, course) {
+			if (!course) {
+				console.log("Course " + req.body.courseID + " not found!");
+				res.status(404).send('course was not found');
+			} else {
+
+				let exercise = course.exercises.id(req.body.exerciseID);
+
+				if (exercise === undefined || exercise === null) {
+					console.log("Exercise " + req.body.exerciseID + " not found!");
+					res.status(404).send("Exercise not found!");
+					return;
+				}
+
+				exercise.isVisibleToStudents = req.body.isVisibleToStudents;
+
+				course
+					.save()
+					.then(course => {
+						res.status(200).json({ isVisibleToStudents: exercise.isVisibleToStudents});
+					})
+					.catch(err => {
+						console.log("Exercise " + req.body.exerciseID + " not found!");
+						res.status(400).send("Updating course failed");
+					});
+			}
+		});
+	});
+
 
 
 app.route("/api/exercise/input")

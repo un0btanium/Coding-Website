@@ -6,7 +6,7 @@ import { isAuthenticated } from "../../services/Authentication";
 import { Button } from 'react-bootstrap';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faLock } from '@fortawesome/free-solid-svg-icons'
+import { faLock, faPlus } from '@fortawesome/free-solid-svg-icons'
 
 export default class CourseList extends Component {
     
@@ -44,7 +44,8 @@ export default class CourseList extends Component {
 					justifyContent: "space-evenly",
 					margin: "20px",
 					padding: "30px",
-					backgroundColor: "rgb(" + ((Math.random()*200)+55) +", " + ((Math.random()*200)+55) +", " + ((Math.random()*200)+55) +")"
+					backgroundColor: "rgb(" + ((Math.random()*200)+55) +", " + ((Math.random()*200)+55) +", " + ((Math.random()*200)+55) +")",
+					boxShadow: '2px 2px 5px #000000'
 				}}
 			>
 				<div style={{ padding: "50px", backgroundColor: "rgba(0, 0, 0, 0.5)"}}>
@@ -58,9 +59,11 @@ export default class CourseList extends Component {
         return (
             <div style={{marginTop: '50px'}}>
                 
-                <h3>Courses</h3>
+				<div style={{textAlign: "center"}}>
+                	<h1>Courses</h1>
+				</div>
 				
-				{isAuthenticated(["admin", "maintainer"]) && <Button variant="success" onClick={() => this.newCourse()}>Create New Course</Button>}
+				{isAuthenticated(["admin", "maintainer"]) && <Button variant="success" onClick={() => this.newCourse()}><FontAwesomeIcon icon={faPlus} /></Button>}
                     
 				<div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", marginTop: "20px" }}>
 					{ 

@@ -32,7 +32,6 @@
   width: 100%;
   top: 0;
   left: 0;
-  background: rgba(128, 128, 128, 1);
   -webkit-transform: skew(45deg);
   -moz-transform: skew(45deg);
   transform: skew(45deg);
@@ -43,14 +42,38 @@
   width: 100%;
   top: 50%;
   left: 0;
-  background: rgba(128, 128, 128, 1);
   -webkit-transform: skew(-45deg);
   -moz-transform: skew(-45deg);
   transform: skew(-45deg);
 }
 
-.progress-arrow:hover:before,
-.progress-arrow:hover:after {
-  background: rgb(71, 255, 169);
+.progress-arrow-neutral:before,
+.progress-arrow-neutral:after {
+	background: rgb(10, 103, 190);
 }
+
+.progress-arrow-neutral:hover:before,
+.progress-arrow-neutral:hover:after {
+	background: rgb(65, 154, 255);
+}
+
+.progress-arrow-started:before,
+.progress-arrow-started:after {
+	background: rgb(211, 197, 0);
+}
+.progress-arrow-started:hover:before,
+.progress-arrow-started:hover:after {
+	background: rgb(255, 241, 45);
+}
+
+.progress-arrow-completed:before,
+.progress-arrow-completed:after {
+	background: rgb(0, 189, 9);
+}
+.progress-arrow-completed:hover:before,
+.progress-arrow-completed:hover:after {
+	background: rgb(26, 255, 37);
+}
+
+
 
