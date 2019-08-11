@@ -22,6 +22,7 @@ export default class ExerciseList extends Component {
 				name: "Loading...",
 				exercises: []
 			},
+			userExercisesData: {},
 			
             showDeleteModalExercise: false,
 			markedExercise: {},
@@ -34,8 +35,10 @@ export default class ExerciseList extends Component {
     componentDidMount() {
         Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/course/' + this.props.match.params.courseID)
             .then(response => {
+				console.log(response.data.userExercisesData)
 				this.setState({
-					course: response.data.course
+					course: response.data.course,
+					userExercisesData: response.data.userExercisesData
 				});
 			})
             .catch((error) => {
@@ -77,6 +80,7 @@ export default class ExerciseList extends Component {
 						</h4>
 						<ProgressArrows
 							arrows={props.exercise.subExercises}
+							data={this.state.userExercisesData[props.exercise._id]}
 						/>
 					</div>
 					

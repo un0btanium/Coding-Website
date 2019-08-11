@@ -15,6 +15,7 @@
     "cors": "^2.8.5",
     "dotenv": "^7.0.0",
     "express": "^4.16.4",
+    "immutability-helper": "^3.0.1",
     "jsonwebtoken": "^8.5.1",
     "lz-string": "^1.4.4",
     "mongoose": "^5.4.19",

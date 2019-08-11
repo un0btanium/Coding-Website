@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const os = require('os');
 const path = require('path');
 const lzstring = require('lz-string');
+const update = require('immutability-helper');
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
@@ -309,14 +310,26 @@ app.route('/api/course/visibility')
 
 app.route('/api/course/:id')
 
-    .get(function (req, res) {
+    .get((req, res, next) => checkAuth(req, res, next), function (req, res) {
         let id = req.params.id;
         Course.findById(id, function (err, course) {
             if (err) {
                 console.log("Course " + id + " not found!");
                 res.status(404).send('Course not found!');
             } else {
-                res.json({course: course});
+
+				User.findById(req.tokenData.userId, function (err, user) {
+					if (err) {
+						res.json({ course: course, userExercisesData: {} });
+					} else {
+
+						if (user.code && user.code[id]) {
+							res.json({ course: course, userExercisesData: user.code[id]});
+						} else {
+							res.json({ course: course, userExercisesData: {} });
+						}
+					}
+				});
             }
         })
 	})
@@ -358,19 +371,12 @@ app.route('/api/course/:courseID/exercise/:exerciseID')
 
 					User.findById(req.tokenData.userId, function (err, user) {
 						if (err) {
-							res.json({ exercise: exercise, userSubExercisesData: [] });
+							res.json({ exercise: exercise, userSubExercisesData: {} });
 						} else {
-							let userCourse = findEntryInArrayByKey(user.courses, "courseID", req.params.courseID);
-							if (userCourse === undefined) {
-								res.json({ exercise: exercise, userSubExercisesData: [] });
+							if (user.code && user.code[req.params.courseID] && user.code[req.params.courseID][req.params.exerciseID]) {
+								res.json({ exercise: exercise, userSubExercisesData: user.code[req.params.courseID][req.params.exerciseID] });
 							} else {
-								let exerciseCourse = findEntryInArrayByKey(userCourse.exercises, "exerciseID", req.params.exerciseID);
-								if (exerciseCourse === undefined) {
-									res.json({ exercise: exercise, userSubExercisesData: [] });
-								} else {
-									
-									res.json({ exercise: exercise, userSubExercisesData: exerciseCourse.subExercises });
-								}
+								res.json({ exercise: exercise, userSubExercisesData: {} });
 							}
 						}
 					});
@@ -683,60 +689,39 @@ app.route("/api/exercise/run")
 				User.findById(userData.userId, function (err, user) {
 					if (!err) {
 
-						// COURSE
-						let userCourse = undefined;
-						while (userCourse === undefined) {
-							for (let c of user.courses) {
-								if (c.courseID === courseID) {
-									userCourse = c;
-									break;
+						if (!user.code) {
+							user.code = {};
+						}
+
+						if (!user.code[courseID]) {
+							user.code[courseID] = {};
+						}
+
+						if (!user.code[courseID][exerciseID]) {
+							user.code[courseID][exerciseID] = {};
+						}
+
+						if (!user.code[courseID][exerciseID][subExerciseID]) {
+							user.code[courseID][exerciseID][subExerciseID] = {
+								codeSnippets: {},
+								solved: false
+							};
+						}
+
+						user.code = update(user.code, {
+							[courseID]: {
+								[exerciseID]: {
+									[subExerciseID]: {
+										codeSnippets: {
+											$set: code_snippets
+										},
+										solved: {
+											$set: true
+										}
+									}
 								}
 							}
-	
-							if (userCourse === undefined) {
-								user.courses.push({
-									courseID: courseID,
-									exercises: []
-								})
-							}
-						}
-
-						// EXERCISE
-						let userExercise = undefined;
-						while (userExercise === undefined) {
-							for (let e of userCourse.exercises) {
-								if (e.exerciseID === exerciseID) {
-									userExercise = e;
-									break;
-								}
-							}
-	
-							if (userExercise === undefined) {
-								userCourse.exercises.push({
-									exerciseID: exerciseID,
-									subExercises: []
-								})
-							} 
-						}
-
-						// SUBEXERCISE
-						let userSubExercise = undefined;
-						for (let s of userExercise.subExercises) {
-							if (s.subExerciseID === subExerciseID) {
-								userSubExercise = s;
-								break;
-							}
-						}
-
-						if (userSubExercise === undefined) {
-							userExercise.subExercises.push({
-								subExerciseID: subExerciseID,
-								solved: true,
-								codeSnippets: code_snippets
-							});
-						} else {
-							userSubExercise.codeSnippets = code_snippets
-						}
+						})
 
 						user
 						.save()

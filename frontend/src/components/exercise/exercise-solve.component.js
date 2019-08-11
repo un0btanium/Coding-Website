@@ -44,27 +44,18 @@ export default class ExerciseSolve extends Component {
         Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/course/' + this.state.courseID + '/exercise/' + this.state.exerciseID)
             .then(response => {
 
-				let userSubExercisesData = {};
-				for (let data of response.data.userSubExercisesData) {
-					userSubExercisesData[data.subExerciseID] = {
-						solved: data.solved,
-						codeSnippets: data.codeSnippets
-					}
-				}
-
 				let exercise = response.data.exercise;
-
 				for (let subExercise of exercise.subExercises) {
 					for (let content of subExercise.content) {
-						if (content.type === "editor" && userSubExercisesData[subExercise._id] && userSubExercisesData[subExercise._id].codeSnippets[content.identifier] && userSubExercisesData[subExercise._id].codeSnippets[content.identifier].code) {
-							content.code = userSubExercisesData[subExercise._id].codeSnippets[content.identifier].code;
+						if (content.type === "editor" && response.data.userSubExercisesData[subExercise._id] && response.data.userSubExercisesData[subExercise._id].codeSnippets[content.identifier] && response.data.userSubExercisesData[subExercise._id].codeSnippets[content.identifier].code) {
+							content.code = response.data.userSubExercisesData[subExercise._id].codeSnippets[content.identifier].code;
 						}
 					}
 				}
 
 				this.setState({
 					exercise: exercise,
-					userSubExercisesData: userSubExercisesData
+					userSubExercisesData: response.data.userSubExercisesData
 				});
             })
             .catch((error) => {
@@ -92,6 +83,7 @@ export default class ExerciseSolve extends Component {
 					<ProgressArrows
 						arrows={this.state.exercise.subExercises}
 						data={this.state.userSubExercisesData}
+						current={this.state.exercise.subExercises[this.state.subExerciseIndex]._id}
 						onClick={(e, i) => {
 							this.setState({ subExerciseIndex: i });
 						}}

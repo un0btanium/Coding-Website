@@ -52,6 +52,11 @@
 	box-shadow: 2px 2px 5px #000000;
 }
 
+.progress-arrow-boxshadow-selected:before,
+.progress-arrow-boxshadow-selected:after {
+	box-shadow: 2px 2px 7px #a07500;
+}
+
 .progress-arrow-neutral:before,
 .progress-arrow-neutral:after {
 	background: rgb(10, 103, 190);
@@ -60,15 +65,6 @@
 .progress-arrow-neutral:hover:before,
 .progress-arrow-neutral:hover:after {
 	background: rgb(65, 154, 255);
-}
-
-.progress-arrow-started:before,
-.progress-arrow-started:after {
-	background: rgb(211, 197, 0);
-}
-.progress-arrow-started:hover:before,
-.progress-arrow-started:hover:after {
-	background: rgb(255, 241, 45);
 }
 
 .progress-arrow-completed:before,

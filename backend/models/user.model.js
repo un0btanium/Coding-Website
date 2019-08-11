@@ -16,26 +16,7 @@ let User = new Schema({
         type: String,
         required: true
 	},
-	courses: [
-		{
-			courseID: String,
-			exercises: [
-				{
-					exerciseID: String,
-					subExercises: [
-						{
-							subExerciseID: String,
-							solved: Boolean,
-							codeSnippets: {}
-						}
-					]
-				}
-			]
-		}
-	],
-	code: {
-
-	}
+	code: {}
 });
 
 module.exports = mongoose.model('User', User);
