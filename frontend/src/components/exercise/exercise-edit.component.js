@@ -45,14 +45,18 @@ export default class ExerciseEdit extends Component {
 
         this.state = {
 			courseID: this.props.courseID,
-            exerciseID: this.props.exerciseID,
-			name: '',
-			isVisibleToStudents: true,
-			subExercises: [{
-				content: [],
-				sourceFiles: []
-			}],
+			exerciseID: this.props.exerciseID,
 			subExerciseIndex: 0,
+
+			exercise: {
+				name: '',
+				isVisibleToStudents: true,
+				subExercises: [{
+					_id: 0,
+					content: [],
+					sourceFiles: []
+				}]
+			},
 
             contentIDCounter: 0,
             tabKey: "content",
@@ -67,9 +71,7 @@ export default class ExerciseEdit extends Component {
         Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/course/' + this.state.courseID + '/exercise/' + this.state.exerciseID)
             .then(response => {
 				this.setState({
-					name: response.data.name,
-					isVisibleToStudents: response.data.isVisibleToStudents,
-					subExercises: response.data.subExercises,
+					exercise: response.data.exercise
 				});
             })
             .catch((error) => {
@@ -80,7 +82,7 @@ export default class ExerciseEdit extends Component {
 
     render () {
 
-		if (this.state.subExercises.length === 0) {
+		if (this.state.exercise.subExercises.length === 0) {
 			return null;
 		}
 
@@ -88,7 +90,7 @@ export default class ExerciseEdit extends Component {
             <div className="disableSelection" style={{marginTop: '50px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
                 
 				<div style={{textAlign: "center"}}>
-					<h3>Edit Exercise {this.state.name}</h3>
+					<h3>Edit Exercise {this.state.exercise.name}</h3>
 				</div>
 
 				<hr style={{backgroundColor: "rgb(223, 105, 26)"}}/>
@@ -106,7 +108,7 @@ export default class ExerciseEdit extends Component {
                                 type="text"
                                 className="form-control"
                                 placeholder="Enter name"
-                                value={this.state.name}
+                                value={this.state.exercise.name}
                                 onChange={this.onChangeExerciseName}
                             />
                         </Col>
@@ -123,8 +125,8 @@ export default class ExerciseEdit extends Component {
 								className="custom-switch"
 								custom="true"
 								label=""
-								checked={this.state.isVisibleToStudents}
-								onChange={(e) => {this.setState({ isVisibleToStudents: !this.state.isVisibleToStudents })}}
+								checked={this.state.exercise.isVisibleToStudents}
+								onChange={(e) => {this.setState({ exercise: update(this.state.exercise, { isVisibleToStudents: { $set: !this.state.exercise.isVisibleToStudents } } ) })}}
 							/>
                         </Col>
                     </Form.Group>
@@ -147,12 +149,11 @@ export default class ExerciseEdit extends Component {
 
 					<div style={{ width: "100%", textAlign: "center"}}>
 						<ProgressArrows
-							arrows={this.state.subExercises}
+							arrows={this.state.exercise.subExercises}
 							onClick={(e, i) => {
 								this.setState({ subExerciseIndex: i });
 							}}
 							onContextMenu={(e, i) => this.deleteSubExcerise(e, i)}
-							onNew={(e) => this.addNewSubExercise()}
 						/>
 					</div>
 
@@ -168,7 +169,7 @@ export default class ExerciseEdit extends Component {
                         <Tab variant="primary" eventKey="content" title="Content Elements">
                             <ExerciseContent
 								subExerciseIndex={this.state.subExerciseIndex}
-                                content={this.state.subExercises[this.state.subExerciseIndex].content}
+                                content={this.state.exercise.subExercises[this.state.subExerciseIndex].content}
                                 mode="edit"
                                 onChangeExerciseContent={this.onChangeExerciseContent}
                                 onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
@@ -194,11 +195,11 @@ export default class ExerciseEdit extends Component {
 								courseID={this.state.courseID}
 								exerciseID={this.state.exerciseID}
 								subExerciseIndex={this.state.subExerciseIndex}
-								content={this.state.subExercises[this.state.subExerciseIndex].content}
-								sourceFiles={this.state.subExercises[this.state.subExerciseIndex].sourceFiles}
+								subExercise={this.state.exercise.subExercises[this.state.subExerciseIndex]}
 								didChangeCode={this.state.didChangeCode}
 								onRanCode={this.onRanCode}
 								setHighlighting={this.setHighlighting}
+								sendSourceFiles={true}
 								largeMargin={false}
 							/>
                         </Tab>
@@ -206,7 +207,7 @@ export default class ExerciseEdit extends Component {
                         <Tab variant="primary" eventKey="source-file" title="Source Files">
                             <ExerciseSourceFiles
                                 mode="edit"
-                                sourceFiles={this.state.subExercises[this.state.subExerciseIndex].sourceFiles}
+                                sourceFiles={this.state.exercise.subExercises[this.state.subExerciseIndex].sourceFiles}
                                 onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
                                 deleteSourceFile={this.deleteSourceFile}
                                 moveSourceFile={this.moveSourceFile}
@@ -253,53 +254,55 @@ export default class ExerciseEdit extends Component {
 
 		this.setState({
 			contentIDCounter: this.state.contentIDCounter+4,
-			subExercises: update(this.state.subExercises, {
-				$push: [
-					{
-						content: [
-							{
-								_id: "NEW " + this.state.contentIDCounter,
-								type: "title",
-								text: ""
-							},
-							{
-								_id: "NEW " + this.state.contentIDCounter+1,
-								type: "text",
-								text: ""
-							},
-							{
-								_id: "NEW " + this.state.contentIDCounter+2,
-								type: "editor",
-								identifier: "main_method_body",
-								code: "",
-								solution: "",
-								settings: {
-									minLines: 5
+			exercise: update(this.state.exercise, {
+				subExercises: {
+					$push: [
+						{
+							content: [
+								{
+									_id: "NEW " + this.state.contentIDCounter,
+									type: "title",
+									text: ""
+								},
+								{
+									_id: "NEW " + this.state.contentIDCounter+1,
+									type: "text",
+									text: ""
+								},
+								{
+									_id: "NEW " + this.state.contentIDCounter+2,
+									type: "editor",
+									identifier: "main_method_body",
+									code: "",
+									solution: "",
+									settings: {
+										minLines: 5
+									}
 								}
-							}
-						],
-						sourceFiles: [{
-							_id: "NEW " + this.state.contentIDCounter+3,
-							package: "main",
-							name: "Main",
-							code: "package main;\n" + 
-							"\n" + 
-							"import java.util.*;\n" + 
-							"import java.io.*;\n" + 
-							"import java.math.*;\n" + 
-							"\n" + 
-							"import java.io.Console;\n" + 
-							"\n" + 
-							"public class Main {\n" + 
-							"    \n" + 
-							"    public static void main(String[] args) {\n" + 
-							"// main_method_body\n" + 
-							"    }\n" + 
-							"    \n" + 
-							"}"
-						}]
-					}
-				]
+							],
+							sourceFiles: [{
+								_id: "NEW " + this.state.contentIDCounter+3,
+								package: "main",
+								name: "Main",
+								code: "package main;\n" + 
+								"\n" + 
+								"import java.util.*;\n" + 
+								"import java.io.*;\n" + 
+								"import java.math.*;\n" + 
+								"\n" + 
+								"import java.io.Console;\n" + 
+								"\n" + 
+								"public class Main {\n" + 
+								"    \n" + 
+								"    public static void main(String[] args) {\n" + 
+								"// main_method_body\n" + 
+								"    }\n" + 
+								"    \n" + 
+								"}"
+							}]
+						}
+					]
+				}
 			})
 		})
 	}
@@ -307,7 +310,7 @@ export default class ExerciseEdit extends Component {
 	deleteSubExcerise(e, index) {
 		e.preventDefault();
 
-		if (this.state.subExercises.length === 1) {
+		if (this.state.exercise.subExercises.length === 1) {
 			return;
 		}
 
@@ -315,72 +318,80 @@ export default class ExerciseEdit extends Component {
 		if (this.state.subExerciseIndex === index && this.state.subExerciseIndex !== 0) {
 			subExerciseIndex = this.state.subExerciseIndex-1;
 		}
-		subExerciseIndex = Math.min(subExerciseIndex, this.state.subExercises.length-2);
+		subExerciseIndex = Math.min(subExerciseIndex, this.state.exercise.subExercises.length-2);
 
         this.setState({
 			subExerciseIndex: subExerciseIndex,
-			subExercises: update(this.state.subExercises, {
-				$splice: [[index, 1]]
+			exercise: update(this.state.exercise, {
+				subExercises: {
+					$splice: [[index, 1]]
+				}
 			})
         });
 	}
 
     addNewSourceFile() {
-        if (this.state.subExercises[this.state.subExerciseIndex].sourceFiles.length === 0) {
+        if (this.state.exercise.subExercises[this.state.subExerciseIndex].sourceFiles.length === 0) {
             this.setState({
-                contentIDCounter: this.state.contentIDCounter+1,
-				subExercises: update(this.state.subExercises, {
-					[this.state.subExerciseIndex]: {
-						sourceFiles: {
-							$push: [
-								{
-									_id: "NEW " + this.state.contentIDCounter,
-									package: "main",
-									name: "Main",
-									code: "package main;\n" + 
-									"\n" + 
-									"import java.util.*;\n" + 
-									"import java.io.*;\n" + 
-									"import java.math.*;\n" + 
-									"\n" + 
-									"import java.io.Console;\n" + 
-									"\n" + 
-									"public class Main {\n" + 
-									"    \n" + 
-									"    public static void main(String[] args) {\n" + 
-									"// main_method_body\n" + 
-									"    }\n" + 
-									"    \n" + 
-									"}"
-								}
-							]
+				contentIDCounter: this.state.contentIDCounter+1,
+				didChangeCode: true,
+				exercise: update(this.state.exercise, {
+					subExercises: {
+						[this.state.subExerciseIndex]: {
+							sourceFiles: {
+								$push: [
+									{
+										_id: "NEW " + this.state.contentIDCounter,
+										package: "main",
+										name: "Main",
+										code: "package main;\n" + 
+										"\n" + 
+										"import java.util.*;\n" + 
+										"import java.io.*;\n" + 
+										"import java.math.*;\n" + 
+										"\n" + 
+										"import java.io.Console;\n" + 
+										"\n" + 
+										"public class Main {\n" + 
+										"    \n" + 
+										"    public static void main(String[] args) {\n" + 
+										"// main_method_body\n" + 
+										"    }\n" + 
+										"    \n" + 
+										"}"
+									}
+								]
+							}
 						}
-					} 
+					}
 				})
             });
         } else {
             this.setState({
 				contentIDCounter: this.state.contentIDCounter+1,
-				subExercises: update(this.state.subExercises, {
-					[this.state.subExerciseIndex]: {
-						sourceFiles: {
-							$push: [
-								{
-									_id: "NEW " + this.state.contentIDCounter,
-									package: "main",
-									name: "",
-									code: "package main;\n" + 
-									"\n" + 
-									"import java.util.*;\n" + 
-									"import java.io.*;\n" + 
-									"import java.math.*;\n" + 
-									"\n" + 
-									"import java.io.Console;\n" + 
-									"\n"
-								}
-							]
+				exercise: update(this.state.exercise, {
+					didChangeCode: true,
+					subExercises: {
+						[this.state.subExerciseIndex]: {
+							sourceFiles: {
+								$push: [
+									{
+										_id: "NEW " + this.state.contentIDCounter,
+										package: "main",
+										name: "",
+										code: "package main;\n" + 
+										"\n" + 
+										"import java.util.*;\n" + 
+										"import java.io.*;\n" + 
+										"import java.math.*;\n" + 
+										"\n" + 
+										"import java.io.Console;\n" + 
+										"\n"
+									}
+								]
+							}
 						}
-					} 
+					}
 				})
             });
         }
@@ -389,18 +400,20 @@ export default class ExerciseEdit extends Component {
     addNewTitle() {
         this.setState({
 			contentIDCounter: this.state.contentIDCounter+1,
-			subExercises: update(this.state.subExercises, {
-				[this.state.subExerciseIndex]: {
-					content: {
-						$push: [
-							{
-								_id: "NEW " + this.state.contentIDCounter,
-								type: "title",
-								text: ""
-							}
-						]
+			exercise: update(this.state.exercise, {
+				subExercises: {
+					[this.state.subExerciseIndex]: {
+						content: {
+							$push: [
+								{
+									_id: "NEW " + this.state.contentIDCounter,
+									type: "title",
+									text: ""
+								}
+							]
+						}
 					}
-				} 
+				}
 			})
         });
     }
@@ -408,18 +421,20 @@ export default class ExerciseEdit extends Component {
     addNewText() {
         this.setState({
 			contentIDCounter: this.state.contentIDCounter+1,
-			subExercises: update(this.state.subExercises, {
-				[this.state.subExerciseIndex]: {
-					content: {
-						$push: [
-							{
-								_id: "NEW " + this.state.contentIDCounter,
-								type: "text",
-								text: ""
-							}
-						]
+			exercise: update(this.state.exercise, {
+				subExercises: {
+					[this.state.subExerciseIndex]: {
+						content: {
+							$push: [
+								{
+									_id: "NEW " + this.state.contentIDCounter,
+									type: "text",
+									text: ""
+								}
+							]
+						}
 					}
-				} 
+				}
 			})
         });
     }
@@ -427,21 +442,23 @@ export default class ExerciseEdit extends Component {
     addNewCode() {
         this.setState({
 			contentIDCounter: this.state.contentIDCounter+1,
-			subExercises: update(this.state.subExercises, {
-				[this.state.subExerciseIndex]: {
-					content: {
-						$push: [
-							{
-								_id: "NEW " + this.state.contentIDCounter,
-								type: "code",
-								code: "",
-								settings: {
-									minLines: 1
+			exercise: update(this.state.exercise, {
+				subExercises: {
+					[this.state.subExerciseIndex]: {
+						content: {
+							$push: [
+								{
+									_id: "NEW " + this.state.contentIDCounter,
+									type: "code",
+									code: "",
+									settings: {
+										minLines: 1
+									}
 								}
-							}
-						]
+							]
+						}
 					}
-				} 
+				}
 			})
         });
     }
@@ -450,7 +467,7 @@ export default class ExerciseEdit extends Component {
         let identifier = "";
 
         let containsEditor = false;
-        for (let element of this.state.subExercises[this.state.subExerciseIndex].content) {
+        for (let element of this.state.exercise.subExercises[this.state.subExerciseIndex].content) {
             if (element.type === "editor") {
                 containsEditor = true;
                 break;
@@ -463,23 +480,26 @@ export default class ExerciseEdit extends Component {
 
         this.setState({
 			contentIDCounter: this.state.contentIDCounter+1,
-			subExercises: update(this.state.subExercises, {
-				[this.state.subExerciseIndex]: {
-					content: {
-						$push: [
-							{
-								_id: "NEW " + this.state.contentIDCounter,
-								type: "editor",
-								identifier: identifier,
-								code: "",
-								solution: "",
-								settings: {
-									minLines: 5
+			didChangeCode: true,
+			exercise: update(this.state.exercise, {
+				subExercises: {
+					[this.state.subExerciseIndex]: {
+						content: {
+							$push: [
+								{
+									_id: "NEW " + this.state.contentIDCounter,
+									type: "editor",
+									identifier: identifier,
+									code: "",
+									solution: "",
+									settings: {
+										minLines: 5
+									}
 								}
-							}
-						]
+							]
+						}
 					}
-				} 
+				}
 			})
         });
     }
@@ -489,7 +509,7 @@ export default class ExerciseEdit extends Component {
     deleteContent(id) {
 		let index = -1;
 		let i = 0;
-		for (let c of this.state.subExercises[this.state.subExerciseIndex].content) {
+		for (let c of this.state.exercise.subExercises[this.state.subExerciseIndex].content) {
 			if (c._id === id) {
 				index = i;
 				break;
@@ -502,12 +522,14 @@ export default class ExerciseEdit extends Component {
 		}
 
         this.setState({
-			subExercises: update(this.state.subExercises, {
-				[this.state.subExerciseIndex]: {
-					content: {
-						$splice: [[index, 1]]
+			exercise: update(this.state.exercise, {
+				subExercises: {
+					[this.state.subExerciseIndex]: {
+						content: {
+							$splice: [[index, 1]]
+						}
 					}
-				} 
+				}
 			})
 		});
     }
@@ -517,7 +539,7 @@ export default class ExerciseEdit extends Component {
 
 		let index = -1;
 		let i = 0;
-		for (let sourceFile of this.state.subExercises[this.state.subExerciseIndex].sourceFiles) {
+		for (let sourceFile of this.state.exercise.subExercises[this.state.subExerciseIndex].sourceFiles) {
 			if (sourceFile._id === id) {
 				index = i;
 				break;
@@ -530,12 +552,15 @@ export default class ExerciseEdit extends Component {
 		}
 
         this.setState({
-			subExercises: update(this.state.subExercises, {
-				[this.state.subExerciseIndex]: {
-					sourceFiles: {
-						$splice: [[index, 1]]
+			didChangeCode: true,
+			exercise: update(this.state.exercise, {
+				subExercises: {
+					[this.state.subExerciseIndex]: {
+						sourceFiles: {
+							$splice: [[index, 1]]
+						}
 					}
-				} 
+				}
 			})
         });
     }
@@ -543,57 +568,46 @@ export default class ExerciseEdit extends Component {
 
 
     moveContent(id, moveUp) {
-        let index = this.getIndexOfContent(id);
-
-        if (index === -1) {
-            console.error("No exercise content found!");
-            return;
-		}
-		
-		let newContent;
-        if (moveUp) {
-            newContent = this.array_move(this.state.subExercises[this.state.subExerciseIndex].content, index, index-1);
-        } else {
-            newContent = this.array_move(this.state.subExercises[this.state.subExerciseIndex].content, index, index+1);
-		}
-		
-		this.setState({
-			subExercises: update(this.state.subExercises, {
-				[this.state.subExerciseIndex]: {
-					content: {
-						$set: newContent
-					}
-				} 
-			})
-		});
+		this.moveSubExerciseElements(id, moveUp, "content");
     }
 
     moveSourceFile(id, moveUp) {
-        let index = this.getIndexOfSourceFile(id);
+		this.moveSubExerciseElements(id, moveUp, "sourceFiles");
+	}
+	
+	moveSubExerciseElements(id, moveUp, key) {
+		let index;
+		if (key === "sourceFiles") {
+			index = this.getIndexOfSourceFile(id);
+		} else if (key === "content") {
+			index = this.getIndexOfContent(id);
+		} else {
+			return;
+		}
 
         if (index === -1) {
-            console.error("No exercise source file found!");
             return;
         }
 
-
-		let newSourceFiles;
+		let subExerciseElements;
         if (moveUp) {
-            newSourceFiles = this.array_move(this.state.subExercises[this.state.subExerciseIndex].sourceFiles, index, index-1);
+            subExerciseElements = this.array_move(this.state.exercise.subExercises[this.state.subExerciseIndex][key], index, index-1);
         } else {
-            newSourceFiles = this.array_move(this.state.subExercises[this.state.subExerciseIndex].sourceFiles, index, index+1);
+            subExerciseElements = this.array_move(this.state.exercise.subExercises[this.state.subExerciseIndex][key], index, index+1);
 		}
 		
 		this.setState({
-			subExercises: update(this.state.subExercises, {
-				[this.state.subExerciseIndex]: {
-					sourceFiles: {
-						$set: newSourceFiles
+			exercise: update(this.state.exercise, {
+				subExercises: {
+					[this.state.subExerciseIndex]: {
+						[key]: {
+							$set: subExerciseElements
+						}
 					}
-				} 
+				}
 			})
 		});
-    }
+	}
 
     array_move(original_array, old_index, new_index) {
         let arr = original_array.slice();
@@ -621,9 +635,13 @@ export default class ExerciseEdit extends Component {
     
 
     onChangeExerciseName(e) {
-        this.setState({
-            name: e.target.value
-        });
+		this.setState({
+			exercise: update(this.state.exercise, {
+				name: {
+					$set: e.target.value
+				}
+			})
+		});
     }
 
     onChangeExerciseContent(e) {
@@ -633,10 +651,22 @@ export default class ExerciseEdit extends Component {
             console.error("No exercise content found!");
             return;
         }
-
-        const newContent = [...this.state.subExercises[this.state.subExerciseIndex].content]
-        newContent[index].text = e.target.value;
-        this.setState({content: newContent});
+		
+		this.setState({
+			exercise: update(this.state.exercise, {
+				subExercises: {
+					[this.state.subExerciseIndex]: {
+						content: {
+							[index]: {
+								text: {
+									$set: e.target.value
+								}
+							}
+						}
+					}
+				}
+			})
+		});
     }
 
     onChangeExerciseAceEditor(e, value, id, key, keySettings) {
@@ -650,35 +680,68 @@ export default class ExerciseEdit extends Component {
                 console.error("No exercise content found!");
                 return;
             } else {
-                const newSourceFiles = [...this.state.subExercises[this.state.subExerciseIndex].sourceFiles]
-                newSourceFiles[index][key] = value;
-                this.setState({
-                    sourceFiles: newSourceFiles,
-                    didChangeCode: true
-                });
+				this.setState({
+					didChangeCode: true,
+					exercise: update(this.state.exercise, {
+						subExercises: {
+							[this.state.subExerciseIndex]: {
+								sourceFiles: {
+									[index]: {
+										[key]: {
+											$set: value
+										}
+									}
+								}
+							}
+						}
+					})
+				});
             }
         } else {
             if (key === "settings") {
-                const newContent = [...this.state.subExercises[this.state.subExerciseIndex].content]
-                newContent[index].settings[keySettings] = value;
-                this.setState({content: newContent});
+				this.setState({
+					didChangeCode: true,
+					exercise: update(this.state.exercise, {
+						subExercises: {
+							[this.state.subExerciseIndex]: {
+								content: {
+									[index]: {
+										settings: {
+											[keySettings]: {
+												$set: value
+											}
+										}
+									}
+								}
+							}
+						}
+					})
+				});
             } else {
-                const newContent = [...this.state.subExercises[this.state.subExerciseIndex].content]
-                newContent[index][key] = value;
-                this.setState({content: newContent});
-                if (key === "code" || key === "solution") {
-                    this.setState({didChangeCode: true});
-                }
+				this.setState({
+					didChangeCode: (key === "code" || key === "solution" ? true : this.state.didChangeCode),
+					exercise: update(this.state.exercise, {
+						subExercises: {
+							[this.state.subExerciseIndex]: {
+								content: {
+									[index]: {
+										[key]: {
+											$set: value
+										}
+									}
+								}
+							}
+						}
+					})
+				});
             }
         }
-
-
     }
 
     getIndexOfContent(id) {
         let index = -1;
         let i = 0;
-        for (let currentContent of this.state.subExercises[this.state.subExerciseIndex].content) {
+        for (let currentContent of this.state.exercise.subExercises[this.state.subExerciseIndex].content) {
             if (currentContent._id === id) {
                 index = i;
                 break;
@@ -691,7 +754,7 @@ export default class ExerciseEdit extends Component {
     getIndexOfSourceFile(id) {
         let index = -1;
         let i = 0;
-        for (let currentSourceFile of this.state.subExercises[this.state.subExerciseIndex].sourceFiles) {
+        for (let currentSourceFile of this.state.exercise.subExercises[this.state.subExerciseIndex].sourceFiles) {
             if (currentSourceFile._id === id) {
                 index = i;
                 break;
@@ -706,12 +769,9 @@ export default class ExerciseEdit extends Component {
     
     exportExerciseAsJSON() {
 
-        let exercise = JSON.stringify({
-			name: this.state.name,
-			isVisibleToStudents: this.state.isVisibleToStudents,
-			subExercises: this.state.subExercises
-        });
-
+		let exerciseCopy = {...this.state.exercise};
+		delete exerciseCopy._id;
+        let exercise = JSON.stringify(exerciseCopy);
 		
         this.setState({
             exerciseExportJSONString: lzstring.compressToBase64(exercise)
@@ -722,12 +782,12 @@ export default class ExerciseEdit extends Component {
     onSubmit(e) {
         e.preventDefault();
 
-        if (this.state.name === '') {
+        if (this.state.exercise.name === '') {
             return;
         }
 
 		let subExercises = [];
-        for (let subExercise of this.state.subExercises) {
+        for (let subExercise of this.state.exercise.subExercises) {
 			// removes id from new content entries so that the database gives it an accual id
 			const content = subExercise.content.map(function(currentContent) {
 				if (currentContent._id.startsWith("NEW ")) {
@@ -749,15 +809,15 @@ export default class ExerciseEdit extends Component {
 		}
 
         
-        const exercise = {
+        const data = {
 			courseID: this.state.courseID,
             exerciseID: this.state.exerciseID,
-			name: this.state.name,
-			isVisibleToStudents: this.state.isVisibleToStudents,
+			name: this.state.exercise.name,
+			isVisibleToStudents: this.state.exercise.isVisibleToStudents,
 			subExercises: subExercises
         }
 
-        Axios.put(process.env.REACT_APP_BACKEND_SERVER + '/course/exercise', exercise)
+        Axios.put(process.env.REACT_APP_BACKEND_SERVER + '/course/exercise', data)
         .then(res => {
             console.log(res.data);
             this.props.setModeToSolve();

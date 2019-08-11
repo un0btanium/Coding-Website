@@ -259,7 +259,7 @@ export default class ExerciseExecuter extends Component {
         }
 
         let code_snippets = {};
-        for (let currentContent of this.props.content) {
+        for (let currentContent of this.props.subExercise.content) {
             if (currentContent.type === "editor") {
                 code_snippets[currentContent.identifier] = {
                     code: currentContent.code
@@ -271,7 +271,8 @@ export default class ExerciseExecuter extends Component {
 			courseID: this.props.courseID,
 			exerciseID: this.props.exerciseID,
 			subExerciseIndex: this.props.subExerciseIndex,
-			sourceFiles: this.props.sourceFiles,
+			subExerciseID: this.props.subExercise._id,
+			sourceFiles: (this.props.sendSourceFiles ? this.props.subExercise.sourceFiles : undefined),
             code_snippets: code_snippets
         }
 

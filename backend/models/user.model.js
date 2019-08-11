@@ -15,7 +15,27 @@ let User = new Schema({
     role: {
         type: String,
         required: true
-    }
+	},
+	courses: [
+		{
+			courseID: String,
+			exercises: [
+				{
+					exerciseID: String,
+					subExercises: [
+						{
+							subExerciseID: String,
+							solved: Boolean,
+							codeSnippets: {}
+						}
+					]
+				}
+			]
+		}
+	],
+	code: {
+
+	}
 });
 
 module.exports = mongoose.model('User', User);

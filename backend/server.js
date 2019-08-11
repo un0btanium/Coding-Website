@@ -345,7 +345,7 @@ app.route('/api/course/:id')
 
 app.route('/api/course/:courseID/exercise/:exerciseID')
 
-    .get(function (req, res) {
+    .get((req, res, next) => checkAuth(req, res, next), function (req, res) {
 		Course.findById(req.params.courseID, function (err, course) {
 			if (err) {
 				console.log("Course " + req.params.courseID + " not found!");
@@ -355,12 +355,30 @@ app.route('/api/course/:courseID/exercise/:exerciseID')
 				let exercise = course.exercises.id(req.params.exerciseID)
 
 				if (exercise) {
-					res.json(exercise);
+
+					User.findById(req.tokenData.userId, function (err, user) {
+						if (err) {
+							res.json({ exercise: exercise, userSubExercisesData: [] });
+						} else {
+							let userCourse = findEntryInArrayByKey(user.courses, "courseID", req.params.courseID);
+							if (userCourse === undefined) {
+								res.json({ exercise: exercise, userSubExercisesData: [] });
+							} else {
+								let exerciseCourse = findEntryInArrayByKey(userCourse.exercises, "exerciseID", req.params.exerciseID);
+								if (exerciseCourse === undefined) {
+									res.json({ exercise: exercise, userSubExercisesData: [] });
+								} else {
+									
+									res.json({ exercise: exercise, userSubExercisesData: exerciseCourse.subExercises });
+								}
+							}
+						}
+					});
+
 				} else {
 					console.log("Exercise " + req.params.exerciseID + " not found!");
 					res.status(404).send('Exercise not found!');
 				}
-
 			}
 		});
     })
@@ -646,8 +664,8 @@ app.route("/api/exercise/run")
 		let courseID = req.body.courseID;
 		let exerciseID = req.body.exerciseID;
 		let subExerciseIndex = req.body.subExerciseIndex;
+		let subExerciseID = req.body.subExerciseID;
         let userData = req.tokenData;
-
 
         Course.findById(courseID, function (err, course) {
             if (!course) {
@@ -661,7 +679,75 @@ app.route("/api/exercise/run")
 					return;
 				}
 
-				// TODO save code for user
+				// PERSIST USER CODE (could probably be simplified codewise)
+				User.findById(userData.userId, function (err, user) {
+					if (!err) {
+
+						// COURSE
+						let userCourse = undefined;
+						while (userCourse === undefined) {
+							for (let c of user.courses) {
+								if (c.courseID === courseID) {
+									userCourse = c;
+									break;
+								}
+							}
+	
+							if (userCourse === undefined) {
+								user.courses.push({
+									courseID: courseID,
+									exercises: []
+								})
+							}
+						}
+
+						// EXERCISE
+						let userExercise = undefined;
+						while (userExercise === undefined) {
+							for (let e of userCourse.exercises) {
+								if (e.exerciseID === exerciseID) {
+									userExercise = e;
+									break;
+								}
+							}
+	
+							if (userExercise === undefined) {
+								userCourse.exercises.push({
+									exerciseID: exerciseID,
+									subExercises: []
+								})
+							} 
+						}
+
+						// SUBEXERCISE
+						let userSubExercise = undefined;
+						for (let s of userExercise.subExercises) {
+							if (s.subExerciseID === subExerciseID) {
+								userSubExercise = s;
+								break;
+							}
+						}
+
+						if (userSubExercise === undefined) {
+							userExercise.subExercises.push({
+								subExerciseID: subExerciseID,
+								solved: true,
+								codeSnippets: code_snippets
+							});
+						} else {
+							userSubExercise.codeSnippets = code_snippets
+						}
+
+						user
+						.save()
+						.then(user => {
+							
+						})
+						.catch(err => {
+							console.log("Saving user code failed")
+						});
+					}
+				});
 
 				let sourceFiles = exercise.subExercises[subExerciseIndex].sourceFiles;
 				if (sourceFilesUser !== undefined && sourceFilesUser !== null) { // user ran in Edit mode
@@ -805,3 +891,15 @@ app.route("/api/exercise/run")
 app.listen(PORT, function () {
     console.log("Server running on Port: " + PORT);
 });
+
+
+function findEntryInArrayByKey(array, key, compareValue) {
+	let element = undefined;
+	for (let entry of array) {
+		if (entry[key] === compareValue) {
+			element = entry;
+			break;
+		}
+	}
+	return element;
+}

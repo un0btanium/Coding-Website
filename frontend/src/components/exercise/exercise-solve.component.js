@@ -21,15 +21,21 @@ export default class ExerciseSolve extends Component {
 
         this.state = {
 			courseID: this.props.courseID,
-            exerciseID: this.props.exerciseID,
-			name: '',
-			subExercises: [{
-				content: [],
-				sourceFiles: []
-			}],
+			exerciseID: this.props.exerciseID,
 			subExerciseIndex: 0,
-            highlighting: null,
 
+			exercise: {
+				name: '',
+				isVisibleToStudents: true,
+				subExercises: [{
+					id: 0,
+					content: [],
+					sourceFiles: []
+				}]
+			},
+			userSubExercisesData: {},
+
+            highlighting: null,
             didChangeCode: true
         }
     }
@@ -37,13 +43,32 @@ export default class ExerciseSolve extends Component {
     componentDidMount() {
         Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/course/' + this.state.courseID + '/exercise/' + this.state.exerciseID)
             .then(response => {
+
+				let userSubExercisesData = {};
+				for (let data of response.data.userSubExercisesData) {
+					userSubExercisesData[data.subExerciseID] = {
+						solved: data.solved,
+						codeSnippets: data.codeSnippets
+					}
+				}
+
+				let exercise = response.data.exercise;
+
+				for (let subExercise of exercise.subExercises) {
+					for (let content of subExercise.content) {
+						if (content.type === "editor" && userSubExercisesData[subExercise._id] && userSubExercisesData[subExercise._id].codeSnippets[content.identifier] && userSubExercisesData[subExercise._id].codeSnippets[content.identifier].code) {
+							content.code = userSubExercisesData[subExercise._id].codeSnippets[content.identifier].code;
+						}
+					}
+				}
+
 				this.setState({
-					exerciseID: response.data._id,
-					name: response.data.name,
-					subExercises: response.data.subExercises
+					exercise: exercise,
+					userSubExercisesData: userSubExercisesData
 				});
             })
             .catch((error) => {
+				console.log(error)
                 console.error("Course or Exercise not found!");
 				this.props.history.push('/');
             });
@@ -51,23 +76,23 @@ export default class ExerciseSolve extends Component {
 
     render () {
 
-		if (this.state.subExercises.length === 0) {
+		if (this.state.exercise.subExercises.length === 0) {
 			return null;
 		}
 
         return (
             <div className="disableSelection" style={{marginTop: '60px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
 				<div style={{textAlign: "center"}}>
-                	<h3>{this.state.name}</h3>
+                	<h3>{this.state.exercise.name}</h3>
 				</div>
 
                 <br />
 
 				<div style={{ width: "100%", textAlign: "center"}}>
 					<ProgressArrows
-						arrows={this.state.subExercises}
+						arrows={this.state.exercise.subExercises}
+						data={this.state.userSubExercisesData}
 						onClick={(e, i) => {
-							console.log(i);
 							this.setState({ subExerciseIndex: i });
 						}}
 					/>
@@ -77,7 +102,7 @@ export default class ExerciseSolve extends Component {
 
                 <ExerciseContent
 					subExerciseIndex={this.state.subExerciseIndex}
-                    content={this.state.subExercises[this.state.subExerciseIndex].content}
+                    content={this.state.exercise.subExercises[this.state.subExerciseIndex].content}
                     mode="solve"
                     onChangeExerciseContent={this.onChangeExerciseContent}
                     onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
@@ -92,10 +117,11 @@ export default class ExerciseSolve extends Component {
 					courseID={this.state.courseID}
 					exerciseID={this.state.exerciseID}
 					subExerciseIndex={this.state.subExerciseIndex}
-                    content={this.state.subExercises[this.state.subExerciseIndex].content}
+					subExercise={this.state.exercise.subExercises[this.state.subExerciseIndex]}
                     didChangeCode={this.state.didChangeCode}
                     onRanCode={this.onRanCode}
 					setHighlighting={this.setHighlighting}
+					sendSourceFiles={false}
 					largeMargin={true}
                 />
             </div>
@@ -104,16 +130,16 @@ export default class ExerciseSolve extends Component {
 
 
 
-    onChangeExerciseAceEditor(e, value, id, key, keySettings) {
-        key = key || "code"; // code, solution, identifier, package, name, settings (minLines)
+    onChangeExerciseAceEditor(e, value, id, key) {
+        key = key || "code"; // code, solution, identifier, package, name
 
         let index = this.getIndexOfContent(id);
 
         if (index > 0 && key === "code") {
             this.setState({
-				subExercises: update(
-					this.state.subExercises,
-					{
+				didChangeCode: (key === "code" || key === "solution" ? true : this.state.didChangeCode),
+				exercise: update(this.state.exercise, {
+					subExercises: {
 						[this.state.subExerciseIndex]: {
 							content: {
 								[index]: {
@@ -124,10 +150,9 @@ export default class ExerciseSolve extends Component {
 							}
 						}
 					}
-				)
+				})
 			});
             if (key === "code" || key === "solution") {
-                this.setState({didChangeCode: true});
                 this.setHighlighting(null);
             }
         }
@@ -136,7 +161,7 @@ export default class ExerciseSolve extends Component {
     getIndexOfContent(id) {
         let index = -1;
         let i = 0;
-        for (let currentContent of this.state.subExercises[this.state.subExerciseIndex].content) {
+        for (let currentContent of this.state.exercise.subExercises[this.state.subExerciseIndex].content) {
             if (currentContent._id === id) {
                 index = i;
                 break;
@@ -149,7 +174,7 @@ export default class ExerciseSolve extends Component {
     getIndexOfSourceFile(id) {
         let index = -1;
         let i = 0;
-        for (let currentSourceFile of this.state.sourceFiles) {
+        for (let currentSourceFile of this.state.exercise.sourceFiles) {
             if (currentSourceFile._id === id) {
                 index = i;
                 break;
