@@ -44,6 +44,7 @@ export default class ExerciseEdit extends Component {
 
 
         this.state = {
+			courseName: "Test",
 			courseID: this.props.courseID,
 			exerciseID: this.props.exerciseID,
 			subExerciseIndex: 0,
@@ -70,8 +71,10 @@ export default class ExerciseEdit extends Component {
     componentDidMount() {
         Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/course/' + this.state.courseID + '/exercise/' + this.state.exerciseID)
             .then(response => {
+				console.log(response.data.exercise);
 				this.setState({
-					exercise: response.data.exercise
+					exercise: response.data.exercise,
+					courseName: response.data.courseName
 				});
             })
             .catch((error) => {
@@ -89,6 +92,10 @@ export default class ExerciseEdit extends Component {
         return (
             <div className="disableSelection" style={{marginTop: '60px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
                 
+				<div onClick={(e) => this.props.history.push("/course/" + this.state.courseID + "/exercises")}style={{textAlign: "center", cursor: "pointer", marginBottom: "20px" }}>
+					<h2>{this.state.courseName}</h2>
+				</div>
+
 				<div style={{textAlign: "center"}}>
 					<h3>Edit Exercise {this.state.exercise.name}</h3>
 				</div>
@@ -799,6 +806,7 @@ export default class ExerciseEdit extends Component {
 			});
 
 			subExercises.push({
+				_id: subExercise._id,
 				content: content,
 				sourceFiles: sourceFiles
 			})
@@ -811,7 +819,7 @@ export default class ExerciseEdit extends Component {
 			name: this.state.exercise.name,
 			isVisibleToStudents: this.state.exercise.isVisibleToStudents,
 			subExercises: subExercises
-        }
+		}
 
         Axios.put(process.env.REACT_APP_BACKEND_SERVER + '/course/exercise', data)
         .then(res => {

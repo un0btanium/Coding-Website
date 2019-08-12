@@ -49,7 +49,7 @@ export default class CourseList extends Component {
 				}}
 			>
 				<div style={{ padding: "50px", backgroundColor: "rgba(0, 0, 0, 0.5)"}}>
-					<h4><b>{props.course.name}</b></h4>
+					<h3><b>{props.course.name}</b></h3>
 					<span style={{marginRight:"25px"}}><b><span style={{fontSize: "30px", marginRight:"5px"}}>{props.course.exercisesAmount}</span> Aufgabenblätter</b></span>
 					<span style={{}}><b><span style={{fontSize: "30px", marginRight:"5px"}}>{props.course.subExercisesAmount}</span> Aufgaben</b>  {!props.course.isVisibleToStudents ? <FontAwesomeIcon size="2x" style={{marginLeft: "20px"}} icon={faLock}/> : null }</span>
 				</div>

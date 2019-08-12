@@ -371,12 +371,12 @@ app.route('/api/course/:courseID/exercise/:exerciseID')
 
 					User.findById(req.tokenData.userId, function (err, user) {
 						if (err) {
-							res.json({ exercise: exercise, userSubExercisesData: {} });
+							res.json({ exercise: exercise, courseName: course.name, userSubExercisesData: {} });
 						} else {
 							if (user.code && user.code[req.params.courseID] && user.code[req.params.courseID][req.params.exerciseID]) {
-								res.json({ exercise: exercise, userSubExercisesData: user.code[req.params.courseID][req.params.exerciseID] });
+								res.json({ exercise: exercise, courseName: course.name, userSubExercisesData: user.code[req.params.courseID][req.params.exerciseID] });
 							} else {
-								res.json({ exercise: exercise, userSubExercisesData: {} });
+								res.json({ exercise: exercise, courseName: course.name, userSubExercisesData: {} });
 							}
 						}
 					});
@@ -500,8 +500,8 @@ app.route('/api/course/exercise')
 
 				exercise.name = req.body.name;
 				exercise.isVisibleToStudents = req.body.isVisibleToStudents;
-                exercise.subExercises = req.body.subExercises;
-
+				exercise.subExercises = req.body.subExercises;
+				
                 course
 					.save()
 					.then(course => {

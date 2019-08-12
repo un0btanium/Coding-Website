@@ -35,7 +35,6 @@ export default class ExerciseList extends Component {
     componentDidMount() {
         Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/course/' + this.props.match.params.courseID)
             .then(response => {
-				console.log(response.data.userExercisesData)
 				this.setState({
 					course: response.data.course,
 					userExercisesData: response.data.userExercisesData
@@ -68,7 +67,7 @@ export default class ExerciseList extends Component {
 				
 				<div style={{ padding: "25px", backgroundColor: "rgba(0, 0, 0, 0.75)", borderRadius: "10px"}}>
 					<div>
-						<h4 style={{marginLeft: "20px"}}>
+						<h2 style={{marginLeft: "20px"}}>
 							{ isAuthenticated(["admin", "maintainer"]) && [
 								<Button variant="danger" onClick={(e) => this.showDeleteModalExercise(e, props.exercise)} key="DeleteExerciseButton" style={{ marginLeft: "20px"}}><FontAwesomeIcon icon={faTrashAlt} /></Button>,
 								<span key="span1"> </span>,
@@ -78,7 +77,7 @@ export default class ExerciseList extends Component {
 								]
 							}
 							<b style={{marginLeft: "20px"}}>{props.exercise.name}</b>
-						</h4>
+						</h2>
 						<ProgressArrows
 							arrows={props.exercise.subExercises}
 							data={this.state.userExercisesData[props.exercise._id]}
@@ -107,7 +106,7 @@ export default class ExerciseList extends Component {
             <div style={{marginTop: '50px'}}>
                 
 				<div style={{textAlign: "center"}}>
-                	<h1>{this.state.course.name || "Loading..."}</h1>
+                	<h1>{this.state.course.name|| "Loading..."}</h1>
 				</div>
 
 				{isAuthenticated(["admin", "maintainer"]) &&
