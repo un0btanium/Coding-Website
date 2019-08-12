@@ -35,8 +35,8 @@ export default class ExerciseView extends Component {
                 <>
                     {modeToggle}
 					<ExerciseEdit 
-						exerciseID={this.props.match.params.exerciseID}
 						courseID={this.props.match.params.courseID}
+						exerciseID={this.props.match.params.exerciseID}
 						setModeToSolve={this.setModeToSolve}
 						history={this.props.history}
 					/>
@@ -47,8 +47,8 @@ export default class ExerciseView extends Component {
                 <>
                     {modeToggle}
                     <ExerciseSolve
-						exerciseID={this.props.match.params.exerciseID}
 						courseID={this.props.match.params.courseID}
+						exerciseID={this.props.match.params.exerciseID}
 						history={this.props.history}
 					/>
                 </>

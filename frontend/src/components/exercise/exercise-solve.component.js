@@ -127,7 +127,7 @@ export default class ExerciseSolve extends Component {
 
         let index = this.getIndexOfContent(id);
 
-        if (index > 0 && key === "code") {
+        if (index >= 0 && key === "code") {
             this.setState({
 				didChangeCode: (key === "code" || key === "solution" ? true : this.state.didChangeCode),
 				exercise: update(this.state.exercise, {
@@ -155,19 +155,6 @@ export default class ExerciseSolve extends Component {
         let i = 0;
         for (let currentContent of this.state.exercise.subExercises[this.state.subExerciseIndex].content) {
             if (currentContent._id === id) {
-                index = i;
-                break;
-            }
-            i++;
-        }
-        return index;
-    }
-
-    getIndexOfSourceFile(id) {
-        let index = -1;
-        let i = 0;
-        for (let currentSourceFile of this.state.exercise.sourceFiles) {
-            if (currentSourceFile._id === id) {
                 index = i;
                 break;
             }

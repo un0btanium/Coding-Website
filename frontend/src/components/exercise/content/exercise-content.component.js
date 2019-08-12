@@ -88,7 +88,7 @@ export default class ExerciseContent extends Component {
                 }
                 if (mode === "edit") {
                     return (
-                        <Form.Group as={Row} className="form-group" key={"ExerciseContentElement" + currentContent._id}>
+                        <Form.Group style={{margin: "20px 0px 20px 0px"}} as={Row} className="form-group" key={"ExerciseContentElement" + currentContent._id}>
                             <ExerciseElementSidebar text={text} id={currentContent._id} mode={mode} delete={deleteContent} move={moveContent} key={"ExerciseSidebar" + currentContent._id}/>
                             {element}
                         </Form.Group>

@@ -11,7 +11,7 @@ export default class ExerciseElementSidebar extends Component {
             return null;
         } else if (this.props.mode === "edit") {
             return (
-                <div style={{ textAlign: 'right', position: 'relative', left: '-140px', top: '67px',  marginTop: '-55px' }}>
+                <div style={{ textAlign: 'right', position: 'relative', left: '-140px', top: '67px',  marginTop: '-60px' }}>
                     <h5>{this.props.text + ""}</h5>
                     <Button size="sm" variant="danger" onClick={ (e) => { this.props.delete(this.props.id); }}>Delete</Button> 
                     <Button size="sm" variant="secondary" onClick={ (e) => { this.props.move(this.props.id, true); }}><FontAwesomeIcon icon={faCaretUp} /></Button> 

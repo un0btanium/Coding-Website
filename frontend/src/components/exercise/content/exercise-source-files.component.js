@@ -25,13 +25,13 @@ export default class ExerciseSourceFiles extends Component {
         let res = 
             this.props.sourceFiles.map(function(sourceFile, i) {
                 return (
-                <Form.Group as={Row} className="form-group" key={"SourceFile" + sourceFile._id}>
+                <Form.Group style={{ margin: "20px 0px 20px 0px" }} as={Row} className="form-group" key={"SourceFile" + sourceFile._id}>
                     <ExerciseElementSidebar text="Source File" id={sourceFile._id} mode={mode} delete={deleteSourceFile} move={moveSourceFile} key={"ExerciseSidebar" + sourceFile._id}/>
-                    <Container className="disableSelection">
+                    <Container style={{ margin: "0px" }} className="disableSelection">
                         
                         <Row>
                             <Col sm={2} style={{textAlign: 'right'}}>
-                                <Form.Label style={{ 'marginTop': '5px'}}><h5>Package:</h5></Form.Label>
+                                <Form.Label style={{ marginTop: '5px'}}><h5>Package:</h5></Form.Label>
                             </Col>
                             <Col sm={4}>
                                 <Form.Control
@@ -64,35 +64,35 @@ export default class ExerciseSourceFiles extends Component {
                                     value={sourceFile.name}
                                     onChange={ (e) => { onChangeExerciseAceEditor(e, e.target.value, sourceFile._id, "name"); }}
                                 />
-                        </Col>
-                    </Row>
+                        	</Col>
+						</Row>
+						<Row style={{'borderColor': '#c20a00', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', boxShadow: '2px 2px 5px #000000'}}>
+							<AceEditor
+								mode="java"
+								theme="monokai"
+								name={"code" + sourceFile._id}
+								fontSize='18px'
+								width='100%'
+								value={sourceFile.code}
+								onChange={(value, e) => { onChangeExerciseAceEditor(e, value, sourceFile._id, "code"); }}
+								// cursorStart={1}
+								editorProps={{$blockScrolling: Infinity}}
+								setOptions={{
+									enableBasicAutocompletion: true,
+									// enableLiveAutocompletion: true,
+									enableSnippets: true,
+									showLineNumbers: true,
+									minLines: 5,
+									maxLines: Infinity,
+									wrap: false,
+									animatedScroll: true,
+									autoScrollEditorIntoView: true,
+									printMarginColumn: 200
+								}}
+							/>
+						</Row>
                     </Container>
                     
-                    <Row style={{'borderColor': '#c20a00', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%', boxShadow: '2px 2px 5px #000000'}}>
-                        <AceEditor
-                            mode="java"
-                            theme="monokai"
-                            name={"code" + sourceFile._id}
-                            fontSize='18px'
-                            width='100%'
-                            value={sourceFile.code}
-                            onChange={(value, e) => { onChangeExerciseAceEditor(e, value, sourceFile._id, "code"); }}
-                            // cursorStart={1}
-                            editorProps={{$blockScrolling: Infinity}}
-                            setOptions={{
-                                enableBasicAutocompletion: true,
-                                // enableLiveAutocompletion: true,
-                                enableSnippets: true,
-                                showLineNumbers: true,
-                                minLines: 5,
-                                maxLines: Infinity,
-                                wrap: false,
-                                animatedScroll: true,
-                                autoScrollEditorIntoView: true,
-                                printMarginColumn: 200
-                            }}
-                        />
-                    </Row>
                 </Form.Group>
                 )
             })

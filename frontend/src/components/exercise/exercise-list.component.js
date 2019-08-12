@@ -68,7 +68,7 @@ export default class ExerciseList extends Component {
 				
 				<div style={{ padding: "25px", backgroundColor: "rgba(0, 0, 0, 0.75)", borderRadius: "10px"}}>
 					<div>
-						<h4 style={{marginLeft: "20px"}}><b>{props.exercise.name}</b>
+						<h4 style={{marginLeft: "20px"}}>
 							{ isAuthenticated(["admin", "maintainer"]) && [
 								<Button variant="danger" onClick={(e) => this.showDeleteModalExercise(e, props.exercise)} key="DeleteExerciseButton" style={{ marginLeft: "20px"}}><FontAwesomeIcon icon={faTrashAlt} /></Button>,
 								<span key="span1"> </span>,
@@ -77,6 +77,7 @@ export default class ExerciseList extends Component {
 								<Button variant="info" onClick={(e) => this.switchVisibilityExercise(e, props.exercise, props.index)} key="VisibilityExerciseButton"><FontAwesomeIcon icon={props.exercise.isVisibleToStudents ? faLockOpen : faLock} /></Button>
 								]
 							}
+							<b style={{marginLeft: "20px"}}>{props.exercise.name}</b>
 						</h4>
 						<ProgressArrows
 							arrows={props.exercise.subExercises}

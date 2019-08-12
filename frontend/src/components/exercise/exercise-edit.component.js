@@ -87,7 +87,7 @@ export default class ExerciseEdit extends Component {
 		}
 
         return (
-            <div className="disableSelection" style={{marginTop: '50px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
+            <div className="disableSelection" style={{marginTop: '60px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
                 
 				<div style={{textAlign: "center"}}>
 					<h3>Edit Exercise {this.state.exercise.name}</h3>
@@ -161,35 +161,33 @@ export default class ExerciseEdit extends Component {
 					<hr style={{backgroundColor: "rgb(223, 105, 26)"}}/>
 
                     <Tabs
+						style={{width: "100%"}}
                         id="controlled-tab-exercise"
                         activeKey={this.state.tabKey}
 						onSelect={(tabKey) => this.setState({ tabKey })}
                     >
-
                         <Tab variant="primary" eventKey="content" title="Content Elements">
-                            <ExerciseContent
+						<ExerciseContent
 								subExerciseIndex={this.state.subExerciseIndex}
-                                content={this.state.exercise.subExercises[this.state.subExerciseIndex].content}
-                                mode="edit"
-                                onChangeExerciseContent={this.onChangeExerciseContent}
-                                onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
-                                deleteContent={this.deleteContent}
-                                moveContent={this.moveContent}
+								content={this.state.exercise.subExercises[this.state.subExerciseIndex].content}
+								mode="edit"
+								onChangeExerciseContent={this.onChangeExerciseContent}
+								onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
+								deleteContent={this.deleteContent}
+								moveContent={this.moveContent}
 								setHighlighting={this.setHighlighting}
 								highlighting={this.state.highlighting}
-                            />
-                            
-                            <br />
-                            <br />
+							/>
+							
+							<br />
+							<br />
 
-                            <Form.Group as={Row} className="form-group">
-                                <Col style={{ textAlign: "center" }}>
-                                    <Button variant="outline-primary" onClick={this.addNewTitle} style={{width: '150px'}}>+Title</Button>
-                                    <Button variant="outline-primary" onClick={this.addNewText} style={{width: '150px'}}>+Text</Button>
-                                    <Button variant="outline-primary" onClick={this.addNewCode} style={{width: '150px'}}>+Code</Button>
-                                    <Button variant="outline-primary" onClick={this.addNewEditor} style={{width: '150px'}}>+Editor</Button>
-                                </Col>
-                            </Form.Group>
+							<Col style={{ textAlign: "center", marginBottom: "30px" }}>
+								<Button variant="outline-primary" onClick={this.addNewTitle} style={{width: '150px'}}>+Title</Button>
+								<Button variant="outline-primary" onClick={this.addNewText} style={{width: '150px'}}>+Text</Button>
+								<Button variant="outline-primary" onClick={this.addNewCode} style={{width: '150px'}}>+Code</Button>
+								<Button variant="outline-primary" onClick={this.addNewEditor} style={{width: '150px'}}>+Editor</Button>
+							</Col>
 
 							<ExerciseExecuter
 								courseID={this.state.courseID}
@@ -202,28 +200,27 @@ export default class ExerciseEdit extends Component {
 								sendSourceFiles={true}
 								largeMargin={false}
 							/>
-                        </Tab>
-
+						</Tab>
                         <Tab variant="primary" eventKey="source-file" title="Source Files">
-                            <ExerciseSourceFiles
-                                mode="edit"
-                                sourceFiles={this.state.exercise.subExercises[this.state.subExerciseIndex].sourceFiles}
-                                onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
-                                deleteSourceFile={this.deleteSourceFile}
-                                moveSourceFile={this.moveSourceFile}
-                            />
-                            
-                            <br />
-                            <br />
+							<ExerciseSourceFiles
+								mode="edit"
+								sourceFiles={this.state.exercise.subExercises[this.state.subExerciseIndex].sourceFiles}
+								onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
+								deleteSourceFile={this.deleteSourceFile}
+								moveSourceFile={this.moveSourceFile}
+							/>
+							
+							<br />
+							<br />
 
-                            <Form.Group as={Row} className="form-group">
-                                <Col style={{ textAlign: "center" }}>
-                                    <Button variant="outline-primary" onClick={this.addNewSourceFile} style={{width: '150px'}}>+Source File</Button>
-                                </Col>
-                            </Form.Group>
-                        </Tab>
+							<Form.Group as={Row} className="form-group">
+								<Col style={{ textAlign: "center" }}>
+									<Button variant="outline-primary" onClick={this.addNewSourceFile} style={{width: '150px'}}>+Source File</Button>
+								</Col>
+							</Form.Group>
+						</Tab>
 
-                    </Tabs>
+					</Tabs>
 
                     <br />
                     <br />
@@ -369,8 +366,8 @@ export default class ExerciseEdit extends Component {
         } else {
             this.setState({
 				contentIDCounter: this.state.contentIDCounter+1,
+				didChangeCode: true,
 				exercise: update(this.state.exercise, {
-					didChangeCode: true,
 					subExercises: {
 						[this.state.subExerciseIndex]: {
 							sourceFiles: {
@@ -700,7 +697,6 @@ export default class ExerciseEdit extends Component {
         } else {
             if (key === "settings") {
 				this.setState({
-					didChangeCode: true,
 					exercise: update(this.state.exercise, {
 						subExercises: {
 							[this.state.subExerciseIndex]: {
