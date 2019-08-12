@@ -174,7 +174,14 @@ export default class ExerciseSolve extends Component {
 
     onRanCode() {
         this.setState({
-            didChangeCode: false
+			didChangeCode: false,
+			userSubExercisesData: update(this.state.userSubExercisesData, {
+				[this.state.exercise.subExercises[this.state.subExerciseIndex]._id]: {
+					$set: {
+						solved: true
+					}
+				}
+			})
         });
     }
 
