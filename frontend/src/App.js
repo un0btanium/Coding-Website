@@ -29,7 +29,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./theme/bootstrap.min.css";
 import "./theme/ProgressArrows.css";
 
-import { Navbar, Nav, Container, Button, Toast } from 'react-bootstrap';
+import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 
 
 const BG = "primary"; // primary, dark, light

@@ -7,7 +7,7 @@ export default class ExerciseText extends Component {
     render () {
         if (this.props.mode === "solve") {
             return (
-                <p className="disableSelection" as={Row} style={{'marginBottom': '15px'}}>{this.props.content.text}</p>
+                <p className="disableSelection" as={Row} style={{'marginBottom': '15px', textAlign: "justify"}}>{this.props.content.text}</p>
             );
         } else if (this.props.mode === "edit") {
             

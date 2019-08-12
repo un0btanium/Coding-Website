@@ -13,6 +13,7 @@ let SubExercise = new Schema({
 		{
 			type: { type: String, required: true },
 			text: String,
+			title: String,
 			identifier: String,
 			code: String,
 			solution: String,

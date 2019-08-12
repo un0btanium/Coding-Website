@@ -28,6 +28,7 @@ export default class ExerciseEdit extends Component {
 
         this.addNewTitle = this.addNewTitle.bind(this);
         this.addNewText = this.addNewText.bind(this);
+        this.addNewHint = this.addNewHint.bind(this);
         this.addNewCode = this.addNewCode.bind(this);
         this.addNewEditor = this.addNewEditor.bind(this);
         this.deleteContent = this.deleteContent.bind(this);
@@ -193,6 +194,7 @@ export default class ExerciseEdit extends Component {
 							<Col style={{ textAlign: "center", marginBottom: "30px" }}>
 								<Button variant="outline-primary" onClick={this.addNewTitle} style={{width: '150px'}}>+Title</Button>
 								<Button variant="outline-primary" onClick={this.addNewText} style={{width: '150px'}}>+Text</Button>
+								<Button variant="outline-primary" onClick={this.addNewHint} style={{width: '150px'}}>+Hint</Button>
 								<Button variant="outline-primary" onClick={this.addNewCode} style={{width: '150px'}}>+Code</Button>
 								<Button variant="outline-primary" onClick={this.addNewEditor} style={{width: '150px'}}>+Editor</Button>
 							</Col>
@@ -444,6 +446,28 @@ export default class ExerciseEdit extends Component {
 				}
 			})
         });
+	}
+	
+    addNewHint() {
+        this.setState({
+			contentIDCounter: this.state.contentIDCounter+1,
+			exercise: update(this.state.exercise, {
+				subExercises: {
+					[this.state.subExerciseIndex]: {
+						content: {
+							$push: [
+								{
+									_id: "NEW " + this.state.contentIDCounter,
+									title: "Hint",
+									type: "hint",
+									text: ""
+								}
+							]
+						}
+					}
+				}
+			})
+        });
     }
 
     addNewCode() {
@@ -655,13 +679,14 @@ export default class ExerciseEdit extends Component {
 		});
     }
 
-    onChangeExerciseContent(e) {
+    onChangeExerciseContent(e, key) {
+		key = key || "text";
         let index = this.getIndexOfContent(e.target.name);
 
         if (index === -1) {
             console.error("No exercise content found!");
             return;
-        }
+		}
 		
 		this.setState({
 			exercise: update(this.state.exercise, {
@@ -669,7 +694,7 @@ export default class ExerciseEdit extends Component {
 					[this.state.subExerciseIndex]: {
 						content: {
 							[index]: {
-								text: {
+								[key]: {
 									$set: e.target.value
 								}
 							}

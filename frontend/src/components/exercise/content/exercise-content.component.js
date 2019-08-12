@@ -6,6 +6,7 @@ import ExerciseTitle from './exercise-title.component';
 import ExerciseText from './exercise-text.component';
 import ExerciseCode from './exercise-code.component';
 import ExerciseEditor from './exercise-editor.component';
+import ExerciseHint from './exercise-hint.component';
 import ExerciseElementSidebar from './exercise-element-sidebar.component';
 
 export default class ExerciseContent extends Component {
@@ -35,8 +36,6 @@ export default class ExerciseContent extends Component {
                         element =
                             <ExerciseTitle
                                 onChange={onChangeExerciseContent}
-                                deleteContent={deleteContent}
-                                moveContent={moveContent}
                                 content={currentContent}
                                 mode={mode}
                                 key={"ExerciseContent" + currentContent._id}
@@ -47,8 +46,6 @@ export default class ExerciseContent extends Component {
                         element =
                             <ExerciseText 
                                 onChange={onChangeExerciseContent}
-                                deleteContent={deleteContent}
-                                moveContent={moveContent}
                                 content={currentContent}
                                 mode={mode}
                                 key={"ExerciseContent" + currentContent._id}
@@ -59,8 +56,6 @@ export default class ExerciseContent extends Component {
                         element =
                             <ExerciseCode
                                 onChange={onChangeExerciseAceEditor}
-                                deleteContent={deleteContent}
-                                moveContent={moveContent}
                                 content={currentContent}
                                 mode={mode}
                                 key={"ExerciseContent" + currentContent._id}
@@ -72,8 +67,6 @@ export default class ExerciseContent extends Component {
                             <ExerciseEditor
 								subExerciseIndex={subExerciseIndex}
                                 onChange={onChangeExerciseAceEditor}
-                                deleteContent={deleteContent}
-                                moveContent={moveContent}
                                 content={currentContent}
                                 setHighlighting={setHighlighting}
                                 highlighting={highlighting}
@@ -81,6 +74,16 @@ export default class ExerciseContent extends Component {
                                 key={"ExerciseContent" + currentContent._id}
                             />;
                         break;
+					case "hint":
+						text = "Hint";
+						element =
+							<ExerciseHint
+								onChange={onChangeExerciseContent}
+								content={currentContent}
+								mode={mode}
+								key={"ExerciseContent" + currentContent._id}
+							/>;
+						break;
                     default:
                         element = <h4 key={"ExerciseContent" + i}>Unknown content!!!</h4>;
                         text = "Unknown";
