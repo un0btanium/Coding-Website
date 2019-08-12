@@ -27,7 +27,7 @@ export default class ExerciseCreate extends Component {
 
     render () {
         return (
-            <div style={{marginTop: '50px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
+            <div className="fadeIn" style={{marginTop: '50px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
 				<h2>Course {this.state.courseName}</h2>
                 
 				<br />

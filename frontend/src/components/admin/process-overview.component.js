@@ -35,7 +35,7 @@ export default class ProcessOverview extends Component {
 
 		const Process = props => (
 			<div
-				className="disableSelection"
+				className="disableSelection fadeIn"
 				style={{
 					order: props.index,
 					flexGrow: 4,

@@ -35,7 +35,7 @@ export default class CourseList extends Component {
 
 		const Course = props => (
 			<div
-				className="disableSelection"
+				className="disableSelection fadeIn"
 				onClick={() => this.enterCourse(props.course._id)}
 				style={{
 					order: props.index,

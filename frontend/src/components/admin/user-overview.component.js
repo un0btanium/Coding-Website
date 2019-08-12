@@ -61,7 +61,7 @@ export default class UserOverview extends Component {
 		);
 
 		return (
-			<div style={{marginTop: '50px'}}>
+			<div className="fadeIn" style={{marginTop: '50px'}}>
 				
 				<div style={{textAlign: "center"}}>
 					<h1>Users</h1>
