@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import Axios from 'axios';
 import update from 'immutability-helper';
 import lzstring from 'lz-string';
+import { toast } from 'react-toastify';
 
 import { Form, Button, Row, Col, Tabs, Tab } from 'react-bootstrap';
 
@@ -324,6 +325,8 @@ export default class ExerciseEdit extends Component {
 		}
 		subExerciseIndex = Math.min(subExerciseIndex, this.state.exercise.subExercises.length-2);
 
+		toast(<div style={{textAlign: "center"}}>Removed Sub-Exercise!<br/>Save to persist!</div>, {type: toast.TYPE.INFO, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
+
         this.setState({
 			subExerciseIndex: subExerciseIndex,
 			exercise: update(this.state.exercise, {
@@ -524,6 +527,10 @@ export default class ExerciseEdit extends Component {
 		if (index === -1) {
 			return;
 		}
+
+		
+		toast(<div style={{textAlign: "center"}}>Removed {this.state.exercise.subExercises[this.state.subExerciseIndex].content[index].type} Entry!<br/>Save to persist!</div>, {type: toast.TYPE.INFO, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
+
 
         this.setState({
 			exercise: update(this.state.exercise, {
@@ -824,6 +831,7 @@ export default class ExerciseEdit extends Component {
         Axios.put(process.env.REACT_APP_BACKEND_SERVER + '/course/exercise', data)
         .then(res => {
             console.log(res.data);
+			toast(<div style={{textAlign: "center"}}>Exercise saved!</div>, {type: toast.TYPE.SUCCESS, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})	
             this.props.setModeToSolve();
 		})
 		.catch((error) => {

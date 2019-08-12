@@ -20,16 +20,16 @@ import ExerciseList from "./components/exercise/exercise-list.component";
 import ExerciseCreate from "./components/exercise/exercise-create.component";
 import ExerciseView from "./components/exercise/exercise-view.component";
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import { setLetterHeight, setLetterWidth } from './services/FontDetector';
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./theme/bootstrap.min.css";
 import "./theme/ProgressArrows.css";
 
-import Navbar from 'react-bootstrap/Navbar';
-import Nav from 'react-bootstrap/Nav';
-import Container from 'react-bootstrap/Container';
-import Button from 'react-bootstrap/Button';
+import { Navbar, Nav, Container, Button, Toast } from 'react-bootstrap';
 
 
 const BG = "primary"; // primary, dark, light
@@ -171,7 +171,7 @@ class App extends Component {
 				</Container>
 			</Navbar>
 
-			<br />
+			<ToastContainer />
 
 			<Container>
 				<Route exact path="/" component={CourseList} />
