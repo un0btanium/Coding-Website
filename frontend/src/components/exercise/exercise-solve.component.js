@@ -76,8 +76,8 @@ export default class ExerciseSolve extends Component {
         return (
             <div className="disableSelection" style={{marginTop: '60px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
 				
-				<div onClick={(e) => this.props.history.push("/course/" + this.state.courseID + "/exercises")}style={{textAlign: "center", cursor: "pointer", marginBottom: "20px" }}>
-					<h2>{this.state.courseName}</h2>
+				<div  onClick={(e) => this.props.history.push("/course/" + this.state.courseID + "/exercises")}style={{textAlign: "center", cursor: "pointer", marginBottom: "20px" }}>
+					<h2 className="changeTextColorOnHover">{this.state.courseName}</h2>
 				</div>
 				
 				<div style={{textAlign: "center"}}>

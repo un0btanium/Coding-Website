@@ -20,3 +20,7 @@ code {
 	-webkit-user-select: none;
 	-webkit-touch-callout: none;
   }
+
+.changeTextColorOnHover:hover {
+	color: #8bb4ff;
+}
