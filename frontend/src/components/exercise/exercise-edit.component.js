@@ -806,6 +806,30 @@ export default class ExerciseEdit extends Component {
 
 		let exerciseCopy = {...this.state.exercise};
 		delete exerciseCopy._id;
+		exerciseCopy.subExercises = [];
+		for (let subExercise of this.state.exercise.subExercises) {
+			delete subExercise._id;
+
+			let newContent = [];
+			for (let c of subExercise.content) {
+				let contentCopy = {...c};
+				delete contentCopy._id;
+				newContent.push(contentCopy);
+			}
+
+			let newSourceFiles = [];
+			for (let sourceFile of subExercise.sourceFiles) {
+				let sourceFileCopy = {...sourceFile};
+				delete sourceFileCopy._id;
+				newSourceFiles.push(sourceFileCopy);
+			}
+
+			exerciseCopy.subExercises.push({
+				content: newContent,
+				sourceFiles: newSourceFiles
+			})
+		}
+		
         let exercise = JSON.stringify(exerciseCopy);
 		
         this.setState({
