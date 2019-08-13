@@ -9,7 +9,7 @@ export default class ProgressArrows extends Component {
 					this.props.arrows !== undefined &&
 					this.props.arrows.map((value, i) => {
 							const arrowWidth = Math.min(((((1/this.props.arrows.length)*100))-(0.5)), 6)+"%";
-							let style = { width:arrowWidth, zIndex: 10, marginLeft:"5px"};
+							let style = { width:arrowWidth, zIndex: 10, marginLeft:"5px", cursor: "pointer"};
 							let arrowType = "neutral";
 							if (this.props.data && this.props.data[value._id] && this.props.data[value._id].solved) {
 								arrowType = "completed";
