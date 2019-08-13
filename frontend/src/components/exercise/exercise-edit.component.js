@@ -46,7 +46,7 @@ export default class ExerciseEdit extends Component {
 
 
         this.state = {
-			courseName: "Test",
+			courseName: this.props.courseName,
 			courseID: this.props.courseID,
 			exerciseID: this.props.exerciseID,
 			subExerciseIndex: 0,

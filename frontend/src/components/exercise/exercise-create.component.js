@@ -167,7 +167,7 @@ export default class ExerciseCreate extends Component {
         //console.log(Axios.defaults.headers.common);
         Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/course/exercise', data)
             .then(res => {
-                this.props.history.push('/course/' + this.state.courseID + '/exercise/' + res.data.id + '/edit');
+                this.props.history.push('/course/' + this.state.courseID + '/exercise/' + res.data.id + '/edit', { courseName: this.state.courseName});
             });
 
         
