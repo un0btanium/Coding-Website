@@ -92,12 +92,13 @@ export default class ExerciseContent extends Component {
                         break;
                 }
                 if (mode === "edit") {
-                    return (
-                        <Form.Group style={{margin: "20px 0px 20px 0px"}} as={Row} className="form-group" key={"ExerciseContentElement" + currentContent._id}>
-                            <ExerciseElementSidebar text={text} id={currentContent._id} mode={mode} delete={deleteContent} move={moveContent} key={"ExerciseSidebar" + currentContent._id}/>
-                            {element}
-                        </Form.Group>
-                    );
+                    return (<>
+						<Form.Group style={{margin: "20px 0px 20px 0px"}} as={Row} className="form-group" key={"ExerciseContentElement" + currentContent._id}>
+							<ExerciseElementSidebar text={text} id={currentContent._id} mode={mode} delete={deleteContent} move={moveContent} key={"ExerciseSidebar" + currentContent._id}/>
+							{element}
+						</Form.Group>
+						<hr style={{backgroundColor: "rgb(128, 128, 128)", marginTop: "30px", marginBottom: "30px"}}/>
+					</>);
                 } else if (mode === "solve") {
                     return element;
                 } else {
