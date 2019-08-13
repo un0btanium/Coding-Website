@@ -186,6 +186,7 @@ export default class ExerciseEdit extends Component {
 								moveContent={this.moveContent}
 								setHighlighting={this.setHighlighting}
 								highlighting={this.state.highlighting}
+								isSolved={false}
 							/>
 							
 							<br />

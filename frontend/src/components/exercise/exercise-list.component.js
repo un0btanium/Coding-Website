@@ -196,11 +196,11 @@ export default class ExerciseList extends Component {
 
     editExercise(e, id) {
 		e.stopPropagation();
-        this.props.history.push('/course/' + this.props.match.params.courseID + '/exercise/' + id + '/edit');
+        this.props.history.push('/course/' + this.props.match.params.courseID + '/exercise/' + id + '/edit', {courseName: this.state.course.name});
     }
 
     solveExercise(id) {
-        this.props.history.push('/course/' + this.props.match.params.courseID + '/exercise/' + id + '/solve');
+        this.props.history.push('/course/' + this.props.match.params.courseID + '/exercise/' + id + '/solve', {courseName: this.state.course.name});
     }
 
     deleteExercise(id) {

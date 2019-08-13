@@ -25,6 +25,7 @@ export default class ExerciseContent extends Component {
         const mode = this.props.mode;
         const highlighting = this.props.highlighting;
         const setHighlighting = this.props.setHighlighting;
+        const showSolutionToggle = this.props.isSubExerciseSolved;
 
         let res = 
             this.props.content.map(function(currentContent, i) {
@@ -77,7 +78,8 @@ export default class ExerciseContent extends Component {
                             <ExerciseEditor
 								subExerciseIndex={subExerciseIndex}
                                 onChange={onChangeExerciseAceEditor}
-                                content={currentContent}
+								content={currentContent}
+								showSolutionToggle={showSolutionToggle}
                                 setHighlighting={setHighlighting}
                                 highlighting={highlighting}
                                 mode={mode}

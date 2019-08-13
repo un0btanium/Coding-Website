@@ -132,23 +132,23 @@ export default class ExerciseExecuter extends Component {
                             </Tracks>
                         </Slider>
                     </ButtonGroup>
-                    <ButtonGroup style={{marginLeft: '12%'}}>
+                    <ButtonGroup style={{marginLeft: '14%'}}>
                         <Button style={{width: '40px'}} bg={BG} variant={VARIANT} onClick={this.onFirstStepClick}><FontAwesomeIcon icon={faFastBackward} /></Button>
                         <Button style={{width: '40px'}} bg={BG} variant={VARIANT} onClick={this.onPreviousStepClick}><FontAwesomeIcon icon={faStepBackward} /></Button>
-                        <ButtonGroup>
-                            <Button style={{width: '40px'}} bg={BG} variant={VARIANT} onClick={this.onPauseUnpauseClick}>{this.state.isRunning ? <FontAwesomeIcon icon={faPause} /> : <FontAwesomeIcon icon={faPlay} />}</Button>
-                            <DropdownButton bg={BG} variant={VARIANT} onChange={this.onSimulationSpeedChange} id="dropdown-speed-button">
-                                <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 32 ? true : false} eventKey="32">32ms</Dropdown.Item>
-                                <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 64 ? true : false} eventKey="64">64ms</Dropdown.Item>
-                                <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 128 ? true : false} eventKey="128">128ms</Dropdown.Item>
-                                <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 256 ? true : false} eventKey="256">256ms</Dropdown.Item>
-                                <Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 512 ? true : false} eventKey="512">512ms</Dropdown.Item>
-                            </DropdownButton>
-                        </ButtonGroup>
+                        <Button style={{width: '40px'}} bg={BG} variant={VARIANT} onClick={this.onPauseUnpauseClick}>{this.state.isRunning ? <FontAwesomeIcon icon={faPause} /> : <FontAwesomeIcon icon={faPlay} />}</Button>
                         <Button style={{width: '40px'}} bg={BG} variant={VARIANT} onClick={this.onNextStepClick}><FontAwesomeIcon icon={faStepForward} /></Button>
                         <Button style={{width: '40px'}} bg={BG} variant={VARIANT} onClick={this.onLastStepClick}><FontAwesomeIcon icon={faFastForward} /></Button>
                     </ButtonGroup>
                     <ButtonGroup style={{float: 'right'}}>
+						<DropdownButton bg={BG} variant="success" onChange={this.onSimulationSpeedChange} id="dropdown-speed-button" title="">
+							<Dropdown.Header>Simulation Speed</Dropdown.Header>
+							<Dropdown.Divider />
+							<Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 32 ? true : false} eventKey="32">32ms</Dropdown.Item>
+							<Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 64 ? true : false} eventKey="64">64ms</Dropdown.Item>
+							<Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 128 ? true : false} eventKey="128">128ms</Dropdown.Item>
+							<Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 256 ? true : false} eventKey="256">256ms</Dropdown.Item>
+							<Dropdown.Item onSelect={this.onSimulationSpeedChange} active={this.state.delay === 512 ? true : false} eventKey="512">512ms</Dropdown.Item>
+						</DropdownButton>
                         {runCodeButton}
                     </ButtonGroup>
                 </div>

@@ -20,21 +20,25 @@ export default class ExerciseSolve extends Component {
         this.setHighlighting = this.setHighlighting.bind(this);
 
         this.state = {
-			courseName: "Test",
+			courseName: this.props.courseName,
 			courseID: this.props.courseID,
 			exerciseID: this.props.exerciseID,
 			subExerciseIndex: 0,
 
 			exercise: {
-				name: '',
+				name: "Loading...",
 				isVisibleToStudents: true,
 				subExercises: [{
-					id: 0,
+					_id: 0,
 					content: [],
 					sourceFiles: []
 				}]
 			},
-			userSubExercisesData: {},
+			userSubExercisesData: {
+				0: {
+					solved: false
+				}
+			},
 
             highlighting: null,
             didChangeCode: true
@@ -56,7 +60,7 @@ export default class ExerciseSolve extends Component {
 
 				this.setState({
 					exercise: exercise,
-					courseName: response.data.courseName,
+					courseName:  response.data.courseName,
 					userSubExercisesData: response.data.userSubExercisesData
 				});
             })
@@ -74,8 +78,8 @@ export default class ExerciseSolve extends Component {
 		}
 
         return (
-            <div className="disableSelection fadeIn" style={{marginTop: '60px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
-				
+            <div className="disableSelection fadeIn" style={{marginTop: '30px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
+
 				<div  onClick={(e) => this.props.history.push("/course/" + this.state.courseID + "/exercises")}style={{textAlign: "center", cursor: "pointer", marginBottom: "20px" }}>
 					<h2 className="changeTextColorOnHover">{this.state.courseName}</h2>
 				</div>
@@ -84,9 +88,7 @@ export default class ExerciseSolve extends Component {
                 	<h3>{this.state.exercise.name}</h3>
 				</div>
 
-                <br />
-
-				<div style={{ width: "100%", textAlign: "center"}}>
+				<div style={{ width: "100%", marginTop: "30px", textAlign: "center"}}>
 					<ProgressArrows
 						arrows={this.state.exercise.subExercises}
 						data={this.state.userSubExercisesData}
@@ -109,6 +111,7 @@ export default class ExerciseSolve extends Component {
                     onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
                     setHighlighting={this.setHighlighting}
                     highlighting={this.state.highlighting}
+					isSubExerciseSolved={this.isCurrentSubExerciseSolved()}
                 />
 
                 <br />
@@ -119,6 +122,7 @@ export default class ExerciseSolve extends Component {
 					exerciseID={this.state.exerciseID}
 					subExerciseIndex={this.state.subExerciseIndex}
 					subExercise={this.state.exercise.subExercises[this.state.subExerciseIndex]}
+					isSolved={this.isCurrentSubExerciseSolved()}
                     didChangeCode={this.state.didChangeCode}
                     onRanCode={this.onRanCode}
 					setHighlighting={this.setHighlighting}
@@ -190,6 +194,21 @@ export default class ExerciseSolve extends Component {
         this.setState({
             highlighting: highlighting
         });
-    }
+	}
+	
+	getCurrentSubExerciseUserData() {
+		if (this.state.userSubExercisesData === {} || this.state.userSubExercisesData[this.state.exercise.subExercises[this.state.subExerciseIndex]] === undefined) {
+			return {};
+		}
+		return this.state.userSubExercisesData[this.state.exercise.subExercises[this.state.subExerciseIndex]._id];
+	}
+
+	isCurrentSubExerciseSolved() {
+		let data = this.state.userSubExercisesData[this.state.exercise.subExercises[this.state.subExerciseIndex]._id];
+		if (this.state.userSubExercisesData === {} || data === undefined || data.solved === undefined) {
+			return false;
+		}
+		return data.solved;
+	}
 
 }
