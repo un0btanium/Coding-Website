@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 
 import { Form, Accordion, Card } from 'react-bootstrap';
 
-export default class ExerciseHint extends Component {
+export default class ExerciseSpoiler extends Component {
 
     render () {
         if (this.props.mode === "solve") {
@@ -25,7 +25,7 @@ export default class ExerciseHint extends Component {
 						type="title"
 						autoComplete="off"
 						className="form-control"
-						placeholder="Enter hint title"
+						placeholder="Enter spoiler title"
 						name={this.props.content._id}
 						defaultValue={this.props.content.title}
 						onChange={(e) => this.props.onChange(e, "title")}
@@ -35,7 +35,7 @@ export default class ExerciseHint extends Component {
 						type="text"
 						autoComplete="off"
 						className="form-control"
-						placeholder="Enter hint text"
+						placeholder="Enter spoiler text"
 						name={this.props.content._id}
 						defaultValue={this.props.content.text}
 						onChange={this.props.onChange}

@@ -6,7 +6,7 @@ import ExerciseTitle from './exercise-title.component';
 import ExerciseText from './exercise-text.component';
 import ExerciseCode from './exercise-code.component';
 import ExerciseEditor from './exercise-editor.component';
-import ExerciseHint from './exercise-hint.component';
+import ExerciseSpoiler from './exercise-spoiler.component';
 import ExerciseElementSidebar from './exercise-element-sidebar.component';
 
 export default class ExerciseContent extends Component {
@@ -51,6 +51,16 @@ export default class ExerciseContent extends Component {
                                 key={"ExerciseContent" + currentContent._id}
                             />;
                         break;
+					case "spoiler":
+						text = "Spoiler";
+						element =
+							<ExerciseSpoiler
+								onChange={onChangeExerciseContent}
+								content={currentContent}
+								mode={mode}
+								key={"ExerciseContent" + currentContent._id}
+							/>;
+						break;
                     case "code":
                         text = "Code";
                         element =
@@ -74,16 +84,6 @@ export default class ExerciseContent extends Component {
                                 key={"ExerciseContent" + currentContent._id}
                             />;
                         break;
-					case "hint":
-						text = "Hint";
-						element =
-							<ExerciseHint
-								onChange={onChangeExerciseContent}
-								content={currentContent}
-								mode={mode}
-								key={"ExerciseContent" + currentContent._id}
-							/>;
-						break;
                     default:
                         element = <h4 key={"ExerciseContent" + i}>Unknown content!!!</h4>;
                         text = "Unknown";
