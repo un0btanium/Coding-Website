@@ -12,6 +12,10 @@ let User = new Schema({
         type: String,
         required: true
     },
+    name: {
+        type: String,
+        required: [true, 'Name is required']
+	},
     role: {
         type: String,
         required: true

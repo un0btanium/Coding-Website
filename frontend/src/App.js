@@ -136,7 +136,7 @@ class App extends Component {
 					<Nav.Link as={Link} style={{ marginRight: '25px'}} to="/processes">Processes</Nav.Link>
 				</>
 			}
-          <Navbar.Text style={{ marginTop:'2px'}}>Signed in as: {this.state.user ? this.state.user.email : "unknown"}</Navbar.Text>
+          <Navbar.Text style={{ marginTop:'2px'}}>Signed in as: {this.state.user ? this.state.user.name : "unknown"}</Navbar.Text>
           <Nav.Link as={Button} style={{ marginLeft: '5px', width: '80px'}} onClick={this.logOutUser}>Logout</Nav.Link>
         </Nav>;
     } else {

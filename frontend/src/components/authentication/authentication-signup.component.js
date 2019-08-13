@@ -13,8 +13,9 @@ export default class AuthenticationSignup extends Component {
         super(props);
         this.state = {
             email: '',
-            password: '',
-            confirm_password: ''
+			password: '',
+            confirm_password: '',
+			name: ''
         };
         this.onSubmit = this.onSubmit.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -28,43 +29,57 @@ export default class AuthenticationSignup extends Component {
                 <h3>Signup</h3>
                 <Form onSubmit={this.onSubmit} style={{marginTop: '50px'}}>
                     <Form.Group as={Row} className="form-group">
-                        <Form.Label column sm><h5>eMail:</h5></Form.Label>
-                        <Col sm={10}>
+                        <Form.Label style={{textAlign: "right"}} column sm><h5>eMail:</h5></Form.Label>
+                        <Col sm={9}>
                             <Form.Control 
                                 autoFocus
                                 name="email"
                                 type="email"
                                 className="form-control"
                                 placeholder="Enter eMail address"
+                                value={this.state.email}
+                                onChange={this.handleChange}
+                            />
+                        </Col>
+                    </Form.Group>
+                    <Form.Group as={Row} className="form-group">
+                        <Form.Label style={{textAlign: "right"}} column sm><h5>Name:</h5></Form.Label>
+                        <Col sm={9}>
+                            <Form.Control 
+                                autoFocus
+                                name="name"
+                                type="text"
+                                className="form-control"
+                                placeholder="Enter your name"
                                 value={this.state.name}
                                 onChange={this.handleChange}
                             />
                         </Col>
                     </Form.Group>
                     <Form.Group as={Row} className="form-group">
-                        <Form.Label column sm><h5>Password:</h5></Form.Label>
-                        <Col sm={10}>
+                        <Form.Label style={{textAlign: "right"}} column sm><h5>Password:</h5></Form.Label>
+                        <Col sm={9}>
                             <Form.Control 
                                 autoFocus
                                 name="password"
                                 type="password"
                                 className="form-control"
                                 placeholder="Enter password"
-                                value={this.state.name}
+                                value={this.state.password}
                                 onChange={this.handleChange}
                             />
                         </Col>
                     </Form.Group>
                     <Form.Group as={Row} className="form-group">
-                        <Form.Label column sm><h5>Password:</h5></Form.Label>
-                        <Col sm={10}>
+                        <Form.Label style={{textAlign: "right"}} column sm><h5>Confirm Password:</h5></Form.Label>
+                        <Col sm={9}>
                             <Form.Control 
                                 autoFocus
                                 name="confirm_password"
                                 type="password"
                                 className="form-control"
                                 placeholder="Confirm password"
-                                value={this.state.name}
+                                value={this.state.confirm_password}
                                 onChange={this.handleChange}
                             />
                         </Col>
@@ -95,13 +110,14 @@ export default class AuthenticationSignup extends Component {
     onSubmit(e) {
         e.preventDefault();
 
-        if (this.state.email === '' || this.state.password === '' || !(this.state.password === this.state.confirm_password)) {
+        if (this.state.email === '' || this.state.password === '' || this.state.name === '' || !(this.state.password === this.state.confirm_password)) {
             return;
         }
         
         const newUser = {
             email: this.state.email,
-            password: this.state.password
+			password: this.state.password,
+			name: this.state.name
         }
 
         registerUser(newUser, this.props.history, (err, res) => {});

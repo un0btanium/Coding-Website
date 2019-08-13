@@ -75,7 +75,8 @@ app.post("/api/login", (req, res, next) => {
                     const token = jwt.sign(
                         {
                             email: user[0].email,
-                            userId: user[0]._id,
+							userId: user[0]._id,
+							name: user[0].name,
                             role: user[0].role
                         },
                         process.env.JWT_KEY,
@@ -129,6 +130,7 @@ app.post('/api/signup', (req, res, next) => {
                             const user = new User({
                                 email: req.body.email,
                                 password: hash,
+								name: req.body.name,
                                 role: role
                             });
                             user
