@@ -81,7 +81,7 @@ app.post("/api/login", (req, res, next) => {
                         },
                         process.env.JWT_KEY,
                         {
-                            expiresIn: "7h"
+                            expiresIn: "20h"
                         }
                     );
                     
