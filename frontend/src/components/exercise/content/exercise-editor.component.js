@@ -99,11 +99,27 @@ export default class ExerciseEditor extends Component {
 				{	
 					this.props.showSolutionToggle && 
 					<div style={{ position: 'relative', top: '47px', left: '97%', marginTop: '-25px', width: '20px', zIndex: '3' }}>
-						<FontAwesomeIcon
-							icon={this.state.codeType === "code" ? faLightbulbRegular : faLightbulb}
-							style={{ color:'#fcd303' }}
-							onClick={() => this.setState({codeType: this.state.codeType === "code" ? "solution" : "code"}) }
-						/>
+						
+						<OverlayTrigger
+							key="tooltipSolutionToggleButton"
+							placement="top"
+							delay={{'show': 0, 'hide': 128}}
+							overlay={
+								<Popover
+									style={{ padding: '10px', background: 'rgba(0,0,0,0.8)', backgroundColor: 'rgba(0,0,0,0.8)', textAlign: 'left', wordBreak: 'keep-all', whiteSpace: 'pre'}}
+									// arrowProps={style="{{background: 'rgba(0,0,0, 0.8)'}}"}
+									id="tooltipSolution"
+								>
+									<b>{this.state.codeType === "code" ? "Show Solution" : "Hide Solution"}</b>
+								</Popover>
+							}
+						>
+							<FontAwesomeIcon
+								icon={this.state.codeType === "code" ? faLightbulbRegular : faLightbulb}
+								style={{ color:'#fcd303' }}
+								onClick={() => this.setState({codeType: this.state.codeType === "code" ? "solution" : "code"}) }
+							/>
+						</OverlayTrigger>
 					</div>
 				}
 				
