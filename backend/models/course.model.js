@@ -27,6 +27,7 @@ let SubExercise = new Schema({
 let Exercise = new Schema({
 	name: String,
 	isVisibleToStudents: Boolean,
+	iFrameUrl: String,
 	subExercises: [
 		SubExercise
 	]

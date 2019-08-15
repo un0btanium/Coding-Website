@@ -7,6 +7,7 @@ import ExerciseText from './exercise-text.component';
 import ExerciseCode from './exercise-code.component';
 import ExerciseEditor from './exercise-editor.component';
 import ExerciseSpoiler from './exercise-spoiler.component';
+import ExerciseIFrame from './exercise-iframe.component';
 import ExerciseElementSidebar from './exercise-element-sidebar.component';
 
 export default class ExerciseContent extends Component {
@@ -62,6 +63,16 @@ export default class ExerciseContent extends Component {
 								key={"ExerciseContent" + currentContent._id}
 							/>;
 						break;
+					case "iframe":
+						text = "IFrame";
+						element =
+							<ExerciseIFrame
+								onChange={onChangeExerciseContent}
+								content={currentContent}
+								mode={mode}
+								key={"ExerciseContent" + currentContent._id}
+							/>;
+						break;
                     case "code":
                         text = "Code";
                         element =
@@ -97,7 +108,7 @@ export default class ExerciseContent extends Component {
 							<ExerciseElementSidebar text={text} id={currentContent._id} mode={mode} delete={deleteContent} move={moveContent} key={"ExerciseSidebar" + currentContent._id}/>
 							{element}
 						</Form.Group>
-						<hr style={{backgroundColor: "rgb(128, 128, 128)", marginTop: "30px", marginBottom: "30px"}}/>
+						<hr key={"ExerciseContentDivider" + i} style={{backgroundColor: "rgb(128, 128, 128)", marginTop: "30px", marginBottom: "30px"}}/>
 					</>);
                 } else if (mode === "solve") {
                     return element;

@@ -161,6 +161,7 @@ export default class ExerciseCreate extends Component {
 			courseID: this.state.courseID,
 			name: name,
 			isVisibleToStudents: isVisibleToStudents,
+			iFrameUrl: "",
 			subExercises: subExercises
         }
         

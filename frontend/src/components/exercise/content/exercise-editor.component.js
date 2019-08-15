@@ -98,7 +98,7 @@ export default class ExerciseEditor extends Component {
                 </div>
 				{	
 					this.props.showSolutionToggle && 
-					<div style={{ position: 'relative', top: '47px', left: '97%', marginTop: '-25px', width: '20px', zIndex: '3' }}>
+					<div style={{ position: 'relative', top: '50px', left: '97%', marginTop: '-25px', width: '20px', zIndex: '3' }}>
 						
 						<OverlayTrigger
 							key="tooltipSolutionToggleButton"
@@ -123,7 +123,7 @@ export default class ExerciseEditor extends Component {
 					</div>
 				}
 				
-                <Row style={{'marginLeft': '0px', 'marginBottom': '15px', 'marginTop': '15px', 'borderColor': (this.state.codeType === "code" ? '#538135' : '#53CC35'), 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%', boxShadow: '2px 2px 5px #000000'}}>
+                <Row style={{'marginLeft': '0px', 'marginBottom': '20px', 'marginTop': '20px', 'borderColor': (this.state.codeType === "code" ? '#538135' : '#53CC35'), 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%', boxShadow: '2px 2px 5px #000000'}}>
 					{this.state.codeType === "code" && highlightOverlay}
 					<AceEditor	
 						mode="java"

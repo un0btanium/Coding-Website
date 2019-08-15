@@ -2,6 +2,10 @@ import React, {Component} from 'react';
 import Axios from 'axios';
 import update from 'immutability-helper';
 
+import Iframe from 'react-iframe';
+
+import { Accordion, Card } from 'react-bootstrap';
+
 import ExerciseContent from './content/exercise-content.component';
 import ExerciseExecuter from './content/exercise-executer.component';
 
@@ -28,6 +32,7 @@ export default class ExerciseSolve extends Component {
 			exercise: {
 				name: "Loading...",
 				isVisibleToStudents: true,
+				iFrameUrl: "",
 				subExercises: [{
 					_id: 0,
 					content: [],
@@ -101,7 +106,30 @@ export default class ExerciseSolve extends Component {
 
                 <br />
                 <br />
+
+				{
+					(this.state.exercise.iFrameUrl && this.state.exercise.iFrameUrl !== "") && 
+					
+						<Accordion style={{'marginBottom': '20px', width: "100%"}} className="disableSelection" defaultActiveKey="0">
+							<Accordion.Toggle as={Card.Header} eventKey="0" style={{textAlign: "center"}}>Show/Hide Presentation</Accordion.Toggle>
+							<Accordion.Collapse eventKey="0" style={{backgroundColor: "#666666"}}>
+								<Iframe url={this.state.exercise.iFrameUrl}
+									width="100%"
+									height="530px"
+									allowFullScreen="true"
+									mozallowfullscreen="true"
+									webkitallowfullscreen="true"
+									frameBorder="0"
+								/>
+							</Accordion.Collapse>
+						</Accordion>
+				}
+				
+
                 <br />
+				<br />
+
+
 
                 <ExerciseContent
 					subExerciseIndex={this.state.subExerciseIndex}

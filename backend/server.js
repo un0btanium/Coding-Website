@@ -426,6 +426,7 @@ app.route('/api/course/exercise')
 				let exercise = {
 					name: req.body.name,
 					isVisibleToStudents: req.body.isVisibleToStudents || true,
+					iFrameUrl: req.body.iFrameUrl || "",
 					subExercises: req.body.subExercises || [
 						{
 							content: [
@@ -502,6 +503,7 @@ app.route('/api/course/exercise')
 
 				exercise.name = req.body.name;
 				exercise.isVisibleToStudents = req.body.isVisibleToStudents;
+				exercise.iFrameUrl = req.body.iFrameUrl;
 				exercise.subExercises = req.body.subExercises;
 				
                 course

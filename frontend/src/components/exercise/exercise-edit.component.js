@@ -13,7 +13,9 @@ import ExerciseContent from './content/exercise-content.component';
 import ExerciseSourceFiles from './content/exercise-source-files.component';
 import ExerciseExecuter from './content/exercise-executer.component';
 
-import ProgressArrows from './progress-arrows/progress-arrows.component'
+import ProgressArrows from './progress-arrows/progress-arrows.component';
+
+import { log } from '../../services/Logger';
 
 export default class ExerciseEdit extends Component {
     
@@ -23,12 +25,14 @@ export default class ExerciseEdit extends Component {
         Axios.defaults.adapter = require('axios/lib/adapters/http');
 
         this.onChangeExerciseName = this.onChangeExerciseName.bind(this);
+        this.onChangeExerciseIFrame = this.onChangeExerciseIFrame.bind(this);
         this.onChangeExerciseContent = this.onChangeExerciseContent.bind(this);
         this.onChangeExerciseAceEditor = this.onChangeExerciseAceEditor.bind(this);
 
         this.addNewTitle = this.addNewTitle.bind(this);
         this.addNewText = this.addNewText.bind(this);
         this.addNewSpoiler = this.addNewSpoiler.bind(this);
+        this.addNewIFrame = this.addNewIFrame.bind(this);
         this.addNewCode = this.addNewCode.bind(this);
         this.addNewEditor = this.addNewEditor.bind(this);
         this.deleteContent = this.deleteContent.bind(this);
@@ -54,6 +58,7 @@ export default class ExerciseEdit extends Component {
 			exercise: {
 				name: '',
 				isVisibleToStudents: true,
+				iFrameUrl: "",
 				subExercises: [{
 					_id: 0,
 					content: [],
@@ -73,7 +78,7 @@ export default class ExerciseEdit extends Component {
     componentDidMount() {
         Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/course/' + this.state.courseID + '/exercise/' + this.state.exerciseID)
             .then(response => {
-				console.log(response.data.exercise);
+				log(response.data.exercise);
 				this.setState({
 					exercise: response.data.exercise,
 					courseName: response.data.courseName
@@ -122,6 +127,22 @@ export default class ExerciseEdit extends Component {
                             />
                         </Col>
                     </Form.Group>
+
+					<Form.Group as={Row} className="form-group">
+						<Form.Label column sm={3} style={{textAlign: 'right'}}><h5>Optional IFrame:</h5></Form.Label>
+						<Col sm={8}>
+							<Form.Control 
+								style={{color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
+								type="text"
+                                plaintext="true"
+								autoComplete="off"
+								className="form-control"
+								placeholder="Enter url of the content displayed in the iframe"
+								value={this.state.exercise.iFrameUrl || ""}
+								onChange={this.onChangeExerciseIFrame}
+							/>
+						</Col>
+					</Form.Group>
 					
 					<Form.Group as={Row} className="form-group">
                         <Form.Label column sm={3} style={{textAlign: 'right'}}><h5>Visible:</h5></Form.Label>
@@ -150,8 +171,6 @@ export default class ExerciseEdit extends Component {
 							><FontAwesomeIcon icon={faPlus} /></Button>
                         </Col>
                     </Form.Group>
-					
-					
 
 					<hr style={{backgroundColor: "rgb(223, 105, 26)"}}/>
                     <br />
@@ -176,7 +195,7 @@ export default class ExerciseEdit extends Component {
 						onSelect={(tabKey) => this.setState({ tabKey })}
                     >
                         <Tab variant="primary" eventKey="content" title="Content Elements">
-						<ExerciseContent
+							<ExerciseContent
 								subExerciseIndex={this.state.subExerciseIndex}
 								content={this.state.exercise.subExercises[this.state.subExerciseIndex].content}
 								mode="edit"
@@ -193,11 +212,12 @@ export default class ExerciseEdit extends Component {
 							<br />
 
 							<Col style={{ textAlign: "center", marginBottom: "30px" }}>
-								<Button variant="outline-primary" onClick={this.addNewTitle} style={{width: '150px'}}>+Title</Button>
-								<Button variant="outline-primary" onClick={this.addNewText} style={{width: '150px'}}>+Text</Button>
-								<Button variant="outline-primary" onClick={this.addNewSpoiler} style={{width: '150px'}}>+Spoiler</Button>
-								<Button variant="outline-primary" onClick={this.addNewCode} style={{width: '150px'}}>+Code</Button>
-								<Button variant="outline-primary" onClick={this.addNewEditor} style={{width: '150px'}}>+Editor</Button>
+								<Button variant="outline-primary" onClick={this.addNewTitle} style={{width: '125px'}}>+Title</Button>
+								<Button variant="outline-primary" onClick={this.addNewText} style={{width: '125px'}}>+Text</Button>
+								<Button variant="outline-primary" onClick={this.addNewSpoiler} style={{width: '125px'}}>+Spoiler</Button>
+								<Button variant="outline-primary" onClick={this.addNewIFrame} style={{width: '125px'}}>+IFrame</Button>
+								<Button variant="outline-primary" onClick={this.addNewCode} style={{width: '125px'}}>+Code</Button>
+								<Button variant="outline-primary" onClick={this.addNewEditor} style={{width: '125px'}}>+Editor</Button>
 							</Col>
 
 							<ExerciseExecuter
@@ -470,6 +490,27 @@ export default class ExerciseEdit extends Component {
 			})
         });
     }
+	
+    addNewIFrame() {
+        this.setState({
+			contentIDCounter: this.state.contentIDCounter+1,
+			exercise: update(this.state.exercise, {
+				subExercises: {
+					[this.state.subExerciseIndex]: {
+						content: {
+							$push: [
+								{
+									_id: "NEW " + this.state.contentIDCounter,
+									type: "iframe",
+									text: "",
+								}
+							]
+						}
+					}
+				}
+			})
+        });
+    }
 
     addNewCode() {
         this.setState({
@@ -678,7 +719,17 @@ export default class ExerciseEdit extends Component {
 				}
 			})
 		});
-    }
+	}
+	
+	onChangeExerciseIFrame(e) {
+		this.setState({
+			exercise: update(this.state.exercise, {
+				iFrameUrl: {
+					$set: e.target.value
+				}
+			})
+		});
+	}
 
     onChangeExerciseContent(e, key) {
 		key = key || "text";
@@ -875,6 +926,7 @@ export default class ExerciseEdit extends Component {
             exerciseID: this.state.exerciseID,
 			name: this.state.exercise.name,
 			isVisibleToStudents: this.state.exercise.isVisibleToStudents,
+			iFrameUrl: this.state.exercise.iFrameUrl || "",
 			subExercises: subExercises
 		}
 
