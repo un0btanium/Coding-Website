@@ -31,11 +31,13 @@ export default class ExerciseSpoiler extends Component {
 						onChange={(e) => this.props.onChange(e, "title")}
 						key={"ContentEntryTitle"+this.props.content._id}
 					/>
-					<Form.Control 
-						style={{color: 'white', marginTop: "20px", border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
-						type="text"
+					
+					<Form.Control
+						style={{color: 'white', marginTop: "20px", border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)', textAlign: "justify" }}
+						plaintext="true"
 						autoComplete="off"
-						className="form-control"
+						as="textarea"
+						rows="5"
 						placeholder="Enter spoiler text"
 						name={this.props.content._id}
 						defaultValue={this.props.content.text}
