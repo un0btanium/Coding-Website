@@ -47,9 +47,6 @@ export default class ExerciseCode extends Component {
             );
         } else if (this.props.mode === "edit") {
             return (<>
-				<div style={{ position: 'relative', left: '-135px', top: '55px', marginTop: '-40px' }}>
-					<FontAwesomeIcon icon={faInfoCircle} style={{ margin: '0px', color:'#4472c4' }} />
-                </div>
 				<div style={{'borderColor': '#4472c4', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%', boxShadow: '2px 2px 5px #000000'}}>
 					<AceEditor
 						mode="java"
