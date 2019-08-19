@@ -13,7 +13,7 @@ export default class ExerciseText extends Component {
             
             return (
                 <Form.Control
-                    style={{color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
+                    style={{color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)', textAlign: "justify"  }}
                     plaintext="true"
                     autoComplete="off"
                     as="textarea"
