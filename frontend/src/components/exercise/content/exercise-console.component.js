@@ -40,7 +40,7 @@ export default class ExerciseConsole extends Component {
             }
 
             for (let i = stepStart; i <= this.props.step; i++) {
-                if (this.props.result.steps[i].type === "console") {
+                if (this.props.result.steps[i].type === "console" || this.props.result.steps[i].type === "error") {
                     consoleMessages += this.props.result.steps[i].msg;
                 }
                 if (i % CACHE_STEPS === 0 && consoleCache[i] === undefined) {

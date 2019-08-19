@@ -29,6 +29,7 @@ export default class ExerciseSpoiler extends Component {
 						name={this.props.content._id}
 						defaultValue={this.props.content.title}
 						onChange={(e) => this.props.onChange(e, "title")}
+						key={"ContentEntryTitle"+this.props.content._id}
 					/>
 					<Form.Control 
 						style={{color: 'white', marginTop: "20px", border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
@@ -39,6 +40,7 @@ export default class ExerciseSpoiler extends Component {
 						name={this.props.content._id}
 						defaultValue={this.props.content.text}
 						onChange={this.props.onChange}
+						key={"ContentEntryText"+this.props.content._id}
 					/>
 				</>
             );

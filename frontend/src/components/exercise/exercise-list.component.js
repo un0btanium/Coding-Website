@@ -237,7 +237,7 @@ export default class ExerciseList extends Component {
                 }
             })
             .catch(function (error) {
-				// TODO show error message to user
+                toast(<div style={{textAlign: "center"}}>Unable to delete exercise!</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
                 console.log(error);
             });
 	}
@@ -250,6 +250,7 @@ export default class ExerciseList extends Component {
 				this.props.history.push("/");
             })
             .catch(function (error) {
+                toast(<div style={{textAlign: "center"}}>Unable to delete course '{this.state.course.name}'!</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
                 console.log(error);
             });
 	}
@@ -259,7 +260,7 @@ export default class ExerciseList extends Component {
 	switchVisibilityCourse(course) {
         Axios.put(process.env.REACT_APP_BACKEND_SERVER + '/course/visibility', { id: this.state.course._id, isVisibleToStudents: !this.state.course.isVisibleToStudents})
             .then(response => {
-				toast(<div style={{textAlign: "center"}}>Switched the visibility of the course '{this.state.course.name}' to '{response.data.isVisibleToStudents ? "visible" : "not visible"}'!</div>, {type: response.data.isVisibleToStudents ? toast.TYPE.SUCCESS : toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
+				toast(<div style={{textAlign: "center"}}>Switched the visibility of the course '{this.state.course.name}' to '{response.data.isVisibleToStudents ? "visible" : "not visible"}'!</div>, {type: toast.TYPE.SUCCESS, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
 				this.setState({
 					course: update(this.state.course, {
 						isVisibleToStudents: {
@@ -269,6 +270,7 @@ export default class ExerciseList extends Component {
 				});
             })
             .catch(function (error) {
+				toast(<div style={{textAlign: "center"}}>Unable to switch visibility of course '{this.state.course.name}'!</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
                 console.log(error);
             });
 	}
@@ -277,7 +279,7 @@ export default class ExerciseList extends Component {
 		e.stopPropagation();
         Axios.put(process.env.REACT_APP_BACKEND_SERVER + '/exercise/visibility', { courseID: this.state.course._id, exerciseID: exercise._id, isVisibleToStudents: !exercise.isVisibleToStudents})
             .then(response => {
-				toast(<div style={{textAlign: "center"}}>Switched the visibility of the exercise '{this.state.course.exercises[index].name}' to '{response.data.isVisibleToStudents ? "visible" : "not visible"}'!</div>, {type: response.data.isVisibleToStudents ? toast.TYPE.SUCCESS : toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
+				toast(<div style={{textAlign: "center"}}>Switched the visibility of the exercise '{this.state.course.exercises[index].name}' to '{response.data.isVisibleToStudents ? "visible" : "not visible"}'!</div>, {type: toast.TYPE.SUCCESS, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
 				this.setState({
 					course: update(this.state.course, {
 						exercises: {
@@ -291,6 +293,7 @@ export default class ExerciseList extends Component {
 				});
             })
             .catch(function (error) {
+				toast(<div style={{textAlign: "center"}}>Unable to switch visibility of exercise '{this.state.course.exercises[index].name}'!</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
                 console.log(error);
             });
 	}

@@ -738,6 +738,14 @@ app.route("/api/exercise/run")
 					}
 				});
 
+                if (javaProcesses[userData.userId] !== undefined && javaProcesses[userData.userId] !== null) {
+                    console.log("Killing java process!");
+                    javaProcesses[userData.userId].process.kill('SIGINT');
+                    console.log(javaProcesses[userData.userId].process.killed ? "Killed java process!" : "Didnt kill java process!");
+                    javaProcesses[userData.userId] = undefined;
+                }
+
+                res.dataArray = [];
 				let sourceFiles = exercise.subExercises[subExerciseIndex].sourceFiles;
 				if (sourceFilesUser !== undefined && sourceFilesUser !== null) { // user ran in Edit mode
 					sourceFiles = sourceFilesUser;
@@ -752,20 +760,10 @@ app.route("/api/exercise/run")
                 if (os.platform() === 'win32') {
                     javaExe = "C:" + path.sep + "Program Files" + path.sep + "Java" + path.sep + "jdk-11" + path.sep + "bin" + path.sep + "java.exe";
                 }
-                let javaOptions = { maxBuffer: 1024*1024*1024 ,timeout: 10*1000, /* windowsHide: false */ };
+                let processOptions = { maxBuffer: 1024*1024*1024 ,timeout: 30*1000, /* windowsHide: false */ };
+				let filePath = __dirname + path.sep + "java" + path.sep + "executer.jar";
 
-
-                if (javaProcesses[userData.userId] !== undefined && javaProcesses[userData.userId] !== null) {
-                    console.log("Killing java process!");
-                    javaProcesses[userData.userId].process.kill('SIGINT');
-                    console.log(javaProcesses[userData.userId].process.killed ? "Killed java process!" : "Didnt kill java process!");
-                    javaProcesses[userData.userId] = undefined;
-                }
-
-                res.dataArray = [];
-
-
-                let javaChild = spawn(javaExe, ["-jar", __dirname + path.sep + "java" + path.sep + "executer.jar", JSON.stringify(arg)], javaOptions);
+                let javaChild = spawn(javaExe, ["-jar", "-Xms64m", "-Xmx64m", filePath, JSON.stringify(arg)], processOptions);
 
                 javaProcesses[userData.userId] = {
 					exerciseData: {

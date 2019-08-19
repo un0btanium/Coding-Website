@@ -279,7 +279,7 @@ export default class ExerciseExecuter extends Component {
         log(data);
         
         let options = {
-            timeout: 30*1000, // TODO adjust?
+            timeout: 120*1000, // TODO adjust?
             // responseType: 'stream',
             maxContentLength: 1000000000,
             headers: {
@@ -335,20 +335,24 @@ export default class ExerciseExecuter extends Component {
                     resetConsoleCache: true,
                     step: 0
                 });
-            }
-            this.props.setHighlighting({
-				subExerciseIndex: this.state.ranSubExerciseIndex,
-                node: json.node_data[json.steps[startAtStep].id],
-                step: json.steps[startAtStep]
-            });
-            this.setState({
-                result: json,
-                step: startAtStep,
-                isRunning: true,
-                resetConsoleCache: false
-            });
-            this.props.onRanCode();
-            timeout = setTimeout(this.simulateNextStep, this.state.delay + (startAtStep === 0 ? 64 : 0));
+			}
+			setTimeout(
+				() => {
+					this.props.setHighlighting({
+						subExerciseIndex: this.state.ranSubExerciseIndex,
+						node: json.node_data[json.steps[startAtStep].id],
+						step: json.steps[startAtStep]
+					});
+					this.setState({
+						result: json,
+						step: startAtStep,
+						isRunning: true,
+						resetConsoleCache: false
+					});
+					this.props.onRanCode();
+					timeout = setTimeout(this.simulateNextStep, this.state.delay + (startAtStep === 0 ? 64 : 0));
+				}, 16
+			);
         }
         
     }
