@@ -50,9 +50,6 @@ export default class ExerciseEditor extends Component {
                 h = sizeLine * ((node.lineEnd - node.lineStart) + 1) + 2;
             }
 
-
-            // console.log(x + " " + y + " " + w + " " + h);
-
             
             // let rgba = 'rgba(20, 171, 255, 0.3)';
             let rgba = 'rgba(255, 255, 32, 0.3)';
@@ -89,7 +86,22 @@ export default class ExerciseEditor extends Component {
                         <div style={{position: 'absolute', width: w, height: h, left: x, top: y, backgroundColor: rgba, zIndex: '2'}}></div>
                     </OverlayTrigger>
                 </div>;
-        }
+		}
+		
+		let errorOverlay = null;
+		if (this.props.highlighting && 
+			this.props.highlighting.step.type === "error" &&
+			this.props.highlighting.step.identifier === this.props.content.identifier &&
+			this.props.highlighting.step.line !== undefined) {
+
+				
+			let sizeLine = getLetterHeight();
+			let y = sizeLine * this.props.highlighting.step.line;
+
+			errorOverlay = <div style={{position: 'relative'}}>
+				<div style={{position: 'absolute', width: "43px", height: sizeLine, left: "0px", top: y, backgroundColor: 'rgba(255, 0, 0, 0.5)', zIndex: '5'}}></div>
+			</div>;
+		}
 
         if (this.props.mode === "solve") {
             return (<>
@@ -124,7 +136,7 @@ export default class ExerciseEditor extends Component {
 				}
 				
                 <Row style={{'marginLeft': '0px', 'marginBottom': '20px', 'marginTop': '20px', 'borderColor': (this.state.codeType === "code" ? '#538135' : '#53CC35'), 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%', boxShadow: '2px 2px 5px #000000'}}>
-					{this.state.codeType === "code" && highlightOverlay}
+					{this.state.codeType === "code" && (highlightOverlay || errorOverlay)}
 					<AceEditor	
 						mode="java"
 						theme="monokai"
