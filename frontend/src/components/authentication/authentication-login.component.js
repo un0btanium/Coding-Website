@@ -32,7 +32,8 @@ export default class AuthenticationLogin extends Component {
                             <Form.Control 
                                 autoFocus
                                 name="email"
-                                type="email"
+								type="email"
+								autoComplete="username"
                                 className="form-control"
                                 placeholder="Enter eMail address"
                                 value={this.state.name}
@@ -47,6 +48,7 @@ export default class AuthenticationLogin extends Component {
                                 autoFocus
                                 name="password"
                                 type="password"
+								autoComplete="current-password"
                                 className="form-control"
                                 placeholder="Enter password"
                                 value={this.state.name}

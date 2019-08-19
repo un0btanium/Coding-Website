@@ -35,6 +35,7 @@ export default class AuthenticationSignup extends Component {
                                 autoFocus
                                 name="email"
                                 type="email"
+								autoComplete="username"
                                 className="form-control"
                                 placeholder="Enter eMail address"
                                 value={this.state.email}
@@ -49,6 +50,7 @@ export default class AuthenticationSignup extends Component {
                                 autoFocus
                                 name="name"
                                 type="text"
+								autoComplete="name"
                                 className="form-control"
                                 placeholder="Enter your name"
                                 value={this.state.name}
@@ -63,6 +65,7 @@ export default class AuthenticationSignup extends Component {
                                 autoFocus
                                 name="password"
                                 type="password"
+								autoComplete="new-password"
                                 className="form-control"
                                 placeholder="Enter password"
                                 value={this.state.password}
@@ -77,6 +80,7 @@ export default class AuthenticationSignup extends Component {
                                 autoFocus
                                 name="confirm_password"
                                 type="password"
+								autoComplete="new-password"
                                 className="form-control"
                                 placeholder="Confirm password"
                                 value={this.state.confirm_password}
