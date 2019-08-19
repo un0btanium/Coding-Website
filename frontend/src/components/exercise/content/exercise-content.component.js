@@ -103,13 +103,14 @@ export default class ExerciseContent extends Component {
                         break;
                 }
                 if (mode === "edit") {
-                    return (<>
+                    return (
+						<div key={"ExerciseContentElementDiv" + currentContent._id}>
 						<Form.Group style={{margin: "20px 0px 20px 0px"}} as={Row} className="form-group" key={"ExerciseContentElement" + currentContent._id}>
 							<ExerciseElementSidebar text={text} id={currentContent._id} mode={mode} delete={deleteContent} move={moveContent} key={"ExerciseSidebar" + currentContent._id}/>
 							{element}
 						</Form.Group>
-						<hr key={"ExerciseContentDivider" + i} style={{backgroundColor: "rgb(128, 128, 128)", marginTop: "30px", marginBottom: "30px"}}/>
-					</>);
+						<hr key={"ExerciseContentDivider" + currentContent._id} style={{backgroundColor: "rgb(128, 128, 128)", marginTop: "30px", marginBottom: "30px"}}/>
+						</div>);
                 } else if (mode === "solve") {
                     return element;
                 } else {
