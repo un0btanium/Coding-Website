@@ -427,10 +427,10 @@ app.route('/api/course/exercise')
 					name: req.body.name,
 					isVisibleToStudents: req.body.isVisibleToStudents || true,
 					iFrameUrl: req.body.iFrameUrl || "",
-					highlightingDetailLevelIndex: req.body.highlightingDetailLevelIndex || 0,
+					highlightingDetailLevelIndex: req.body.highlightingDetailLevelIndex || 5,
 					subExercises: req.body.subExercises || [
 						{
-							highlightingDetailLevelIndex: req.body.highlightingDetailLevelIndex || 0,
+							highlightingDetailLevelIndex: req.body.highlightingDetailLevelIndex || 5,
 							content: [
 								{
 									type: "title",
