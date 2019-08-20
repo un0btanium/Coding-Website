@@ -6,6 +6,10 @@ import { toast } from 'react-toastify';
 
 import { Form, Button, Row, Col, Tabs, Tab } from 'react-bootstrap';
 
+import { Slider, Rail, Handles, Tracks } from 'react-compound-slider'
+import { Track } from './slider/track';
+import { Handle } from './slider/handle';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 
@@ -46,8 +50,10 @@ export default class ExerciseEdit extends Component {
 		this.exportExerciseAsJSON = this.exportExerciseAsJSON.bind(this);
 		
         this.onRanCode = this.onRanCode.bind(this);
-        this.setHighlighting = this.setHighlighting.bind(this);
-
+		this.setHighlighting = this.setHighlighting.bind(this);
+		this.setHighlightingDetailLevelIndex = this.setHighlightingDetailLevelIndex.bind(this);
+		this.setHighlightingDetailLevelIndexSubExercise = this.setHighlightingDetailLevelIndexSubExercise.bind(this);
+		
 
         this.state = {
 			courseName: this.props.courseName,
@@ -59,8 +65,10 @@ export default class ExerciseEdit extends Component {
 				name: '',
 				isVisibleToStudents: true,
 				iFrameUrl: "",
+				highlightingDetailLevelIndex: 0,
 				subExercises: [{
 					_id: 0,
+					highlightingDetailLevelIndex: 0,
 					content: [],
 					sourceFiles: []
 				}]
@@ -112,8 +120,8 @@ export default class ExerciseEdit extends Component {
 
                 <Form onSubmit={this.onSubmit}>
                     <Form.Group as={Row} className="form-group">
-                        <Form.Label column sm={3} style={{textAlign: 'right'}}><h5>Name:</h5></Form.Label>
-                        <Col sm={8}>
+                        <Form.Label column sm={5} style={{textAlign: 'right'}}><h5>Name:</h5></Form.Label>
+                        <Col sm={6}>
                             <Form.Control 
                                 autoFocus
                                 style={{color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
@@ -129,8 +137,8 @@ export default class ExerciseEdit extends Component {
                     </Form.Group>
 
 					<Form.Group as={Row} className="form-group">
-						<Form.Label column sm={3} style={{textAlign: 'right'}}><h5>Optional IFrame:</h5></Form.Label>
-						<Col sm={8}>
+						<Form.Label column sm={5} style={{textAlign: 'right'}}><h5>Optional IFrame:</h5></Form.Label>
+						<Col sm={6}>
 							<Form.Control 
 								style={{color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
 								type="text"
@@ -143,9 +151,56 @@ export default class ExerciseEdit extends Component {
 							/>
 						</Col>
 					</Form.Group>
-					
+
 					<Form.Group as={Row} className="form-group">
-                        <Form.Label column sm={3} style={{textAlign: 'right'}}><h5>Visible:</h5></Form.Label>
+						<Form.Label column sm={5} style={{textAlign: 'right'}}><h5>Default Highlighting Detail Level:</h5></Form.Label>
+						<Col sm={6}>
+							<Slider
+								mode={1}
+								step={1}
+								domain={[0, 5]}
+								rootStyle={{position: 'relative', width: '200px', height: '40px', touchAction: 'none'}}
+								onUpdate={this.setHighlightingDetailLevelIndex}
+								values={[this.state.exercise.highlightingDetailLevelIndex || 0]}
+							>
+								<Rail>
+								{({ getRailProps }) => (  // adding the rail props sets up events on the rail
+									<div style={{position: 'absolute', width: '100%', height: '10px', marginTop: '15px', borderRadius: '5px', backgroundColor: '#4e5d6c'}} {...getRailProps()} /> 
+								)}
+								</Rail>
+								<Handles>
+									{({ handles, getHandleProps }) => (
+										<div className="slider-handles">
+											{handles.map(handle => (
+												<Handle
+												key={handle.id}
+												handle={handle}
+												getHandleProps={getHandleProps}
+											/>
+											))}
+										</div>
+									)}
+								</Handles>
+								<Tracks right={false}>
+									{({ tracks, getTrackProps }) => (
+										<div className="slider-tracks">
+										{tracks.map(({ id, source, target }) => (
+											<Track
+											key={id}
+											source={source}
+											target={target}
+											getTrackProps={getTrackProps}
+											/>
+										))}
+										</div>
+									)}
+								</Tracks>
+							</Slider>
+						</Col>
+					</Form.Group>
+                    
+					<Form.Group as={Row} className="form-group">
+                        <Form.Label column sm={5} style={{textAlign: 'right'}}><h5>Visible:</h5></Form.Label>
                         <Col sm={6}>
 							<Form.Check
 								style={{marginTop: "10px"}} 
@@ -162,7 +217,7 @@ export default class ExerciseEdit extends Component {
                     </Form.Group>
 					
 					<Form.Group as={Row} className="form-group">
-                        <Form.Label column sm={3} style={{textAlign: 'right'}}><h5>New Sub-Exercise:</h5></Form.Label>
+                        <Form.Label column sm={5} style={{textAlign: 'right'}}><h5>New Sub-Exercise:</h5></Form.Label>
                         <Col sm={6}>
 							<Button
 								key="AddNewSubExercise"
@@ -230,6 +285,7 @@ export default class ExerciseEdit extends Component {
 								setHighlighting={this.setHighlighting}
 								sendSourceFiles={true}
 								largeMargin={false}
+								setHighlightingDetailLevelIndex={this.setHighlightingDetailLevelIndexSubExercise}
 							/>
 						</Tab>
                         <Tab variant="primary" eventKey="source-file" title="Source Files">
@@ -275,17 +331,49 @@ export default class ExerciseEdit extends Component {
 
                 </Form>
             </div>);
-    }
+	}
+	
+
+	setHighlightingDetailLevelIndex(highlightingDetailLevelIndex) {
+		if (this.state.exercise.highlightingDetailLevelIndex !== highlightingDetailLevelIndex[0]) {
+			console.log(highlightingDetailLevelIndex);
+			this.setState({
+				didChangeCode: true,
+				exercise: update(this.state.exercise, {
+					highlightingDetailLevelIndex: {
+						$set: highlightingDetailLevelIndex[0]
+					}
+				})
+			});
+		}
+	}
+
+	setHighlightingDetailLevelIndexSubExercise(highlightingDetailLevelIndex) {
+		if (this.state.exercise.subExercises[this.state.subExerciseIndex].highlightingDetailLevelIndex !== highlightingDetailLevelIndex[0]) {
+			console.log(highlightingDetailLevelIndex);
+			this.setState({
+				didChangeCode: true,
+				exercise: update(this.state.exercise, {
+					subExercises: {
+						[this.state.subExerciseIndex]: {
+							highlightingDetailLevelIndex: {
+								$set: highlightingDetailLevelIndex[0]
+							}
+						}
+					}
+				})
+			});
+		}
+	}
 
 	addNewSubExercise() {
-
-
 		this.setState({
 			contentIDCounter: this.state.contentIDCounter+4,
 			exercise: update(this.state.exercise, {
 				subExercises: {
 					$push: [
 						{
+							highlightingDetailLevelIndex: this.state.exercise.highlightingDetailLevelIndex,
 							content: [
 								{
 									_id: "NEW " + this.state.contentIDCounter,
@@ -877,6 +965,7 @@ export default class ExerciseEdit extends Component {
 			}
 
 			exerciseCopy.subExercises.push({
+				highlightingDetailLevelIndex: subExercise.highlightingDetailLevelIndex,
 				content: newContent,
 				sourceFiles: newSourceFiles
 			})
@@ -915,6 +1004,7 @@ export default class ExerciseEdit extends Component {
 
 			subExercises.push({
 				_id: subExercise._id,
+				highlightingDetailLevelIndex: subExercise.highlightingDetailLevelIndex || 0,
 				content: content,
 				sourceFiles: sourceFiles
 			})
@@ -927,6 +1017,7 @@ export default class ExerciseEdit extends Component {
 			name: this.state.exercise.name,
 			isVisibleToStudents: this.state.exercise.isVisibleToStudents,
 			iFrameUrl: this.state.exercise.iFrameUrl || "",
+			highlightingDetailLevelIndex: this.state.exercise.highlightingDetailLevelIndex || 0,
 			subExercises: subExercises
 		}
 

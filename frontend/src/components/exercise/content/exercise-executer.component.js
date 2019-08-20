@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
-import { Slider, Rail, Handles, Tracks } from 'react-compound-slider'
-
 import Axios from 'axios';
+
+import { Slider, Rail, Handles, Tracks } from 'react-compound-slider';
+import { Track } from '../slider/track';
+import { Handle } from '../slider/handle';
 
 import { Row,  ButtonGroup, DropdownButton, Dropdown, Button, ProgressBar } from 'react-bootstrap';
 
@@ -95,8 +97,8 @@ export default class ExerciseExecuter extends Component {
                             step={1}
                             domain={[0, 5]}
                             rootStyle={{position: 'relative', width: '200px', height: '40px', touchAction: 'none'}}
-                            // onChange={this.onChangeSlider}
-                            values={[1]}
+                            onUpdate={this.props.setHighlightingDetailLevelIndex}
+                            values={[this.props.subExercise.highlightingDetailLevelIndex || 0]}
                         >
                             <Rail>
                             {({ getRailProps }) => (  // adding the rail props sets up events on the rail
@@ -176,7 +178,7 @@ export default class ExerciseExecuter extends Component {
         this.setState({
             consoleInputValue: e.target.value
         });
-    }
+	}
 
     onChange(e) {
         // placeholder to prevent warning
@@ -273,8 +275,9 @@ export default class ExerciseExecuter extends Component {
 			subExerciseIndex: this.props.subExerciseIndex,
 			subExerciseID: this.props.subExercise._id,
 			sourceFiles: (this.props.sendSourceFiles ? this.props.subExercise.sourceFiles : undefined),
-            code_snippets: code_snippets
-        }
+			code_snippets: code_snippets,
+			highlightingDetailLevelIndex: this.props.subExercise.highlightingDetailLevelIndex || 0
+        };
 
         log(data);
         
@@ -507,47 +510,3 @@ export default class ExerciseExecuter extends Component {
     }
 
 }
-
-
-
-
-export function Handle({ handle: { id, value, percent }, getHandleProps }) {
-    return (
-      <div
-        style={{
-          left: `${percent}%`,
-          position: 'absolute',
-          marginLeft: -5,
-          marginTop: 5,
-          zIndex: 2,
-          width: 10,
-          height: 30,
-          border: 0,
-          textAlign: 'center',
-          cursor: 'pointer',
-          borderRadius: '5px',
-          backgroundColor: '#ffffff',
-        }}
-        {...getHandleProps(id)}
-      />
-    )
-}
-
-export function Track({ source, target, getTrackProps }) {
-    return (
-      <div
-        style={{
-          position: 'absolute',
-          height: 10,
-          zIndex: 1,
-          marginTop: 15,
-          backgroundColor: '#df691a',
-          borderRadius: 5,
-          cursor: 'pointer',
-          left: `${source.percent}%`,
-          width: `${target.percent - source.percent}%`,
-        }}
-        {...getTrackProps()}
-      />
-    )
-  }

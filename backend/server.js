@@ -367,7 +367,7 @@ app.route('/api/course/:courseID/exercise/:exerciseID')
                 res.status(404).send('Course not found!');
 			} else {
 				
-				let exercise = course.exercises.id(req.params.exerciseID)
+				let exercise = course.exercises.id(req.params.exerciseID);
 
 				if (exercise) {
 
@@ -427,8 +427,10 @@ app.route('/api/course/exercise')
 					name: req.body.name,
 					isVisibleToStudents: req.body.isVisibleToStudents || true,
 					iFrameUrl: req.body.iFrameUrl || "",
+					highlightingDetailLevelIndex: req.body.highlightingDetailLevelIndex || 0,
 					subExercises: req.body.subExercises || [
 						{
+							highlightingDetailLevelIndex: req.body.highlightingDetailLevelIndex || 0,
 							content: [
 								{
 									type: "title",
@@ -504,6 +506,7 @@ app.route('/api/course/exercise')
 				exercise.name = req.body.name;
 				exercise.isVisibleToStudents = req.body.isVisibleToStudents;
 				exercise.iFrameUrl = req.body.iFrameUrl;
+				exercise.highlightingDetailLevelIndex = req.body.highlightingDetailLevelIndex;
 				exercise.subExercises = req.body.subExercises;
 				
                 course
@@ -675,6 +678,7 @@ app.route("/api/exercise/run")
 		let exerciseID = req.body.exerciseID;
 		let subExerciseIndex = req.body.subExerciseIndex;
 		let subExerciseID = req.body.subExerciseID;
+		let highlightingDetailLevelIndex = req.body.highlightingDetailLevelIndex;
         let userData = req.tokenData;
 
         Course.findById(courseID, function (err, course) {
@@ -689,7 +693,7 @@ app.route("/api/exercise/run")
 					return;
 				}
 
-				// PERSIST USER CODE (could probably be simplified codewise)
+				// PERSIST USER CODE
 				User.findById(userData.userId, function (err, user) {
 					if (!err) {
 
@@ -752,6 +756,7 @@ app.route("/api/exercise/run")
 				}
 
                 let arg = {
+					highlightingDetailLevelIndex: highlightingDetailLevelIndex || 0,
                     code_snippets: code_snippets,
                     source_files: sourceFiles
                 }
@@ -772,7 +777,8 @@ app.route("/api/exercise/run")
 						exerciseName: exercise.name,
 						exerciseID: exerciseID,
 						subExerciseIndex: subExerciseIndex,
-						code_snippets: code_snippets
+						code_snippets: code_snippets,
+						highlightingDetailLevelIndex: arg.highlightingDetailLevelIndex
 					},
 					userData: {
 						userId: userData.userId,

@@ -21,7 +21,9 @@ export default class ExerciseSolve extends Component {
         this.onChangeExerciseAceEditor = this.onChangeExerciseAceEditor.bind(this);
 
         this.onRanCode = this.onRanCode.bind(this);
-        this.setHighlighting = this.setHighlighting.bind(this);
+		this.setHighlighting = this.setHighlighting.bind(this);
+		
+		this.setHighlightingDetailLevelIndexSubExercise = this.setHighlightingDetailLevelIndexSubExercise.bind(this);
 
         this.state = {
 			courseName: this.props.courseName,
@@ -33,8 +35,10 @@ export default class ExerciseSolve extends Component {
 				name: "Loading...",
 				isVisibleToStudents: true,
 				iFrameUrl: "",
+				highlightingDetailLevelIndex: 0,
 				subExercises: [{
 					_id: 0,
+					highlightingDetailLevelIndex: 0,
 					content: [],
 					sourceFiles: []
 				}]
@@ -65,7 +69,7 @@ export default class ExerciseSolve extends Component {
 
 				this.setState({
 					exercise: exercise,
-					courseName:  response.data.courseName,
+					courseName: response.data.courseName,
 					userSubExercisesData: response.data.userSubExercisesData
 				});
             })
@@ -156,11 +160,29 @@ export default class ExerciseSolve extends Component {
 					setHighlighting={this.setHighlighting}
 					sendSourceFiles={false}
 					largeMargin={true}
+					setHighlightingDetailLevelIndex={this.setHighlightingDetailLevelIndexSubExercise}
                 />
             </div>
         );
     }
 
+
+	setHighlightingDetailLevelIndexSubExercise(highlightingDetailLevelIndex) {
+		if (this.state.exercise.subExercises[this.state.subExerciseIndex].highlightingDetailLevelIndex !== highlightingDetailLevelIndex[0]) {
+			this.setState({
+				didChangeCode: true,
+				exercise: update(this.state.exercise, {
+					subExercises: {
+						[this.state.subExerciseIndex]: {
+							highlightingDetailLevelIndex: {
+								$set: highlightingDetailLevelIndex[0]
+							}
+						}
+					}
+				})
+			});
+		}
+	}
 
 
     onChangeExerciseAceEditor(e, value, id, key) {

@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 let SubExercise = new Schema({
+	highlightingDetailLevelIndex: Number,
 	sourceFiles: [
 		{
 			package: String,
@@ -28,6 +29,7 @@ let Exercise = new Schema({
 	name: String,
 	isVisibleToStudents: Boolean,
 	iFrameUrl: String,
+	highlightingDetailLevelIndex: Number,
 	subExercises: [
 		SubExercise
 	]
