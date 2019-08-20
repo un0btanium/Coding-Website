@@ -336,7 +336,6 @@ export default class ExerciseEdit extends Component {
 
 	setHighlightingDetailLevelIndex(highlightingDetailLevelIndex) {
 		if (this.state.exercise.highlightingDetailLevelIndex !== highlightingDetailLevelIndex[0]) {
-			console.log(highlightingDetailLevelIndex);
 			this.setState({
 				didChangeCode: true,
 				exercise: update(this.state.exercise, {
@@ -350,7 +349,6 @@ export default class ExerciseEdit extends Component {
 
 	setHighlightingDetailLevelIndexSubExercise(highlightingDetailLevelIndex) {
 		if (this.state.exercise.subExercises[this.state.subExerciseIndex].highlightingDetailLevelIndex !== highlightingDetailLevelIndex[0]) {
-			console.log(highlightingDetailLevelIndex);
 			this.setState({
 				didChangeCode: true,
 				exercise: update(this.state.exercise, {
