@@ -594,6 +594,7 @@ app.route("/api/exercise/input")
                                         compressedJson: compressedJson
                                     };
                                     
+									res.dataArray = [];
                                     res.isDataSend = true;
                                     res.status(200).json(jsonMessage);
                                 }
@@ -647,11 +648,13 @@ app.route("/api/exercise/input")
                             compressedJson: compressedJson
                         };
                         
+						res.dataArray = [];
                         res.isDataSend = true;
                         res.status(200).json(jsonMessage);
                     }
                 } catch (e) {
                     console.error(e);
+					res.dataArray = [];
                     res.isDataSend = true;
                     res.status(400).json({});
                 }
@@ -672,6 +675,7 @@ app.route("/api/exercise/input")
 app.route("/api/exercise/run")
 
     .post((req, res, next) => checkAuth(req, res, next), function (req, res) {
+		let isElectronApp = req.body.isElectronApp;
 		let code_snippets = req.body.code_snippets;
 		let sourceFilesUser = req.body.sourceFiles;
 		let courseID = req.body.courseID;
@@ -679,7 +683,7 @@ app.route("/api/exercise/run")
 		let subExerciseIndex = req.body.subExerciseIndex;
 		let subExerciseID = req.body.subExerciseID;
 		let highlightingDetailLevelIndex = req.body.highlightingDetailLevelIndex;
-        let userData = req.tokenData;
+		let userData = req.tokenData;
 
         Course.findById(courseID, function (err, course) {
             if (!course) {
@@ -747,12 +751,18 @@ app.route("/api/exercise/run")
                     javaProcesses[userData.userId].process.kill('SIGINT');
                     console.log(javaProcesses[userData.userId].process.killed ? "Killed java process!" : "Didnt kill java process!");
                     javaProcesses[userData.userId] = undefined;
-                }
+				}
+				
 
-                res.dataArray = [];
 				let sourceFiles = exercise.subExercises[subExerciseIndex].sourceFiles;
 				if (sourceFilesUser !== undefined && sourceFilesUser !== null) { // user ran in Edit mode
 					sourceFiles = sourceFilesUser;
+				}
+
+				if (isElectronApp) {
+					console.log("isElectronApp")
+					res.status(200).json({sourceFiles: sourceFiles});
+					return;
 				}
 
                 let arg = {
@@ -761,6 +771,7 @@ app.route("/api/exercise/run")
                     source_files: sourceFiles
                 }
 
+                res.dataArray = [];
                 let javaExe = "java";
                 if (os.platform() === 'win32') {
                     javaExe = "C:" + path.sep + "Program Files" + path.sep + "Java" + path.sep + "jdk-11" + path.sep + "bin" + path.sep + "java.exe";
@@ -810,8 +821,9 @@ app.route("/api/exercise/run")
                                         let compressedJson = lzstring.compressToBase64(jsonString);
                                         let jsonMessage = {
                                             compressedJson: compressedJson
-                                        };
-                                        
+										};
+										
+                                        res.dataArray = [];
                                         res.isDataSend = true;
                                         res.status(200).json(jsonMessage);
                                     }
@@ -864,11 +876,13 @@ app.route("/api/exercise/run")
                                 compressedJson: compressedJson
                             };
 
+							res.dataArray = [];
                             res.isDataSend = true;
                             res.status(200).json(jsonMessage);
                         }
                     } catch (e) {
                         console.error(e);
+						res.dataArray = [];
                         res.isDataSend = true;
                         res.status(400).json({});
                     }
