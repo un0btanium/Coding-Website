@@ -69,9 +69,12 @@ export default class ExerciseList extends Component {
 				<div style={{ padding: "25px", backgroundColor: "rgba(0, 0, 0, 0.75)", borderRadius: "10px"}}>
 					<div>
 						<h2 style={{marginLeft: "20px"}}>
-							{ isAuthenticated(["admin", "maintainer"]) && [
+							{ isAuthenticated(["admin"]) && [
 								<Button variant="danger" onClick={(e) => this.showDeleteModalExercise(e, props.exercise)} key="DeleteExerciseButton" style={{ marginLeft: "20px"}}><FontAwesomeIcon icon={faTrashAlt} /></Button>,
-								<span key="span1"> </span>,
+								<span key="span1"> </span>
+								]
+							}
+							{ isAuthenticated(["admin", "maintainer"]) && [
 								<Button variant="primary" onClick={(e) => this.editExercise(e, props.exercise._id)} key="EditExerciseButton"><FontAwesomeIcon icon={faEdit} /></Button>,
 								<span key="span2"> </span>,
 								<Button variant="info" onClick={(e) => this.switchVisibilityExercise(e, props.exercise, props.index)} key="VisibilityExerciseButton"><FontAwesomeIcon icon={props.exercise.isVisibleToStudents ? faLockOpen : faLock} /></Button>
@@ -113,9 +116,10 @@ export default class ExerciseList extends Component {
 				{isAuthenticated(["admin", "maintainer"]) &&
 					[
 					<Button variant="success" onClick={() => this.newExercise()} key="CreateExerciseButton"><FontAwesomeIcon icon={faPlus} /></Button>,
-					<Button variant="info" onClick={() => this.switchVisibilityCourse()} key="VisibilityCourseButton"><FontAwesomeIcon icon={this.state.course.isVisibleToStudents ? faLockOpen : faLock} /></Button>,
+					<Button variant="info" onClick={() => this.switchVisibilityCourse()} key="VisibilityCourseButton"><FontAwesomeIcon icon={this.state.course.isVisibleToStudents ? faLockOpen : faLock} /></Button>]
+				}
+				{isAuthenticated(["admin"]) &&
 					<Button variant="danger" onClick={() => this.showDeleteModalCourse(this.state.course)} key="DeleteCourseButton"><FontAwesomeIcon icon={faTrashAlt} /></Button>
-				]
 				}
 
 				<div style={{ display: "flex", flexDirection: "column", flexWrap: "nowrap", marginTop: "20px" }}>
