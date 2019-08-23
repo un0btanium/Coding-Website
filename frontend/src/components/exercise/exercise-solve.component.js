@@ -114,7 +114,7 @@ export default class ExerciseSolve extends Component {
 				{
 					(this.state.exercise.iFrameUrl && this.state.exercise.iFrameUrl !== "") && 
 					
-						<Accordion style={{'marginBottom': '20px', width: "100%"}} className="disableSelection" defaultActiveKey="0">
+						<Accordion style={{'marginBottom': '5px', width: "100%", boxShadow: '2px 2px 5px #000000'}} className="disableSelection" defaultActiveKey="0">
 							<Accordion.Toggle as={Card.Header} eventKey="0" style={{textAlign: "center"}}>Show/Hide Presentation</Accordion.Toggle>
 							<Accordion.Collapse eventKey="0" style={{backgroundColor: "#666666"}}>
 								<Iframe url={this.state.exercise.iFrameUrl}

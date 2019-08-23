@@ -9,7 +9,7 @@ export default class ExerciseIFrame extends Component {
     render () {
         if (this.props.mode === "solve") {
             return (
-				<Accordion style={{'marginBottom': '20px', width: "100%"}} className="disableSelection" defaultActiveKey="0">
+				<Accordion style={{'marginBottom': '20px', width: "100%", boxShadow: '2px 2px 5px #000000'}} className="disableSelection" defaultActiveKey="0">
 					<Accordion.Toggle as={Card.Header} eventKey="0" style={{textAlign: "center"}}>Show/Hide</Accordion.Toggle>
 					<Accordion.Collapse eventKey="0" style={{backgroundColor: "#666666"}}>
 						<Iframe url={this.props.content.text}

@@ -7,7 +7,7 @@ export default class ExerciseSpoiler extends Component {
     render () {
         if (this.props.mode === "solve") {
             return (
-				<Accordion style={{'marginBottom': '20px', width: "100%"}} className="disableSelection">
+				<Accordion style={{'marginBottom': '20px', width: "100%", boxShadow: '2px 2px 5px #000000'}} className="disableSelection">
 					<Card>
 						<Accordion.Toggle as={Card.Header} eventKey="0">{this.props.content.title}</Accordion.Toggle>
 						<Accordion.Collapse eventKey="0">
