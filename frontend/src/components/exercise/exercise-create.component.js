@@ -131,6 +131,7 @@ export default class ExerciseCreate extends Component {
 		let isVisibleToStudents = this.state.isVisibleToStudents;
 		let subExercises = undefined;
 		let highlightingDetailLevelIndex = 5;
+		let iFrameUrl = "";
         if (this.state.importString !== '') {
             try {
                 let json = JSON.parse(lzstring.decompressFromBase64(this.state.importString));
@@ -138,6 +139,7 @@ export default class ExerciseCreate extends Component {
 				name = json.name;
 				isVisibleToStudents = json.isVisibleToStudents || true;
 				highlightingDetailLevelIndex = json.highlightingDetailLevelIndex || 5;
+				iFrameUrl = json.iFrameUrl || "";
 
 				if (json.content !== undefined && json.source_files !== undefined) {
 					subExercises = [{
@@ -163,7 +165,7 @@ export default class ExerciseCreate extends Component {
 			courseID: this.state.courseID,
 			name: name,
 			isVisibleToStudents: isVisibleToStudents,
-			iFrameUrl: "",
+			iFrameUrl: iFrameUrl,
 			highlightingDetailLevelIndex: highlightingDetailLevelIndex,
 			subExercises: subExercises
         }
