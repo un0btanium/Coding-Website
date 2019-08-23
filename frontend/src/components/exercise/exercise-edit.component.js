@@ -4,11 +4,13 @@ import update from 'immutability-helper';
 import lzstring from 'lz-string';
 import { toast } from 'react-toastify';
 
-import { Form, Button, Row, Col, Tabs, Tab } from 'react-bootstrap';
+import { Form, Button, Row, Col, Tabs, Tab, Accordion, Card } from 'react-bootstrap';
 
 import { Slider, Rail, Handles, Tracks } from 'react-compound-slider'
 import { Track } from './slider/track';
 import { Handle } from './slider/handle';
+
+import Iframe from 'react-iframe';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
@@ -240,8 +242,33 @@ export default class ExerciseEdit extends Component {
 						/>
 					</div>
 
+
+					{
+						(this.state.exercise.iFrameUrl && this.state.exercise.iFrameUrl !== "") && 
+						
+							<>
+								<br />
+								<hr style={{backgroundColor: "rgb(223, 105, 26)"}}/>
+								<br />
+								<Accordion style={{'marginBottom': '20px', width: "100%", boxShadow: '2px 2px 5px #000000'}} className="disableSelection" defaultActiveKey="0">
+									<Accordion.Toggle as={Card.Header} eventKey="0" style={{textAlign: "center"}}>Show/Hide Presentation</Accordion.Toggle>
+									<Accordion.Collapse eventKey="0" style={{backgroundColor: "#666666"}}>
+										<Iframe url={this.state.exercise.iFrameUrl}
+											width="100%"
+											height="530px"
+											allowFullScreen="true"
+											mozallowfullscreen="true"
+											webkitallowfullscreen="true"
+											frameBorder="0"
+										/>
+									</Accordion.Collapse>
+								</Accordion>
+							</>
+					}
+
                     <br />
 					<hr style={{backgroundColor: "rgb(223, 105, 26)"}}/>
+                    <br />
 
                     <Tabs
 						style={{width: "100%"}}
