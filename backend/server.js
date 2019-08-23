@@ -336,7 +336,7 @@ app.route('/api/course/:id')
         })
 	})
 	
-    .delete((req, res, next) => checkAuth(req, res, next, ["admin", "maintainer"]), function (req, res) {
+    .delete((req, res, next) => checkAuth(req, res, next, ["admin"]), function (req, res) {
         let id = req.params.id;
         Course.findByIdAndDelete(id, function (err) {
             if (!err) {
@@ -391,7 +391,7 @@ app.route('/api/course/:courseID/exercise/:exerciseID')
 		});
     })
 
-    .delete((req, res, next) => checkAuth(req, res, next, ["admin", "maintainer"]), function (req, res) {
+    .delete((req, res, next) => checkAuth(req, res, next, ["admin"]), function (req, res) {
 		Course.findById(req.params.courseID, function (err, course) {
 			if (err) {
 				console.log("Course " + req.params.courseID + " not found!");
@@ -697,54 +697,56 @@ app.route("/api/exercise/run")
 					return;
 				}
 
-				// PERSIST USER CODE
-				User.findById(userData.userId, function (err, user) {
-					if (!err) {
+				// PERSIST USER CODE (only in solve mode)
+				if (sourceFilesUser === undefined) {
+					User.findById(userData.userId, function (err, user) {
+						if (!err) {
 
-						if (!user.code) {
-							user.code = {};
-						}
+							if (!user.code) {
+								user.code = {};
+							}
 
-						if (!user.code[courseID]) {
-							user.code[courseID] = {};
-						}
+							if (!user.code[courseID]) {
+								user.code[courseID] = {};
+							}
 
-						if (!user.code[courseID][exerciseID]) {
-							user.code[courseID][exerciseID] = {};
-						}
+							if (!user.code[courseID][exerciseID]) {
+								user.code[courseID][exerciseID] = {};
+							}
 
-						if (!user.code[courseID][exerciseID][subExerciseID]) {
-							user.code[courseID][exerciseID][subExerciseID] = {
-								codeSnippets: {},
-								solved: false
-							};
-						}
+							if (!user.code[courseID][exerciseID][subExerciseID]) {
+								user.code[courseID][exerciseID][subExerciseID] = {
+									codeSnippets: {},
+									solved: false
+								};
+							}
 
-						user.code = update(user.code, {
-							[courseID]: {
-								[exerciseID]: {
-									[subExerciseID]: {
-										codeSnippets: {
-											$set: code_snippets
-										},
-										solved: {
-											$set: true
+							user.code = update(user.code, {
+								[courseID]: {
+									[exerciseID]: {
+										[subExerciseID]: {
+											codeSnippets: {
+												$set: code_snippets
+											},
+											solved: {
+												$set: true
+											}
 										}
 									}
 								}
-							}
-						})
+							})
 
-						user
-						.save()
-						.then(user => {
-							
-						})
-						.catch(err => {
-							console.log("Saving user code failed")
-						});
-					}
-				});
+							user
+							.save()
+							.then(user => {
+								
+							})
+							.catch(err => {
+								console.log("Saving user code failed")
+							});
+						}
+					});
+				}
 
                 if (javaProcesses[userData.userId] !== undefined && javaProcesses[userData.userId] !== null) {
                     console.log("Killing java process!");
