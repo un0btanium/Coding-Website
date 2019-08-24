@@ -13,6 +13,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken')
 
 const checkAuth = require('./middleware/check-auth');
+const array_move = require('./middleware/move_array');
 
 // const passport = require('passport');
 // const passportJWT = require('passport-jwt');
@@ -272,9 +273,9 @@ app.route('/api/course')
 			if (!course) {
 				res.status(404).send('course was not found');
 			} else {
-				course.name = req.body.name;
-				course.isVisibleToStudents = req.body.isVisibleToStudents;
-				course.exercises = req.body.exercises;
+				course.name = req.body.name || course.name;
+				course.isVisibleToStudents = req.body.isVisibleToStudents || course.isVisibleToStudents;
+				course.exercises = req.body.exercises || course.exercises;
 
 				course
 					.save()
@@ -287,6 +288,50 @@ app.route('/api/course')
 			}
 		});
 	});
+
+app.route('/api/course/moveexercise')
+
+	.put((req, res, next) => checkAuth(req, res, next, ["admin", "maintainer"]), function (req, res) {
+		Course.findById(req.body.id, function (err, course) {
+			if (!course) {
+				res.status(404).send('course was not found');
+			} else {
+				
+				let index = -1;
+				let i = 0;
+				for (let exercise of course.exercises) {
+					if (exercise._id.toString() === req.body.exerciseID) {
+						index = i;
+						break;
+					}
+					i++;
+				}
+
+				if (index === -1) {
+					res.status(404).send("Exercise not found");
+				} else {
+					let exercises = [...course.exercises];
+					if (req.body.moveUp) {
+						exercises = array_move(exercises, index, index-1);
+					} else {
+						exercises = array_move(exercises, index, index+1);
+					}
+	
+					course.exercises = exercises;
+	
+					course
+						.save()
+						.then(course => {
+							res.status(200).json({exercises: getSimplifiedExercises(course.exercises)});
+						})
+						.catch(err => {
+							res.status(400).send("Moving exercise failed");
+						});
+				}
+			}
+		});
+	});
+
 
 app.route('/api/course/visibility')
 
@@ -325,17 +370,8 @@ app.route('/api/course/:id')
 					name: course.name,
 					isVisibleToStudents: course.isVisibleToStudents
 				};
-				simplifiedCourse.exercises = course.exercises.map((exercise, index) => {
-					let simplifiedExercise = {
-						_id: exercise._id,
-						name: exercise.name,
-						isVisibleToStudents: exercise.isVisibleToStudents
-					};
-					simplifiedExercise.subExercises = exercise.subExercises.map((subExercise, index) => {
-						return {_id: subExercise._id};
-					});
-					return simplifiedExercise;
-				});
+				
+				simplifiedCourse.exercises = getSimplifiedExercises(course.exercises);
 
 				User.findById(req.tokenData.userId, function (err, user) {
 					if (err) {
@@ -928,4 +964,18 @@ function findEntryInArrayByKey(array, key, compareValue) {
 		}
 	}
 	return element;
+}
+
+function getSimplifiedExercises(exercises) {
+	return exercises.map((exercise) => {
+		let simplifiedExercise = {
+			_id: exercise._id,
+			name: exercise.name,
+			isVisibleToStudents: exercise.isVisibleToStudents
+		};
+		simplifiedExercise.subExercises = exercise.subExercises.map((subExercise) => {
+			return {_id: subExercise._id};
+		});
+		return simplifiedExercise;
+	});
 }

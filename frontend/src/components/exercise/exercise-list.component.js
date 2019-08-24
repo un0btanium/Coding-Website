@@ -5,11 +5,10 @@ import { toast } from 'react-toastify';
 
 import { isAuthenticated } from "../../services/Authentication";
 
-import Button from 'react-bootstrap/Button';
-import Modal from 'react-bootstrap/Modal';
+import { Button, Modal, ButtonGroup } from 'react-bootstrap';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faLock, faLockOpen, faTrashAlt, faEdit, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faLock, faLockOpen, faTrashAlt, faEdit, faPlus, faCaretUp, faCaretDown } from '@fortawesome/free-solid-svg-icons'
 
 import ProgressArrows from './progress-arrows/progress-arrows.component'
 
@@ -69,15 +68,20 @@ export default class ExerciseList extends Component {
 				<div style={{ padding: "25px", backgroundColor: "rgba(0, 0, 0, 0.75)", borderRadius: "10px"}}>
 					<div>
 						<h2 style={{marginLeft: "20px"}}>
-							{ isAuthenticated(["admin"]) && [
-								<Button variant="danger" onClick={(e) => this.showDeleteModalExercise(e, props.exercise)} key="DeleteExerciseButton" style={{ marginLeft: "20px"}}><FontAwesomeIcon icon={faTrashAlt} /></Button>,
-								<span key="span1"> </span>
+							{ isAuthenticated(["admin", "maintainer"]) && [
+								<ButtonGroup key="ButtonGroupMoveExercise" vertical="true" style={{ marginLeft: "20px"}}>
+									<Button variant="secondary" size="sm" onClick={(e) => this.moveExercise(e, props.exercise._id, true)} key="MoveExerciseUpButton"><FontAwesomeIcon icon={faCaretUp} /></Button>
+									<Button variant="secondary" size="sm" onClick={(e) => this.moveExercise(e, props.exercise._id, false)} key="MoveExerciseDownButton"><FontAwesomeIcon icon={faCaretDown} /></Button>
+								</ButtonGroup>,
+								<span key="span3"> </span>,
+								<Button variant="primary" onClick={(e) => this.editExercise(e, props.exercise._id)} key="EditExerciseButton"><FontAwesomeIcon icon={faEdit} /></Button>,
+								<span key="span4"> </span>,
+								<Button variant="info" onClick={(e) => this.switchVisibilityExercise(e, props.exercise, props.index)} key="VisibilityExerciseButton"><FontAwesomeIcon icon={props.exercise.isVisibleToStudents ? faLockOpen : faLock} /></Button>
 								]
 							}
-							{ isAuthenticated(["admin", "maintainer"]) && [
-								<Button variant="primary" onClick={(e) => this.editExercise(e, props.exercise._id)} key="EditExerciseButton"><FontAwesomeIcon icon={faEdit} /></Button>,
-								<span key="span2"> </span>,
-								<Button variant="info" onClick={(e) => this.switchVisibilityExercise(e, props.exercise, props.index)} key="VisibilityExerciseButton"><FontAwesomeIcon icon={props.exercise.isVisibleToStudents ? faLockOpen : faLock} /></Button>
+							{ isAuthenticated(["admin"]) && [
+								<span key="span5"> </span>,
+								<Button variant="danger" onClick={(e) => this.showDeleteModalExercise(e, props.exercise)} key="DeleteExerciseButton"><FontAwesomeIcon icon={faTrashAlt} /></Button>
 								]
 							}
 							<b style={{marginLeft: "20px"}}>{props.exercise.name} {!props.exercise.isVisibleToStudents ? <FontAwesomeIcon size="1x" style={{marginLeft: "20px"}} icon={faLock}/> : null }</b>
@@ -193,6 +197,31 @@ export default class ExerciseList extends Component {
     }
 
 
+
+	moveExercise(e, id, moveUp) {
+		e.stopPropagation();
+		
+		let data = {
+			id: this.state.course._id,
+			exerciseID: id,
+			moveUp: moveUp
+		}
+		
+        Axios.put(process.env.REACT_APP_BACKEND_SERVER + '/course/moveexercise', data)
+            .then(response => {
+				this.setState({
+					course: update(this.state.course, {
+						exercises: {
+							$set: response.data.exercises || []
+						}
+					})
+				});
+            })
+            .catch(function (error) {
+                toast(<div style={{textAlign: "center"}}>Failed to move exercise!</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
+                console.log(error);
+            });
+	}
 
 	newExercise() {
 		this.props.history.push('/course/' + this.props.match.params.courseID + '/exercise/create', {courseName: this.state.course.name})
