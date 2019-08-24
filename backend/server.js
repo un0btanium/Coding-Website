@@ -320,15 +320,32 @@ app.route('/api/course/:id')
                 res.status(404).send('Course not found!');
             } else {
 
+				let simplifiedCourse = {
+					_id: course._id,
+					name: course.name,
+					isVisibleToStudents: course.isVisibleToStudents
+				};
+				simplifiedCourse.exercises = course.exercises.map((exercise, index) => {
+					let simplifiedExercise = {
+						_id: exercise._id,
+						name: exercise.name,
+						isVisibleToStudents: exercise.isVisibleToStudents
+					};
+					simplifiedExercise.subExercises = exercise.subExercises.map((subExercise, index) => {
+						return {_id: subExercise._id};
+					});
+					return simplifiedExercise;
+				});
+
 				User.findById(req.tokenData.userId, function (err, user) {
 					if (err) {
-						res.json({ course: course, userExercisesData: {} });
+						res.json({ course: simplifiedCourse, userExercisesData: {} });
 					} else {
 
 						if (user.code && user.code[id]) {
-							res.json({ course: course, userExercisesData: user.code[id]});
+							res.json({ course: simplifiedCourse, userExercisesData: user.code[id]});
 						} else {
-							res.json({ course: course, userExercisesData: {} });
+							res.json({ course: simplifiedCourse, userExercisesData: {} });
 						}
 					}
 				});
