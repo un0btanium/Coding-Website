@@ -1,14 +1,15 @@
 import React, {Component} from 'react';
 import Axios from 'axios';
+import lzstring from 'lz-string';
 import update from 'immutability-helper';
 import { toast } from 'react-toastify';
 
 import { isAuthenticated } from "../../services/Authentication";
 
-import { Button, Modal, ButtonGroup } from 'react-bootstrap';
+import { Button, Modal, ButtonGroup, Form } from 'react-bootstrap';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faLock, faLockOpen, faTrashAlt, faEdit, faPlus, faCaretUp, faCaretDown } from '@fortawesome/free-solid-svg-icons'
+import { faLock, faLockOpen, faTrashAlt, faEdit, faPlus, faCaretUp, faCaretDown, faDownload } from '@fortawesome/free-solid-svg-icons'
 
 import ProgressArrows from './progress-arrows/progress-arrows.component'
 
@@ -28,7 +29,9 @@ export default class ExerciseList extends Component {
 			markedExercise: {},
 			
             showDeleteModalCourse: false,
-            markedCourse: {}
+			markedCourse: {},
+			
+			courseExportJSONString: ""
         };
     }
 
@@ -120,10 +123,26 @@ export default class ExerciseList extends Component {
 				{isAuthenticated(["admin", "maintainer"]) &&
 					[
 					<Button variant="success" onClick={() => this.newExercise()} key="CreateExerciseButton"><FontAwesomeIcon icon={faPlus} /></Button>,
-					<Button variant="info" onClick={() => this.switchVisibilityCourse()} key="VisibilityCourseButton"><FontAwesomeIcon icon={this.state.course.isVisibleToStudents ? faLockOpen : faLock} /></Button>]
+					<Button variant="info" onClick={() => this.switchVisibilityCourse()} key="VisibilityCourseButton"><FontAwesomeIcon icon={this.state.course.isVisibleToStudents ? faLockOpen : faLock} /></Button>,
+					<Button variant="warning" onClick={() => this.exportCourseAsJSON()} key="ExportCourseButton"><FontAwesomeIcon icon={faDownload} /></Button>
+					]
 				}
 				{isAuthenticated(["admin"]) &&
 					<Button variant="danger" onClick={() => this.showDeleteModalCourse(this.state.course)} key="DeleteCourseButton"><FontAwesomeIcon icon={faTrashAlt} /></Button>
+				}
+				
+
+				{
+					this.state.courseExportJSONString &&
+					<Form.Control
+						style={{color: 'white', border: 'solid 2px', borderColor: 'rgb(223, 105, 26)', background: 'rgb(43, 62, 80)' }}
+						plaintext="true"
+						autoComplete="off"
+						as="textarea"
+						rows="3"
+						name="CourseExportJSONStringTextArea"
+						defaultValue={this.state.courseExportJSONString}
+					/>
 				}
 
 				<div style={{ display: "flex", flexDirection: "column", flexWrap: "nowrap", marginTop: "20px" }}>
@@ -206,7 +225,7 @@ export default class ExerciseList extends Component {
 			exerciseID: id,
 			moveUp: moveUp
 		}
-		
+
         Axios.put(process.env.REACT_APP_BACKEND_SERVER + '/course/moveexercise', data)
             .then(response => {
 				this.setState({
@@ -330,4 +349,58 @@ export default class ExerciseList extends Component {
                 console.log(error);
             });
 	}
+
+	
+    exportCourseAsJSON() {
+
+        Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/course/full/' + this.state.course._id)
+            .then(response => {
+				let courseCopy = {...response.data.course};
+				delete courseCopy._id;
+				
+				courseCopy.exercises = [];
+				for (let originalExercise of response.data.course.exercises) {
+					let exercise = {...originalExercise};
+					delete exercise._id;
+		
+					let newSubExercises = [];
+					for (let originalSubExercise of exercise.subExercises) {
+						let subExercise = {...originalSubExercise};
+						delete subExercise._id;
+		
+						let newContent = [];
+						for (let c of subExercise.content) {
+							let contentCopy = {...c};
+							delete contentCopy._id;
+							newContent.push(contentCopy);
+						}
+		
+						let newSourceFiles = [];
+						for (let sourceFile of subExercise.sourceFiles) {
+							let sourceFileCopy = {...sourceFile};
+							delete sourceFileCopy._id;
+							newSourceFiles.push(sourceFileCopy);
+						}
+		
+						subExercise.content = newContent;
+						subExercise.sourceFiles = newSourceFiles;
+		
+						newSubExercises.push(subExercise);
+					}
+		
+					courseCopy.exercises.push(exercise);
+				}
+				
+				let course = JSON.stringify(courseCopy);
+				
+				this.setState({
+					courseExportJSONString: lzstring.compressToBase64(course)
+				});
+            })
+            .catch(function (error) {
+				toast(<div style={{textAlign: "center"}}>Unable to create course export string!</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
+                console.log(error);
+            });
+
+    }
 }

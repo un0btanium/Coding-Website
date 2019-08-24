@@ -13,7 +13,7 @@ import { Handle } from './slider/handle';
 import Iframe from 'react-iframe';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faDownload } from '@fortawesome/free-solid-svg-icons'
 
 import ExerciseContent from './content/exercise-content.component';
 import ExerciseSourceFiles from './content/exercise-source-files.component';
@@ -23,6 +23,7 @@ import ProgressArrows from './progress-arrows/progress-arrows.component';
 
 import { log } from '../../services/Logger';
 import { array_move } from '../../services/ArrayShifter';
+import { faSave } from '@fortawesome/free-regular-svg-icons';
 
 export default class ExerciseEdit extends Component {
     
@@ -346,15 +347,15 @@ export default class ExerciseEdit extends Component {
                             plaintext="true"
                             autoComplete="off"
                             as="textarea"
-                            rows="10"
+                            rows="3"
                             name="ExerciseExportJSONStringTextArea"
                             defaultValue={this.state.exerciseExportJSONString}
                         />
                     }
 
                     <Form.Group className="form-group">
-                        <Button type="submit" variant="success" style={{marginBottom: '150px', marginTop: '30px', width: '150px', float: 'right'}}>Save</Button>
-                        <Button variant="danger" onClick={this.exportExerciseAsJSON} style={{marginBottom: '150px', marginTop: '30px', width: '150px', float: 'right'}}>Export</Button>
+                        <Button type="submit" variant="success" style={{marginBottom: '150px', marginTop: '30px', width: '150px', float: 'right'}}><FontAwesomeIcon icon={faSave} /> Save</Button>
+                        <Button variant="danger" onClick={this.exportExerciseAsJSON} style={{marginBottom: '150px', marginTop: '30px', width: '150px', float: 'right'}}><FontAwesomeIcon icon={faDownload} /> Export</Button>
                     </Form.Group>
 
                 </Form>
@@ -950,7 +951,8 @@ export default class ExerciseEdit extends Component {
 		let exerciseCopy = {...this.state.exercise};
 		delete exerciseCopy._id;
 		exerciseCopy.subExercises = [];
-		for (let subExercise of this.state.exercise.subExercises) {
+		for (let originalSubExercise of this.state.exercise.subExercises) {
+			let subExercise = {...originalSubExercise};
 			delete subExercise._id;
 
 			let newContent = [];
@@ -967,11 +969,10 @@ export default class ExerciseEdit extends Component {
 				newSourceFiles.push(sourceFileCopy);
 			}
 
-			exerciseCopy.subExercises.push({
-				highlightingDetailLevelIndex: subExercise.highlightingDetailLevelIndex,
-				content: newContent,
-				sourceFiles: newSourceFiles
-			})
+			subExercise.content = newContent;
+			subExercise.sourceFiles = newSourceFiles;
+
+			exerciseCopy.subExercises.push(subExercise)
 		}
 		
         let exercise = JSON.stringify(exerciseCopy);

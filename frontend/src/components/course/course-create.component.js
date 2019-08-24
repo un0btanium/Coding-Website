@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import Axios from 'axios';
 import lzstring from 'lz-string';
 
+import { toast } from 'react-toastify';
+
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Row from 'react-bootstrap/Row';
@@ -132,11 +134,13 @@ export default class CourseCreate extends Component {
 					exercises = json.exercises;
 				} else {
 					console.log("Faulty course import string!")
+					toast(<div style={{textAlign: "center"}}>Faulty course import string!</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
 					return;
 				}
 
             } catch (e) {
                 console.log(e);
+                toast(<div style={{textAlign: "center"}}>Faulty course import string!</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
                 return;
             }
         }

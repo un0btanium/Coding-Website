@@ -65,7 +65,7 @@ export default class ExerciseExecuter extends Component {
             // progressBar = <div style={{height: '10px', backgroundColor: '#4e5d6d'}}></div>
         }
         
-        let runCodeButton = <Button style={{width: '230px'}} variant="success" onClick={this.runCode} >Run Code</Button>
+        let runCodeButton = <Button style={{width: '230px'}} variant="success" onClick={this.runCode} >Run Code <FontAwesomeIcon style={{float: 'right', marginTop: '4px'}} icon={faPlay} /></Button>
         if (this.state.isExecutingOnServer) {
             runCodeButton = <Button style={{width: '230px'}} variant="success" onClick={this.runCode} ><span><FontAwesomeIcon style={{ 'marginRight': '12px'}} icon={faSpinner} pulse={true} size="lg" />Running...</span></Button>
         } else if (this.state.result && (this.state.result.isGuiReadIn || this.state.result.isReadIn)) {

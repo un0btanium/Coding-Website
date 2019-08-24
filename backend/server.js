@@ -364,7 +364,7 @@ app.route('/api/course/:id')
                 console.log("Course " + id + " not found!");
                 res.status(404).send('Course not found!');
             } else {
-
+				
 				let simplifiedCourse = {
 					_id: course._id,
 					name: course.name,
@@ -405,7 +405,18 @@ app.route('/api/course/:id')
         })
     });
 
+app.route('/api/course/full/:id')
 
+    .get((req, res, next) => checkAuth(req, res, next), function (req, res) {
+        Course.findById(req.params.id, function (err, course) {
+            if (err) {
+                console.log("Course " + id + " not found!");
+                res.status(404).send('Course not found!');
+            } else {
+				res.status(200).json({ course: course });
+            }
+        })
+	});
 
 
 				/* EXERCISES */
