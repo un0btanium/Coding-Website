@@ -111,7 +111,7 @@ export default class ExerciseEdit extends Component {
         return (
             <div className="disableSelection fadeIn" style={{marginTop: '60px', width: '80%', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto'}}>
                 
-				<div onClick={(e) => this.props.history.push("/course/" + this.state.courseID + "/exercises")}style={{textAlign: "center", cursor: "pointer", marginBottom: "20px" }}>
+				<div onClick={(e) => this.props.history.push("/course/" + this.state.courseID + "/exercises")} style={{textAlign: "center", cursor: "pointer", marginBottom: "20px" }}>
 					<h2 className="changeTextColorOnHover">{this.state.courseName}</h2>
 				</div>
 
@@ -122,7 +122,7 @@ export default class ExerciseEdit extends Component {
 				<hr style={{backgroundColor: "rgb(223, 105, 26)"}}/>
                 <br />
 
-                <Form onSubmit={this.onSubmit}>
+                <div>
                     <Form.Group as={Row} className="form-group">
                         <Form.Label column sm={5} style={{textAlign: 'right'}}><h5>Name:</h5></Form.Label>
                         <Col sm={6}>
@@ -355,11 +355,11 @@ export default class ExerciseEdit extends Component {
                     }
 
                     <Form.Group className="form-group">
-                        <Button type="submit" variant="success" style={{marginBottom: '150px', marginTop: '30px', width: '150px', float: 'right'}}><FontAwesomeIcon icon={faSave} /> Save</Button>
+                        <Button variant="success" onClick={this.onSubmit} style={{marginBottom: '150px', marginTop: '30px', width: '150px', float: 'right'}}><FontAwesomeIcon icon={faSave} /> Save</Button>
                         <Button variant="danger" onClick={this.exportExerciseAsJSON} style={{marginBottom: '150px', marginTop: '30px', width: '150px', float: 'right'}}><FontAwesomeIcon icon={faDownload} /> Export</Button>
                     </Form.Group>
 
-                </Form>
+				</div>
             </div>);
 	}
 	
