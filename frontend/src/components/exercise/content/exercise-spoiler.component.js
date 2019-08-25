@@ -11,7 +11,7 @@ export default class ExerciseSpoiler extends Component {
 					<Card>
 						<Accordion.Toggle as={Card.Header} eventKey="0">{this.props.content.title}</Accordion.Toggle>
 						<Accordion.Collapse eventKey="0">
-							<Card.Body style={{textAlign: "justify"}}>{this.props.content.text}</Card.Body>
+							<Card.Body style={{textAlign: "justify", whiteSpace: "pre-wrap"}}>{this.props.content.text}</Card.Body>
 						</Accordion.Collapse>
 					</Card>
 				</Accordion>
