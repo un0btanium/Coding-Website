@@ -18,8 +18,14 @@ export default class ExerciseConsole extends Component {
 
         this.state = {
             consoleInputValue: ""
-        }
+		}
+		
+		this.consoleTextAreaRef = React.createRef();
     }
+
+	componentDidUpdate() {
+		this.scrollToBottom();
+	}
 
     render () {
 
@@ -74,11 +80,12 @@ export default class ExerciseConsole extends Component {
                             </Col>
                         </Form.Group>
                     </Form>;
-            }
-
+			}
+			
             return (
                 <div as={Row} style={{'width': '100%'}}>
-                    <Form.Control 
+					<Form.Control 
+						ref={this.consoleTextAreaRef}
                         style={{minHeight: '75px', maxHeight: '700px', boxShadow: 'none', fontFamily: 'Consolas, "Courier New", Courier, monospace', color: '#FFFFFF', backgroundColor: '#000000'}}
                         autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck="false"
                         as="textarea"
@@ -86,7 +93,7 @@ export default class ExerciseConsole extends Component {
                         name="console_output_textarea"
                         value={consoleMessages}
                         onChange={this.onChange}
-                        readOnly={false}
+                        readOnly={true}
                     />
                     {inputField}
                 </div>
@@ -106,12 +113,18 @@ export default class ExerciseConsole extends Component {
         // placeholder to prevent warning by console textfield
     }
 
-    addConsoleCacheEntry(at, entry) {
-        let tempCache = this.state.consoleCache;
-        tempCache[at] = entry;
-        this.setState({
-            consoleCache: tempCache
-        })
-    }
+	scrollToBottom = () => {
+		if (this.consoleTextAreaRef.current) {
+			this.consoleTextAreaRef.current.scrollTop = this.consoleTextAreaRef.current.scrollHeight;
+		}
+	};
+
+    // addConsoleCacheEntry(at, entry) {
+    //     let tempCache = this.state.consoleCache;
+    //     tempCache[at] = entry;
+    //     this.setState({
+    //         consoleCache: tempCache
+    //     })
+    // }
 
 }
