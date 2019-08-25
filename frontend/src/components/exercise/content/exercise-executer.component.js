@@ -5,7 +5,7 @@ import { Slider, Rail, Handles, Tracks } from 'react-compound-slider';
 import { Track } from '../slider/track';
 import { Handle } from '../slider/handle';
 
-import { Row,  ButtonGroup, DropdownButton, Dropdown, Button, ProgressBar } from 'react-bootstrap';
+import { Row,  ButtonGroup, DropdownButton, Dropdown, Button, ProgressBar, OverlayTrigger, Popover } from 'react-bootstrap';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFastBackward, faStepBackward, faPlay, faPause, faStepForward, faFastForward, faSpinner } from '@fortawesome/free-solid-svg-icons';
@@ -48,7 +48,9 @@ export default class ExerciseExecuter extends Component {
             isRunning: false,
 
             resetConsoleCache: false,
-            containsReadIn: false
+			containsReadIn: false,
+
+			codeType: "code"
         }
     }
 
@@ -65,11 +67,43 @@ export default class ExerciseExecuter extends Component {
             // progressBar = <div style={{height: '10px', backgroundColor: '#4e5d6d'}}></div>
         }
         
-        let runCodeButton = <Button style={{width: '230px'}} variant="success" onClick={this.runCode} >Run Code <FontAwesomeIcon style={{float: 'right', marginTop: '4px'}} icon={faPlay} /></Button>
-        if (this.state.isExecutingOnServer) {
-            runCodeButton = <Button style={{width: '230px'}} variant="success" onClick={this.runCode} ><span><FontAwesomeIcon style={{ 'marginRight': '12px'}} icon={faSpinner} pulse={true} size="lg" />Running...</span></Button>
+		let runCodeButton = <>
+			<Button
+				style={{width: this.props.isSolved ?'190px':'230px'}}
+				variant="success" onClick={(e) => this.runCode(e, "code")}
+			>
+				Run Code <FontAwesomeIcon style={{float: 'right', marginTop: '4px'}} icon={faPlay} />
+			</Button>
+			{ 
+				this.props.isSolved && 
+				<OverlayTrigger
+                        key="tooltipOverlayHighlighting"
+                        placement="top"
+                        delay={{'show': 0, 'hide': 128}}
+                        overlay={
+                            <Popover
+                                style={{ padding: '15px',background: 'rgba(0,0,0, 0.8)', backgroundColor: 'rgba(0,0,0, 0.8)', textAlign: 'left', wordBreak: 'keep-all', whiteSpace: 'pre'}}
+                                // arrowProps={style="{{background: 'rgba(0,0,0, 0.8)'}}"}
+                                id="tooltipRunSolutionButton"
+                            >
+								<b>Run Solution</b>
+							</Popover>
+                        }
+                    >
+						<Button
+							style={{width: '41px'}}
+							variant="warning" onClick={(e) => this.runCode(e, "solution")}
+						>
+							<FontAwesomeIcon icon={faPlay} />
+						</Button>
+                    </OverlayTrigger>
+			}
+		</>
+		
+		if (this.state.isExecutingOnServer) {
+            runCodeButton = <Button style={{width: '230px'}} variant="success" onClick={this.onChange} ><span><FontAwesomeIcon style={{ 'marginRight': '12px'}} icon={faSpinner} pulse={true} size="lg" />Running...</span></Button>
         } else if (this.state.result && (this.state.result.isGuiReadIn || this.state.result.isReadIn)) {
-            runCodeButton = <Button style={{width: '230px'}} variant="success" onClick={this.runCode} ><span><FontAwesomeIcon style={{ 'marginRight': '12px'}} icon={faSpinner} pulse={true} size="lg" />Waiting for User Input...</span></Button>
+            runCodeButton = <Button style={{width: '230px'}} variant="success" onClick={this.onChange} ><span><FontAwesomeIcon style={{ 'marginRight': '12px'}} icon={faSpinner} pulse={true} size="lg" />Waiting for User Input...</span></Button>
         }
 
 
@@ -237,17 +271,20 @@ export default class ExerciseExecuter extends Component {
 
 
 
-    runCode(e) {
+    runCode(e, codeType) {
+
+		codeType = codeType || "code";
 
         if (this.state.isExecutingOnServer) { // TODO allow to stop it if the button is pressed a second time? show stop icon and ask for confirmation?
             return;
         }
 
-        if (!this.props.didChangeCode && !this.state.containsReadIn && this.state.ranSubExerciseIndex === this.props.subExerciseIndex) {
+        if (!this.props.didChangeCode && !this.state.containsReadIn && this.state.ranSubExerciseIndex === this.props.subExerciseIndex && this.state.codeType === codeType) {
             this.props.setHighlighting({
 				subExerciseIndex: this.state.ranSubExerciseIndex,
                 node: this.state.result.node_data[this.state.result.steps[0].id],
-                step: this.state.result.steps[0]
+				step: this.state.result.steps[0],
+				codeType: this.state.codeType
             });
             this.setState({
                 step: 0
@@ -264,7 +301,7 @@ export default class ExerciseExecuter extends Component {
         for (let currentContent of this.props.subExercise.content) {
             if (currentContent.type === "editor") {
                 code_snippets[currentContent.identifier] = {
-                    code: currentContent.code
+                    code: currentContent[codeType]
                 }
             }
         }
@@ -276,8 +313,9 @@ export default class ExerciseExecuter extends Component {
 			subExerciseID: this.props.subExercise._id,
 			sourceFiles: (this.props.sendSourceFiles ? this.props.subExercise.sourceFiles : undefined),
 			code_snippets: code_snippets,
-			highlightingDetailLevelIndex: this.props.subExercise.highlightingDetailLevelIndex || 0
-        };
+			highlightingDetailLevelIndex: this.props.subExercise.highlightingDetailLevelIndex || 0,
+			persistCode: codeType === "code" && !this.props.sendSourceFiles
+		};
 
         log(data);
         
@@ -292,7 +330,8 @@ export default class ExerciseExecuter extends Component {
         
         this.setState({
 			isExecutingOnServer: true,
-			ranSubExerciseIndex: this.props.subExerciseIndex
+			ranSubExerciseIndex: this.props.subExerciseIndex,
+			codeType: codeType
         });
 
         Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/exercise/run', data, options)
@@ -344,7 +383,8 @@ export default class ExerciseExecuter extends Component {
 					this.props.setHighlighting({
 						subExerciseIndex: this.state.ranSubExerciseIndex,
 						node: json.node_data[json.steps[startAtStep].id],
-						step: json.steps[startAtStep]
+						step: json.steps[startAtStep],
+						codeType: this.state.codeType
 					});
 					this.setState({
 						result: json,
@@ -377,7 +417,8 @@ export default class ExerciseExecuter extends Component {
             this.props.setHighlighting({
 				subExerciseIndex: this.state.ranSubExerciseIndex,
                 node: this.state.result.node_data[this.state.result.steps[this.state.step+1].id],
-                step: this.state.result.steps[this.state.step+1]
+                step: this.state.result.steps[this.state.step+1],
+				codeType: this.state.codeType
             });
             this.setState({
                 step: this.state.step+1,
@@ -400,7 +441,8 @@ export default class ExerciseExecuter extends Component {
             this.props.setHighlighting({
 				subExerciseIndex: this.state.ranSubExerciseIndex,
                 node: this.state.result.node_data[this.state.result.steps[0].id],
-                step: this.state.result.steps[0]
+                step: this.state.result.steps[0],
+				codeType: this.state.codeType
             });
             this.setState({
                 step: 0
@@ -417,7 +459,8 @@ export default class ExerciseExecuter extends Component {
                 this.props.setHighlighting({
 					subExerciseIndex: this.state.ranSubExerciseIndex,
                     node: this.state.result.node_data[this.state.result.steps[this.state.step+1].id],
-                    step: this.state.result.steps[this.state.step+1]
+                    step: this.state.result.steps[this.state.step+1],
+					codeType: this.state.codeType
                 });
                 this.setState({
                     step: this.state.step+1
@@ -426,7 +469,8 @@ export default class ExerciseExecuter extends Component {
                 this.props.setHighlighting({
 					subExerciseIndex: this.state.ranSubExerciseIndex,
                     node: this.state.result.node_data[this.state.result.steps[0].id],
-                    step: this.state.result.steps[0]
+                    step: this.state.result.steps[0],
+					codeType: this.state.codeType
                 });
                 this.setState({
                     step: 0
@@ -444,7 +488,8 @@ export default class ExerciseExecuter extends Component {
                     this.props.setHighlighting({
 						subExerciseIndex: this.state.ranSubExerciseIndex,
                         node: this.state.result.node_data[this.state.result.steps[0].id],
-                        step: this.state.result.steps[0]
+                        step: this.state.result.steps[0],
+						codeType: this.state.codeType
                     });
                     this.setState({
                         step: 0
@@ -475,7 +520,8 @@ export default class ExerciseExecuter extends Component {
                 this.props.setHighlighting({
 					subExerciseIndex: this.state.ranSubExerciseIndex,
                     node: this.state.result.node_data[this.state.result.steps[this.state.step-1].id],
-                    step: this.state.result.steps[this.state.step-1]
+                    step: this.state.result.steps[this.state.step-1],
+					codeType: this.state.codeType
                 });
                 this.setState({
                     step: this.state.step-1
@@ -484,7 +530,8 @@ export default class ExerciseExecuter extends Component {
                 this.props.setHighlighting({
 					subExerciseIndex: this.state.ranSubExerciseIndex,
                     node: this.state.result.node_data[this.state.result.steps[this.state.result.steps.length-1].id],
-                    step: this.state.result.steps[this.state.result.steps.length-1]
+                    step: this.state.result.steps[this.state.result.steps.length-1],
+					codeType: this.state.codeType
                 });
                 this.setState({
                     step: this.state.result.steps.length-1
@@ -501,7 +548,8 @@ export default class ExerciseExecuter extends Component {
             this.props.setHighlighting({
 				subExerciseIndex: this.state.ranSubExerciseIndex,
                 node: this.state.result.node_data[this.state.result.steps[this.state.result.steps.length-1].id],
-                step: this.state.result.steps[this.state.result.steps.length-1]
+                step: this.state.result.steps[this.state.result.steps.length-1],
+				codeType: this.state.codeType
             });
             this.setState({
                 step: this.state.result.steps.length-1

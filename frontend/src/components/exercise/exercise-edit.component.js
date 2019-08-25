@@ -315,6 +315,7 @@ export default class ExerciseEdit extends Component {
 								sendSourceFiles={true}
 								largeMargin={false}
 								setHighlightingDetailLevelIndex={this.setHighlightingDetailLevelIndexSubExercise}
+								isSolved={true}
 							/>
 						</Tab>
                         <Tab variant="primary" eventKey="source-file" title="Source Files">

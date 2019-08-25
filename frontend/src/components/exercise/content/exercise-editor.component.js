@@ -37,7 +37,7 @@ export default class ExerciseEditor extends Component {
             let sizeColumn = getLetterWidth();
             let sizeLine = getLetterHeight();
 
-            let x = 46 + sizeColumn * (node.columnStart-1) + sizeColumn * (('' + ((this.props.content.code.match(/\r\n|\r|\n/g) || '').length + 1)).length-1);
+            let x = 46 + sizeColumn * (node.columnStart-1) + sizeColumn * (('' + ((this.props.content[this.props.highlighting.codeType].match(/\r\n|\r|\n/g) || '').length + 1)).length-1);
             let y = sizeLine * node.lineStart;
 
             let w;
@@ -136,7 +136,7 @@ export default class ExerciseEditor extends Component {
 				}
 				
                 <Row style={{'marginLeft': '0px', 'marginBottom': '20px', 'marginTop': '20px', 'borderColor': (this.state.codeType === "code" ? '#538135' : '#53CC35'), 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%', boxShadow: '2px 2px 5px #000000'}}>
-					{this.state.codeType === "code" && (highlightOverlay || errorOverlay)}
+					{(this.props.highlighting && this.state.codeType === this.props.highlighting.codeType && highlightOverlay) || errorOverlay}
 					<AceEditor	
 						mode="java"
 						theme="monokai"
@@ -201,7 +201,7 @@ export default class ExerciseEditor extends Component {
 						<Tab variant="primary" eventKey="solution" title="Solution" style={{width: "100%"}}></Tab>
 					</Tabs>
 					<div style={{'marginLeft': '0px', 'borderColor': (this.state.codeType === "code" ? '#538135' : '#53CC35'), 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', 'width': '100%', boxShadow: '2px 2px 5px #000000'}}>
-						{highlightOverlay}
+						{(this.props.highlighting && this.state.codeType === this.props.highlighting.codeType && highlightOverlay) || errorOverlay}
 						<AceEditor
 							mode="java"
 							theme="monokai"

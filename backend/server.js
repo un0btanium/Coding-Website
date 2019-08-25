@@ -748,6 +748,7 @@ app.route("/api/exercise/run")
 		let subExerciseID = req.body.subExerciseID;
 		let highlightingDetailLevelIndex = req.body.highlightingDetailLevelIndex;
 		let userData = req.tokenData;
+		let persistCode = req.body.persistCode;
 
         Course.findById(courseID, function (err, course) {
             if (!course) {
@@ -762,7 +763,7 @@ app.route("/api/exercise/run")
 				}
 
 				// PERSIST USER CODE (only in solve mode)
-				if (sourceFilesUser === undefined) {
+				if (persistCode) {
 					User.findById(userData.userId, function (err, user) {
 						if (!err) {
 
@@ -958,7 +959,17 @@ app.route("/api/exercise/run")
             }
         });
 
-    });
+	});
+	
+
+
+// app.route("/api/ElectronApp.zip")
+
+// 	.get(function (req, res) {
+// 		const file = `${__dirname}/electron-app/CodingBuddy.zip`;
+// 		res.download(file);
+// 	});
+
 
 
 app.listen(PORT, function () {
