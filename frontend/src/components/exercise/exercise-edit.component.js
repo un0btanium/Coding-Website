@@ -396,60 +396,76 @@ export default class ExerciseEdit extends Component {
 	}
 
 	addNewSubExercise() {
-		this.setState({
-			contentIDCounter: this.state.contentIDCounter+4,
-			exercise: update(this.state.exercise, {
-				subExercises: {
-					$push: [
-						{
-							highlightingDetailLevelIndex: this.state.exercise.highlightingDetailLevelIndex,
-							content: [
-								{
-									_id: "NEW " + this.state.contentIDCounter,
-									type: "title",
-									text: ""
-								},
-								{
-									_id: "NEW " + this.state.contentIDCounter+1,
-									type: "text",
-									text: ""
-								},
-								{
-									_id: "NEW " + this.state.contentIDCounter+2,
-									type: "editor",
-									identifier: "main_method_body",
-									code: "",
-									solution: "",
-									settings: {
-										minLines: 5
-									}
-								}
-							],
-							sourceFiles: [{
-								_id: "NEW " + this.state.contentIDCounter+3,
-								package: "main",
-								name: "Main",
-								code: "package main;\n" + 
-								"\n" + 
-								"import java.util.*;\n" + 
-								"import java.io.*;\n" + 
-								"import java.math.*;\n" + 
-								"\n" + 
-								"import java.io.Console;\n" + 
-								"\n" + 
-								"public class Main {\n" + 
-								"    \n" + 
-								"    public static void main(String[] args) {\n" + 
-								"// main_method_body\n" + 
-								"    }\n" + 
-								"    \n" + 
-								"}"
-							}]
-						}
-					]
+
+		let newSubExercise = {
+			highlightingDetailLevelIndex: this.state.exercise.highlightingDetailLevelIndex,
+			content: [
+				{
+					_id: "NEW " + this.state.contentIDCounter,
+					type: "title",
+					text: ""
+				},
+				{
+					_id: "NEW " + this.state.contentIDCounter+1,
+					type: "text",
+					text: ""
+				},
+				{
+					_id: "NEW " + this.state.contentIDCounter+2,
+					type: "editor",
+					identifier: "main_method_body",
+					code: "",
+					solution: "",
+					settings: {
+						minLines: 5
+					}
 				}
+			],
+			sourceFiles: [{
+				_id: "NEW " + this.state.contentIDCounter+3,
+				package: "main",
+				name: "Main",
+				code: "package main;\n" + 
+				"\n" + 
+				"import java.util.*;\n" + 
+				"import java.io.*;\n" + 
+				"import java.math.*;\n" + 
+				"\n" + 
+				"import java.io.Console;\n" + 
+				"\n" + 
+				"public class Main {\n" + 
+				"    \n" + 
+				"    public static void main(String[] args) {\n" + 
+				"// main_method_body\n" + 
+				"    }\n" + 
+				"    \n" + 
+				"}"
+			}]
+		};
+
+		if (this.state.subExerciseIndex === this.state.exercise.subExercises.length-1) {
+			this.setState({
+				contentIDCounter: this.state.contentIDCounter+4,
+				exercise: update(this.state.exercise, {
+					subExercises: {
+						$push: [
+							newSubExercise
+						]
+					}
+				})
 			})
-		})
+		} else {
+			let newSubExerciseArray = [...this.state.exercise.subExercises];
+			newSubExerciseArray.splice(this.state.subExerciseIndex+1, 0, newSubExercise);
+			this.setState({
+				contentIDCounter: this.state.contentIDCounter+4,
+				exercise: update(this.state.exercise, {
+					subExercises: {
+						$set: newSubExerciseArray
+					}
+				})
+			})
+		}
 	}
 
 	deleteSubExcerise(e, index) {
