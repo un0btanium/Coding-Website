@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router'
 import { BrowserRouter as Router, Route, Redirect} from "react-router-dom";
 import { Link } from 'react-router-dom';
+// import { download } from "downloadjs";
 
 import { isAuthenticated, getUserData, logoutUser, loginUser } from "./services/Authentication";
 
@@ -136,8 +137,9 @@ class App extends Component {
 					<Nav.Link as={Link} style={{ marginRight: '25px'}} to="/processes">Processes</Nav.Link>
 				</>
 			}
-          <Navbar.Text style={{ marginTop:'2px'}}>Signed in as: {this.state.user ? (this.state.user.name || this.state.user.email) : "unknown"}</Navbar.Text>
-          <Nav.Link as={Button} style={{ marginLeft: '5px', width: '80px'}} onClick={this.logOutUser}>Logout</Nav.Link>
+			{/* <Nav.Link as={Button} style={{ marginLeft: '5px', width: '80px'}} onClick={(e) => this.downloadElectronApp(e)}>ElectronApp</Nav.Link> */}
+			<Navbar.Text style={{ marginTop:'2px'}}>Signed in as: {this.state.user ? (this.state.user.name || this.state.user.email) : "unknown"}</Navbar.Text>
+			<Nav.Link as={Button} style={{ marginLeft: '5px', width: '80px'}} onClick={this.logOutUser}>Logout</Nav.Link>
         </Nav>;
     } else {
       rightNavbar = <Nav>
@@ -193,6 +195,18 @@ class App extends Component {
     </Router>
     );
   }
+
+	// async downloadElectronApp(e) {
+	// 	e.preventDefault();
+	// 	const res = await fetch(process.env.REACT_APP_BACKEND_SERVER + '/downloadelectronapp');
+	// 	const blob = await res.blob()
+	// 	download(process.env.REACT_APP_BACKEND_SERVER + '/ElectronApp.zip');
+
+	// 	Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/downloadelectronapp')
+	// 	.then((response) => {
+	// 		downloadFile(response.blob(), 'CodingBuddy.zip', 'application/zip');
+	// 	});
+	// }
 }
 
 export default withRouter(App);
