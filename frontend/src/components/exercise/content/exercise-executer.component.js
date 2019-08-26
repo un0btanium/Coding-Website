@@ -259,8 +259,11 @@ export default class ExerciseExecuter extends Component {
                     // TODO stop code execution because something went wrong
                 }
             })
-            .catch(function (error) {
+            .catch((error) => {
                 logError(error);
+                this.setState({
+					result: null
+                });
             })
             .finally(() => {
                 this.setState({
