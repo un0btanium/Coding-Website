@@ -32,6 +32,11 @@ export default class ExerciseConsole extends Component {
         let consoleMessages = "";
         let inputField = null;
         if (this.props.result && this.props.step >= 0) {
+			
+			if (this.props.step === 0) {
+				consoleCache = {};
+				log("Resetting console cache");
+			}
 
             let stepStart = 0;
             let lastCachePoint = this.props.step - (this.props.step % CACHE_STEPS);
@@ -48,12 +53,6 @@ export default class ExerciseConsole extends Component {
                     consoleCache[i] = consoleMessages;
                     log("Saving console cache " + i);
                 }
-			}
-			
-			
-			if (this.props.resetConsoleCache) {
-				consoleCache = {};
-				log("Resetting console cache");
 			}
 
             let type = this.props.result.steps[this.props.step].type;
