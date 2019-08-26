@@ -237,6 +237,7 @@ export default class ExerciseEdit extends Component {
 					<div style={{ width: "100%", textAlign: "center"}}>
 						<ProgressArrows
 							arrows={this.state.exercise.subExercises}
+							current={this.state.exercise.subExercises[this.state.subExerciseIndex]._id}
 							onClick={(e, i) => {
 								this.setState({ subExerciseIndex: i });
 							}}
