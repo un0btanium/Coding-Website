@@ -29,11 +29,6 @@ export default class ExerciseConsole extends Component {
 
     render () {
 
-        if (this.props.resetConsoleCache) {
-            consoleCache = {};
-            log("Resetting console cache");
-        }
-
         let consoleMessages = "";
         let inputField = null;
         if (this.props.result && this.props.step >= 0) {
@@ -53,7 +48,13 @@ export default class ExerciseConsole extends Component {
                     consoleCache[i] = consoleMessages;
                     log("Saving console cache " + i);
                 }
-            }
+			}
+			
+			
+			if (this.props.resetConsoleCache) {
+				consoleCache = {};
+				log("Resetting console cache");
+			}
 
             let type = this.props.result.steps[this.props.step].type;
             if (type && type === "htmlGui") {
