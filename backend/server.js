@@ -821,9 +821,11 @@ app.route("/api/exercise/run")
 				}
 				
 
-				let sourceFiles = exercise.subExercises[subExerciseIndex].sourceFiles;
+				let sourceFiles = [];
 				if (sourceFilesUser !== undefined && sourceFilesUser !== null) { // user ran in Edit mode
 					sourceFiles = sourceFilesUser;
+				} else {
+					sourceFiles = exercise.subExercises[subExerciseIndex].sourceFiles;
 				}
 
 				if (isElectronApp) {
