@@ -725,13 +725,14 @@ app.route("/api/exercise/input")
 
             });
             try {
-                javaChild.stdin.write(input);
-                javaChild.stdin.end();
+                javaChild.stdin.write(input + '\n');
             } catch (e) {
                 console.log(e);
+				res.status(400).json({});
             }
         } else {
 			console.warn("No java process available anymore to write to!");
+			res.status(400).json({});
 			// TODO send response to cancel code execution clientside
         }
     });
