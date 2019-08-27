@@ -23,8 +23,8 @@ const URLS = {
 	}
 }
 
-const CODING_BUDDY_URLS = URLS["development"];
-// const CODING_BUDDY_URLS = URLS["production"];
+// const CODING_BUDDY_URLS = URLS["development"];
+const CODING_BUDDY_URLS = URLS["production"];
 
 console.log(CODING_BUDDY_URLS)
 
