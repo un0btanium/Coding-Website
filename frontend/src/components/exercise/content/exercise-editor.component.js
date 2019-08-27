@@ -21,7 +21,7 @@ export default class ExerciseEditor extends Component {
 		super(props);
 
 		this.state = {
-			codeType: "code"
+			codeType: this.props.mode === "solve" ? "code" : "solution"
 		}
 	}
 
