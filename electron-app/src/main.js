@@ -191,8 +191,8 @@ expressApp.route("/api/exercise/run")
 					res.dataArray = [];
 					let javaExe = "java";
 					if (os.platform() === 'win32') {
-						// TODO improve!
-						javaExe = "C:" + path.sep + "Program Files" + path.sep + "Java" + path.sep + "jdk-11" + path.sep + "bin" + path.sep + "java.exe";
+						// javaExe = "C:" + path.sep + "Program Files" + path.sep + "Java" + path.sep + "jdk-11" + path.sep + "bin" + path.sep + "java.exe";
+						javaExe = "java";
 					}
 					let processOptions = { maxBuffer: 1024*1024*1024 ,timeout: 30*1000, /* windowsHide: false */ };
 					let filePath = __dirname + path.sep + "java" + path.sep + "executer.jar";
