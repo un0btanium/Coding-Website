@@ -43,7 +43,7 @@ export default class ExerciseExecuter extends Component {
         this.state = {
 			ranSubExerciseIndex: 0,
             isExecutingOnServer: false,
-            result: null,
+            result: undefined,
             step: 0,
             delay: 128,
             isRunning: false,
@@ -279,7 +279,7 @@ export default class ExerciseExecuter extends Component {
             return;
         }
 
-        if (!this.props.didChangeCode && !this.state.containsReadIn && this.state.ranSubExerciseIndex === this.props.subExerciseIndex && this.state.codeType === codeType) {
+        if (!this.props.didChangeCode && this.state.result && !this.state.result.isUsingMathRandom && !this.state.containsReadIn && this.state.ranSubExerciseIndex === this.props.subExerciseIndex && this.state.codeType === codeType) {
             this.props.setHighlighting({
 				subExerciseIndex: this.state.ranSubExerciseIndex,
                 node: this.state.result.node_data[this.state.result.steps[0].id],
