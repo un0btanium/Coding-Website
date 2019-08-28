@@ -26,7 +26,13 @@ export default class ExerciseEditor extends Component {
 	}
 
     render () {
-        
+		
+		if (this.props.highlighting && this.props.highlighting.currentStep === 0 && this.props.highlighting.codeType !== this.state.codeType) {
+			this.setState({
+				codeType: this.props.highlighting.codeType
+			});
+		}
+
 		let highlightOverlay = null;
 		if (this.props.highlighting &&
 			this.props.highlighting.node !== undefined &&

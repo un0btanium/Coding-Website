@@ -287,7 +287,8 @@ export default class ExerciseExecuter extends Component {
 				subExerciseIndex: this.state.ranSubExerciseIndex,
                 node: this.state.result.node_data[this.state.result.steps[0].id],
 				step: this.state.result.steps[0],
-				codeType: this.state.codeType
+                codeType: this.state.codeType,
+                currentStep: 0
             });
             this.setState({
                 step: 0
@@ -387,7 +388,8 @@ export default class ExerciseExecuter extends Component {
 						subExerciseIndex: this.state.ranSubExerciseIndex,
 						node: json.node_data[json.steps[startAtStep].id],
 						step: json.steps[startAtStep],
-						codeType: this.state.codeType
+						codeType: this.state.codeType,
+                        currentStep: startAtStep
 					});
 					this.setState({
 						result: json,
@@ -421,7 +423,8 @@ export default class ExerciseExecuter extends Component {
 				subExerciseIndex: this.state.ranSubExerciseIndex,
                 node: this.state.result.node_data[this.state.result.steps[this.state.step+1].id],
                 step: this.state.result.steps[this.state.step+1],
-				codeType: this.state.codeType
+				codeType: this.state.codeType,
+                currentStep: this.state.step+1
             });
             this.setState({
                 step: this.state.step+1,
@@ -445,7 +448,8 @@ export default class ExerciseExecuter extends Component {
 				subExerciseIndex: this.state.ranSubExerciseIndex,
                 node: this.state.result.node_data[this.state.result.steps[0].id],
                 step: this.state.result.steps[0],
-				codeType: this.state.codeType
+				codeType: this.state.codeType,
+                currentStep: 0
             });
             this.setState({
                 step: 0
@@ -463,7 +467,8 @@ export default class ExerciseExecuter extends Component {
 					subExerciseIndex: this.state.ranSubExerciseIndex,
                     node: this.state.result.node_data[this.state.result.steps[this.state.step+1].id],
                     step: this.state.result.steps[this.state.step+1],
-					codeType: this.state.codeType
+					codeType: this.state.codeType,
+                    currentStep: this.state.step+1
                 });
                 this.setState({
                     step: this.state.step+1
@@ -473,7 +478,8 @@ export default class ExerciseExecuter extends Component {
 					subExerciseIndex: this.state.ranSubExerciseIndex,
                     node: this.state.result.node_data[this.state.result.steps[0].id],
                     step: this.state.result.steps[0],
-					codeType: this.state.codeType
+					codeType: this.state.codeType,
+                    currentStep: 0
                 });
                 this.setState({
                     step: 0
@@ -492,7 +498,8 @@ export default class ExerciseExecuter extends Component {
 						subExerciseIndex: this.state.ranSubExerciseIndex,
                         node: this.state.result.node_data[this.state.result.steps[0].id],
                         step: this.state.result.steps[0],
-						codeType: this.state.codeType
+						codeType: this.state.codeType,
+                        currentStep: 0
                     });
                     this.setState({
                         step: 0
@@ -524,7 +531,8 @@ export default class ExerciseExecuter extends Component {
 					subExerciseIndex: this.state.ranSubExerciseIndex,
                     node: this.state.result.node_data[this.state.result.steps[this.state.step-1].id],
                     step: this.state.result.steps[this.state.step-1],
-					codeType: this.state.codeType
+					codeType: this.state.codeType,
+                    currentStep: this.state.step-1
                 });
                 this.setState({
                     step: this.state.step-1
@@ -534,7 +542,8 @@ export default class ExerciseExecuter extends Component {
 					subExerciseIndex: this.state.ranSubExerciseIndex,
                     node: this.state.result.node_data[this.state.result.steps[this.state.result.steps.length-1].id],
                     step: this.state.result.steps[this.state.result.steps.length-1],
-					codeType: this.state.codeType
+					codeType: this.state.codeType,
+                    currentStep: this.state.step-1
                 });
                 this.setState({
                     step: this.state.result.steps.length-1
@@ -552,7 +561,8 @@ export default class ExerciseExecuter extends Component {
 				subExerciseIndex: this.state.ranSubExerciseIndex,
                 node: this.state.result.node_data[this.state.result.steps[this.state.result.steps.length-1].id],
                 step: this.state.result.steps[this.state.result.steps.length-1],
-				codeType: this.state.codeType
+				codeType: this.state.codeType,
+                currentStep: this.state.result.steps.length-1
             });
             this.setState({
                 step: this.state.result.steps.length-1
