@@ -82,12 +82,15 @@ expressApp.route("/api/exercise/input")
                         }
                     } catch (e) {
                         console.error(e);
+						res.status(400).json({});
                     }
                 }
             });
             javaChild.stderr.on('data', function (err) {
                 console.log("stderr input");
                 if (err && !res.isDataSend) {
+					res.isDataSend = true;
+					res.status(400).json({});
                     console.log(err.toString()); // TODO send to client and print on screen (warp in json error step)
                 }
             });
@@ -104,6 +107,8 @@ expressApp.route("/api/exercise/input")
 
                 if (exitCode === null) {
                     console.log("canceled response (exitCode ist null)");
+					res.isDataSend = true;
+					res.status(400).json({});
                     return;
                 }
 
@@ -139,13 +144,14 @@ expressApp.route("/api/exercise/input")
 
             });
             try {
-                javaChild.stdin.write(input);
-                javaChild.stdin.end();
+                javaChild.stdin.write(input + '\n');
             } catch (e) {
                 console.log(e);
+				res.status(400).json({});
             }
         } else {
 			console.warn("No java process available anymore to write to!");
+			res.status(400).json({});
 			// TODO send response to cancel code execution clientside
         }
 	});
@@ -197,7 +203,16 @@ expressApp.route("/api/exercise/run")
 					let processOptions = { maxBuffer: 1024*1024*1024 ,timeout: 30*1000, /* windowsHide: false */ };
 					let filePath = __dirname + path.sep + "java" + path.sep + "executer.jar";
 
-					let javaChild = spawn(javaExe, ["-jar", filePath, JSON.stringify(arg)], processOptions);
+					let javaChild;
+
+					try {
+						javaChild = spawn(javaExe, ["-jar", filePath, JSON.stringify(arg)], processOptions);
+					} catch (e) {
+						console.log("No java installed or missing JAVA_HOME and/or PATH entry")
+						res.isDataSend = true;
+						res.status(400).json({ errMsg: "No java installed or missing JAVA_HOME and/or PATH entry"});
+						return;
+					}
 	
 					javaProcess = javaChild;
 
@@ -242,6 +257,8 @@ expressApp.route("/api/exercise/run")
 					javaChild.stderr.on('data', function (err) {
 						console.log("stderr run");
 						if (err && !res.isDataSend) {
+							res.isDataSend = true;
+							res.status(400).json({});
 							console.log(err.toString()); // TODO send to client and print on screen (warp in json error step)
 						}
 					});

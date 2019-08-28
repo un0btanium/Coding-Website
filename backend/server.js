@@ -674,6 +674,8 @@ app.route("/api/exercise/input")
             javaChild.stderr.on('data', function (err) {
                 console.log("stderr input");
                 if (err && !res.isDataSend) {
+					res.isDataSend = true;
+					res.status(400).json({});
                     console.log(err.toString()); // TODO send to client and print on screen (warp in json error step)
                 }
             });
@@ -910,6 +912,8 @@ app.route("/api/exercise/run")
                 javaChild.stderr.on('data', function (err) {
                     console.log("stderr run");
                     if (err && !res.isDataSend) {
+                        res.isDataSend = true;
+                        res.status(400).json({});
                         console.log(err.toString()); // TODO send to client and print on screen (warp in json error step)
                     }
                 });

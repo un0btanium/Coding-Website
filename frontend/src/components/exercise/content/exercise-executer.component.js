@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import Axios from 'axios';
+import { toast } from 'react-toastify';
 
 import { Slider, Rail, Handles, Tracks } from 'react-compound-slider';
 import { Track } from '../slider/track';
@@ -346,6 +347,7 @@ export default class ExerciseExecuter extends Component {
             })
             .catch(function (error) {
                 logError(error);
+                toast(<div style={{textAlign: "center"}}>Code execution failed!<br/>{error.errMsg}</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
             })
             .finally(() => {
                 this.setState({
