@@ -48,7 +48,6 @@ export default class ExerciseExecuter extends Component {
             delay: 128,
             isRunning: false,
 
-            resetConsoleCache: false,
 			containsReadIn: false,
 
 			codeType: "code"
@@ -113,7 +112,6 @@ export default class ExerciseExecuter extends Component {
                 result={this.state.result}
                 step={this.state.step}
                 onConsoleInput={this.onConsoleInput}
-                resetConsoleCache={this.state.resetConsoleCache}
             />
 
         let HTMLGUIComponent = 
@@ -223,7 +221,7 @@ export default class ExerciseExecuter extends Component {
 
 
     onConsoleInput(e, value) {
-        e.preventDefault()
+		e.preventDefault()
 
         if (this.state.result) {
             let type = this.state.result.steps[this.state.step].type;
@@ -237,13 +235,13 @@ export default class ExerciseExecuter extends Component {
         }
 
         let options = {
-            timeout: 60*1000, // TODO adjust?
+            timeout: 10*1000, // TODO adjust?
             // responseType: 'stream',
             maxContentLength: 1000000000,
             headers: {
                 "Content-Type": "application/json"
             }
-        };
+		};
         
         this.setState({
             isExecutingOnServer: true,
@@ -253,7 +251,7 @@ export default class ExerciseExecuter extends Component {
         Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/exercise/input', data, options)
             .then(response => {
                 if (response.status === 200) {
-                    log(response);
+					log(response);
                     this.saveCodeResponse(response.data.compressedJson, this.state.result.steps.length-1);
                 } else {
                     log(response);
@@ -261,10 +259,8 @@ export default class ExerciseExecuter extends Component {
                 }
             })
             .catch((error) => {
-                logError(error);
-                this.setState({
-					result: null
-                });
+				toast(<div style={{textAlign: "center"}}>Code execution failed!<br/>{error.response && error.response.data ? error.response.data.errMsg || "" : ""}</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
+				logError(error);
             })
             .finally(() => {
                 this.setState({
@@ -345,10 +341,10 @@ export default class ExerciseExecuter extends Component {
                     this.saveCodeResponse(response.data.compressedJson, 0);
                 }
             })
-            .catch(function (error) {
+            .catch((error) => {
                 logError(error);
-                toast(<div style={{textAlign: "center"}}>Code execution failed!<br/>{error.errMsg}</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
-            })
+                toast(<div style={{textAlign: "center"}}>Code execution failed!<br/>{error.response && error.response.data ? error.response.data.errMsg || "" : ""}</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
+			})
             .finally(() => {
                 this.setState({
                     isExecutingOnServer: false,
@@ -380,7 +376,6 @@ export default class ExerciseExecuter extends Component {
             }
             if (startAtStep === 0) {
                 this.setState({
-                    resetConsoleCache: true,
                     step: 0
                 });
 			}
@@ -396,8 +391,7 @@ export default class ExerciseExecuter extends Component {
 					this.setState({
 						result: json,
 						step: startAtStep,
-						isRunning: true,
-						resetConsoleCache: false
+						isRunning: true
 					});
 					this.props.onRanCode();
 					timeout = setTimeout(this.simulateNextStep, this.state.delay + (startAtStep === 0 ? 64 : 0));

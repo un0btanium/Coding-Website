@@ -39,121 +39,24 @@ let javaProcess = undefined;
 
 expressApp.route("/api/exercise/input")
 	.post(function (req, res) {
+		let input = req.body.input;
 
-        let input = req.body.input;
+        if (input !== undefined && javaProcess !== undefined && javaProcess.process != undefined) {
+			console.log("Writing input '" + input + "' to java process!");
+			
+			javaProcess.res = res;
 
-        if (input !== null && javaProcess !== undefined && !javaProcess.killed) {
-            console.log("Writing input '" + input + "' to java process!");
-            let javaChild = javaProcess;
-
-            res.dataArray = [];
-
-            javaChild.stdout.on('data', function (data) {
-                console.log("stdout input");
-                if (data && !res.isDataSend) {
-					res.dataArray.push(data);
-					
-                    try {
-                        let buffers = [];
-                        for (let buffer of res.dataArray) {
-                            buffers.push(Buffer.from(buffer));
-                        }
-
-                        let finalBuffer = Buffer.concat(buffers);
-
-                        try {
-                            let jsonString = finalBuffer.toString()
-                            if (jsonString.includes("}",jsonString.length-4)) {
-                                let json = JSON.parse(jsonString); // checks if it is the end of the json string, throws error if it isnt
-                                
-                                if (json !== null && (json.isReadIn || json.isGuiReadIn)) {
-                                    let compressedJson = lzstring.compressToBase64(jsonString);
-                                    let jsonMessage = {
-                                        compressedJson: compressedJson
-                                    };
-                                    
-									res.dataArray = [];
-                                    res.isDataSend = true;
-                                    res.status(200).json(jsonMessage);
-                                }
-                            }
-                        } catch (e) {
-                            console.error("Not the end of json string!");
-                        }
-                    } catch (e) {
-                        console.error(e);
-						res.status(400).json({});
-                    }
-                }
-            });
-            javaChild.stderr.on('data', function (err) {
-                console.log("stderr input");
-                if (err && !res.isDataSend) {
-					res.isDataSend = true;
-					res.status(400).json({});
-                    console.log(err.toString()); // TODO send to client and print on screen (warp in json error step)
-                }
-            });
-            javaChild.on('close', function (exitCode) {
-                console.log("close input");
-                console.log(exitCode);
-                
-                if (res.isDataSend) {
-                    console.log("canceled response (data was already send)");
-                    return;
-                }
-
-                javaProcess = undefined;
-
-                if (exitCode === null) {
-                    console.log("canceled response (exitCode ist null)");
-					res.isDataSend = true;
-					res.status(400).json({});
-                    return;
-                }
-
-                
-                let buffers = [];
-                for (let buffer of res.dataArray) {
-                    buffers.push(Buffer.from(buffer));
-                }
-
-                let finalBuffer = Buffer.concat(buffers);
-
-                // console.log(finalBuffer.toString());
-                try {
-                    let jsonString = finalBuffer.toString()
-                    if (jsonString.includes("}",jsonString.length-4)) {
-                        JSON.parse(jsonString); // checks if this is valid json
-
-                        let compressedJson = lzstring.compressToBase64(jsonString);
-                        let jsonMessage = {
-                            compressedJson: compressedJson
-                        };
-                        
-						res.dataArray = [];
-                        res.isDataSend = true;
-                        res.status(200).json(jsonMessage);
-                    }
-                } catch (e) {
-                    console.error(e);
-					res.dataArray = [];
-                    res.isDataSend = true;
-                    res.status(400).json({});
-                }
-
-            });
             try {
-                javaChild.stdin.write(input + '\n');
+                javaProcess.process.stdin.write(input + '\n');
             } catch (e) {
                 console.log(e);
-				res.status(400).json({});
+				javaProcess.res.status(400).send({ errMsg: "Unable to write to program!" });
             }
         } else {
 			console.warn("No java process available anymore to write to!");
-			res.status(400).json({});
-			// TODO send response to cancel code execution clientside
-        }
+			res.status(400).send({errMsg: "Java program was already termined!"});
+			javaProcess = undefined;
+		}
 	});
 
 expressApp.route("/api/exercise/run")
@@ -194,43 +97,47 @@ expressApp.route("/api/exercise/run")
 						javaProcess = undefined;
 					}
 
-					res.dataArray = [];
 					let javaExe = "java";
 					if (os.platform() === 'win32') {
 						// javaExe = "C:" + path.sep + "Program Files" + path.sep + "Java" + path.sep + "jdk-11" + path.sep + "bin" + path.sep + "java.exe";
 						javaExe = "java";
 					}
-					let processOptions = { maxBuffer: 1024*1024*1024 ,timeout: 30*1000, /* windowsHide: false */ };
+					let processOptions = { };
 					let filePath = __dirname + path.sep + "java" + path.sep + "executer.jar";
 
-					let javaChild;
+					let javaChild = undefined;
 
 					try {
-						javaChild = spawn(javaExe, ["-jar", filePath, JSON.stringify(arg)], processOptions);
+						javaChild = spawn(javaExe, ["-jar", "-Dfile.encoding=UTF-8", filePath, JSON.stringify(arg)], processOptions);
 					} catch (e) {
 						console.log("No java installed or missing JAVA_HOME and/or PATH entry")
-						res.isDataSend = true;
-						res.status(400).json({ errMsg: "No java installed or missing JAVA_HOME and/or PATH entry"});
+						res.status(400).send({ errMsg: "No java installed or missing JAVA_HOME and/or PATH entry"});
 						return;
 					}
 	
-					javaProcess = javaChild;
+					javaProcess = {
+						res: res,
+						dataArray: [],
+						process: javaChild
+					};
 
+					javaChild.stdin.setDefaultEncoding("UTF-8");
+					
 					javaChild.stdout.on('data', function (data) {
-						console.log("stdout run");
-						if (data && !res.isDataSend) {
-							res.dataArray.push(data);
+						console.log("out")
+						if (data && javaProcess.res) {
+							javaProcess.dataArray.push(data);
 							
 							try {
 								let buffers = [];
-								for (let buffer of res.dataArray) {
-									buffers.push(Buffer.from(buffer));
+								for (let buffer of javaProcess.dataArray) {
+									buffers.push(Buffer.from(buffer, "utf-8"));
 								}
 		
 								let finalBuffer = Buffer.concat(buffers);
 								
 								try {
-									let jsonString = finalBuffer.toString()
+									let jsonString = finalBuffer.toString("utf-8")
 									if (jsonString.includes("}",jsonString.length-4)) {
 										let json = JSON.parse(jsonString); // checks if it is the end of the json string, throws error if it
 		
@@ -240,54 +147,48 @@ expressApp.route("/api/exercise/run")
 												compressedJson: compressedJson
 											};
 											
-											res.dataArray = [];
-											res.isDataSend = true;
-											res.status(200).json(jsonMessage);
+											javaProcess.dataArray = [];
+											javaProcess.res.status(200).json(jsonMessage);
+											javaProcess.res = undefined;
 										}
 									}
 								} catch (e) {
 									console.error("Not the end of json string!");
 								}
 							} catch (e) {
-								res.status(400).json({});
 								console.error(e);
 							}
 						}
 					});
 					javaChild.stderr.on('data', function (err) {
-						console.log("stderr run");
-						if (err && !res.isDataSend) {
-							res.isDataSend = true;
-							res.status(400).json({});
+						console.log("error")
+						if (err && javaProcess.res) {
+							javaProcess.res.status(400).send({});
+							javaProcess.res = undefined;
 							console.log(err.toString()); // TODO send to client and print on screen (warp in json error step)
 						}
 					});
 					javaChild.on('close', function (exitCode) {
-						console.log("close run");
+						console.log("close")
 						
-						if (res.isDataSend) {
+						if (!javaProcess.res) {
 							console.log("canceled response (data was already send)");
 							return;
 						}
-						
-						javaProcess = undefined;
 
 						if (exitCode === null) {
-							console.log("canceled response (exitCode ist null)");
-							res.status(400).json({});
 							return;
 						}
 	
 						let buffers = [];
-						for (let buffer of res.dataArray) {
-							buffers.push(Buffer.from(buffer));
+						for (let buffer of javaProcess.dataArray) {
+							buffers.push(Buffer.from(buffer, "utf-8"));
 						}
 		
 						let finalBuffer = Buffer.concat(buffers);
-		
-						// console.log(finalBuffer.toString());
+						
 						try {
-							let jsonString = finalBuffer.toString();
+							let jsonString = finalBuffer.toString("utf-8");
 							if (jsonString.includes("}",jsonString.length-4)) {
 								JSON.parse(jsonString); // checks if this is valid json
 	
@@ -295,16 +196,18 @@ expressApp.route("/api/exercise/run")
 								let jsonMessage = {
 									compressedJson: compressedJson
 								};
-	
-								res.dataArray = [];
-								res.isDataSend = true;
-								res.status(200).json(jsonMessage);
+								
+								javaProcess.res.status(200).json(jsonMessage);
+								javaProcess = undefined;
+							} else {
+								console.error("Not a valid json string on program close!");
+								javaProcess.res.status(400).send({ errMsg: "Server error on code execution (no json)"} );
+								javaProcess = undefined;
 							}
 						} catch (e) {
 							console.error(e);
-							res.dataArray = [];
-							res.isDataSend = true;
-							res.status(400).json({});
+							javaProcess.res.status(400).send({});
+							javaProcess = undefined;
 						}
 		
 					});
@@ -374,7 +277,7 @@ const createWindow = () => {
 
 	mainWindow.maximize();
 
-	// view.webContents.openDevTools(); // DEBUGGING
+	mainWindow.webContents.openDevTools(); // DEBUGGING
 
 	mainWindow.on('closed', () => {
 		mainWindow = null;

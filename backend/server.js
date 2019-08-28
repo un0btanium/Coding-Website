@@ -628,114 +628,19 @@ app.route("/api/exercise/input")
         let input = req.body.input;
         let userData = req.tokenData;
 
-        if (input !== null && javaProcesses[userData.userId] !== undefined && javaProcesses[userData.userId] !== null && !javaProcesses[userData.userId].process.killed) {
-            console.log("Writing input '" + input + "' to java process!");
-            let javaChild = javaProcesses[userData.userId].process
+        if (input !== undefined && javaProcesses[userData.userId] !== undefined && javaProcesses[userData.userId].process !== undefined) {
+            // console.log("Writing input '" + input + "' to java process!");
+			javaProcesses[userData.userId].res = res;
 
-            res.dataArray = [];
-
-            javaChild.stdout.on('data', function (data) {
-                console.log("stdout input");
-                if (data && !res.isDataSend) {
-                    res.dataArray.push(data);
-                    // Check if it is is a read in command
-                    try {
-                        let buffers = [];
-                        for (let buffer of res.dataArray) {
-                            buffers.push(Buffer.from(buffer));
-                        }
-
-                        let finalBuffer = Buffer.concat(buffers);
-
-                        try {
-                            let jsonString = finalBuffer.toString()
-                            if (jsonString.includes("}",jsonString.length-4)) {
-                                let json = JSON.parse(jsonString); // checks if it is the end of the json string, throws error if it isnt
-                                
-                                if (json !== null && (json.isReadIn || json.isGuiReadIn)) {
-                                    let compressedJson = lzstring.compressToBase64(jsonString);
-                                    let jsonMessage = {
-                                        compressedJson: compressedJson
-                                    };
-                                    
-									res.dataArray = [];
-                                    res.isDataSend = true;
-                                    res.status(200).json(jsonMessage);
-                                }
-                            }
-                        } catch (e) {
-                            console.error("Not the end of json string!");
-                        }
-                    } catch (e) {
-                        console.error(e);
-                    }
-                }
-            });
-            javaChild.stderr.on('data', function (err) {
-                console.log("stderr input");
-                if (err && !res.isDataSend) {
-					res.isDataSend = true;
-					res.status(400).json({});
-                    console.log(err.toString()); // TODO send to client and print on screen (warp in json error step)
-                }
-            });
-            javaChild.on('close', function (exitCode) {
-                console.log("close input");
-                console.log(exitCode);
-                
-                if (res.isDataSend) {
-                    console.log("canceled response (data was already send)");
-                    return;
-                }
-
-                javaProcesses[userData.userId] = undefined;
-
-                if (exitCode === null) {
-                    console.log("canceled response (exitCode ist null)");
-                    return;
-                }
-
-                
-                let buffers = [];
-                for (let buffer of res.dataArray) {
-                    buffers.push(Buffer.from(buffer));
-                }
-
-                let finalBuffer = Buffer.concat(buffers);
-
-                // console.log(finalBuffer.toString());
-                try {
-                    let jsonString = finalBuffer.toString()
-                    if (jsonString.includes("}",jsonString.length-4)) {
-                        JSON.parse(jsonString); // checks if this is valid json
-
-                        let compressedJson = lzstring.compressToBase64(jsonString);
-                        let jsonMessage = {
-                            compressedJson: compressedJson
-                        };
-                        
-						res.dataArray = [];
-                        res.isDataSend = true;
-                        res.status(200).json(jsonMessage);
-                    }
-                } catch (e) {
-                    console.error(e);
-					res.dataArray = [];
-                    res.isDataSend = true;
-                    res.status(400).json({});
-                }
-
-            });
             try {
-                javaChild.stdin.write(input + '\n');
+                javaProcesses[userData.userId].process.stdin.write(input + '\n');
             } catch (e) {
                 console.log(e);
-				res.status(400).json({});
+				javaProcesses[userData.userId].res.status(400).send({ errMsg: "Unable to write to program!" });
             }
         } else {
 			console.warn("No java process available anymore to write to!");
-			res.status(400).json({});
-			// TODO send response to cancel code execution clientside
+			res.status(400).send({errMsg: "Java program was already termined!"});
         }
     });
 
@@ -755,13 +660,13 @@ app.route("/api/exercise/run")
 
         Course.findById(courseID, function (err, course) {
             if (!course) {
-                res.status(404).send('Course not found');
+                res.status(404).send({ errMsg: 'Course not found' });
             } else {
 
 				let exercise = course.exercises.id(exerciseID);
 
 				if (exercise === undefined || exercise === null) {
-					res.status(404).send('Exercise not found');
+					res.status(404).send({ errMsg: 'Exercise not found' });
 					return;
 				}
 
@@ -843,16 +748,15 @@ app.route("/api/exercise/run")
                     source_files: sourceFiles
                 }
 
-                res.dataArray = [];
                 let javaExe = "java";
                 if (os.platform() === 'win32') {
 					// javaExe = "C:" + path.sep + "Program Files" + path.sep + "Java" + path.sep + "jdk-11" + path.sep + "bin" + path.sep0 + "java.exe";
 					javaExe = "java";
                 }
-                let processOptions = { maxBuffer: 1024*1024*1024 ,timeout: 30*1000, /* windowsHide: false */ };
+                let processOptions = { };
 				let filePath = __dirname + path.sep + "java" + path.sep + "executer.jar";
 
-                let javaChild = spawn(javaExe, ["-jar", "-Xms64m", "-Xmx64m", filePath, JSON.stringify(arg)], processOptions);
+                let javaChild = spawn(javaExe, ["-jar", "-Dfile.encoding=UTF-8", "-Xms64m", "-Xmx64m", filePath, JSON.stringify(arg)], processOptions);
 
                 javaProcesses[userData.userId] = {
 					exerciseData: {
@@ -869,100 +773,101 @@ app.route("/api/exercise/run")
 						email: userData.email
 					},
 					started: new Date(),
-					process: javaChild
+					res: res,
+					dataArray: [],
+					process: javaChild,
 				};
 
-                javaChild.stdout.on('data', function (data) {
-                    console.log("stdout run");
-                    if (data && !res.isDataSend) {
-                        res.dataArray.push(data);
-                        // Check if it is is a read in command
-                        try {
-                            let buffers = [];
-                            for (let buffer of res.dataArray) {
-                                buffers.push(Buffer.from(buffer));
-                            }
-    
-                            let finalBuffer = Buffer.concat(buffers);
-                            
-                            try {
-                                let jsonString = finalBuffer.toString()
-                                if (jsonString.includes("}",jsonString.length-4)) {
-                                    let json = JSON.parse(jsonString); // checks if it is the end of the json string, throws error if it
-    
-                                    if (json !== null && (json.isReadIn || json.isGuiReadIn)) {
-                                        let compressedJson = lzstring.compressToBase64(jsonString);
-                                        let jsonMessage = {
-                                            compressedJson: compressedJson
+				javaChild.stdin.setDefaultEncoding("UTF-8");
+				
+				javaChild.stdout.on('data', function (data) {
+					console.log("out")
+					if (data && javaProcesses[userData.userId].res) {
+						javaProcesses[userData.userId].dataArray.push(data);
+						// Check if it is is a read in command
+						try {
+							let buffers = [];
+							for (let buffer of javaProcesses[userData.userId].dataArray) {
+								buffers.push(Buffer.from(buffer, "utf-8"));
+							}
+
+							let finalBuffer = Buffer.concat(buffers);
+							
+							try {
+								let jsonString = finalBuffer.toString("utf-8");
+								if (jsonString.includes("}",jsonString.length-4)) {
+									let json = JSON.parse(jsonString); // checks if it is the end of the json string, throws error if it
+									
+									if (json !== null && (json.isReadIn || json.isGuiReadIn)) {
+										let compressedJson = lzstring.compressToBase64(jsonString);
+										let jsonMessage = {
+											compressedJson: compressedJson
 										};
 										
-                                        res.dataArray = [];
-                                        res.isDataSend = true;
-                                        res.status(200).json(jsonMessage);
-                                    }
-                                }
-                            } catch (e) {
-                                console.error("Not the end of json string!");
-                            }
-                        } catch (e) {
-                            console.error(e);
-                        }
-                    }
-                });
-                javaChild.stderr.on('data', function (err) {
-                    console.log("stderr run");
-                    if (err && !res.isDataSend) {
-                        res.isDataSend = true;
-                        res.status(400).json({});
-                        console.log(err.toString()); // TODO send to client and print on screen (warp in json error step)
-                    }
-                });
-                javaChild.on('close', function (exitCode) {
-                    console.log("close run");
-                    console.log(exitCode);
-                    
-                    if (res.isDataSend) {
-                        console.log("canceled response (data was already send)");
-                        return;
-                    }
+										javaProcesses[userData.userId].dataArray = [];
+										javaProcesses[userData.userId].res.status(200).json(jsonMessage);
+										javaProcesses[userData.userId].res = undefined;
+									}
+								}
+							} catch (e) {
+								console.error("Not the end of json string!");
+							}
+						} catch (e) {
+							console.error(e);
+						}
+					}
+				});
+				javaChild.stderr.on('data', function (err) {
+					console.log("error")
+					if (err && javaProcesses[userData.userId].res) {
+						javaProcesses[userData.userId].res.status(400).send({});
+						javaProcesses[userData.userId].res = undefined;
+						console.log(err.toString()); // TODO send to client and print on screen (warp in json error step)
+					}
+				});
+				javaChild.on('close', function (exitCode) {
+					console.log("close")
+					
+					if (!javaProcesses[userData.userId].res) {
+						console.log("canceled response (data was already send)");
+						return;
+					}
 
-                    javaProcesses[userData.userId] = undefined;
+					if (exitCode === null) {
+						return;
+					}
 
-                    if (exitCode === null) {
-                        console.log("canceled response (exitCode ist null)");
-                        return;
-                    }
+					let buffers = [];
+					for (let buffer of javaProcesses[userData.userId].dataArray) {
+						buffers.push(Buffer.from(buffer, "utf-8"));
+					}
 
-                    let buffers = [];
-                    for (let buffer of res.dataArray) {
-                        buffers.push(Buffer.from(buffer));
-                    }
-    
-                    let finalBuffer = Buffer.concat(buffers);
-    
-                    // console.log(finalBuffer.toString());
-                    try {
-                        let jsonString = finalBuffer.toString();
-                        if (jsonString.includes("}",jsonString.length-4)) {
-                            JSON.parse(jsonString); // checks if this is valid json
+					let finalBuffer = Buffer.concat(buffers);
 
-                            let compressedJson = lzstring.compressToBase64(jsonString);
-                            let jsonMessage = {
-                                compressedJson: compressedJson
-                            };
+					try {
+						let jsonString = finalBuffer.toString("utf-8");
+						if (jsonString.includes("}",jsonString.length-4)) {
+							JSON.parse(jsonString); // checks if this is valid json
 
-							res.dataArray = [];
-                            res.isDataSend = true;
-                            res.status(200).json(jsonMessage);
-                        }
-                    } catch (e) {
-                        console.error(e);
-						res.dataArray = [];
-                        res.isDataSend = true;
-                        res.status(400).json({});
-                    }
-    
-                });
+							let compressedJson = lzstring.compressToBase64(jsonString);
+							let jsonMessage = {
+								compressedJson: compressedJson
+							};
+
+							javaProcesses[userData.userId].res.status(200).json(jsonMessage);
+							javaProcesses[userData.userId] = undefined;
+						} else {
+							console.error("Not a valid json string on program close!");
+							javaProcesses[userData.userId].res.status(400).send({ errMsg: "Server error on code execution (no json)"} );
+							javaProcesses[userData.userId] = undefined;
+						}
+					} catch (e) {
+						console.error(e);
+						javaProcesses[userData.userId].res.status(400).send({});
+						javaProcesses[userData.userId] = undefined;
+					}
+
+				});
 
             }
         });
