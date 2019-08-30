@@ -35,6 +35,7 @@ export default class ExerciseEditor extends Component {
 
 		let highlightOverlay = null;
 		if (this.props.highlighting &&
+			this.props.highlighting.detailLevel > 0 &&
 			this.props.highlighting.node !== undefined &&
 			this.props.highlighting.subExerciseIndex === this.props.subExerciseIndex &&
 			this.props.highlighting.node.identifier === this.props.content.identifier) {

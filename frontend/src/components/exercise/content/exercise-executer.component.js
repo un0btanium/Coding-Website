@@ -41,7 +41,8 @@ export default class ExerciseExecuter extends Component {
         
 
         this.state = {
-			ranSubExerciseIndex: 0,
+            ranSubExerciseIndex: 0,
+            ranWithHighlightingDetailLevel: 0,
             isExecutingOnServer: false,
             result: undefined,
             step: 0,
@@ -285,7 +286,8 @@ export default class ExerciseExecuter extends Component {
                 node: this.state.result.node_data[this.state.result.steps[0].id],
 				step: this.state.result.steps[0],
                 codeType: this.state.codeType,
-                currentStep: 0
+                currentStep: 0,
+                detailLevel: this.state.ranWithHighlightingDetailLevel
             });
             this.setState({
                 step: 0
@@ -332,7 +334,8 @@ export default class ExerciseExecuter extends Component {
         this.setState({
 			isExecutingOnServer: true,
 			ranSubExerciseIndex: this.props.subExerciseIndex,
-			codeType: codeType
+            codeType: codeType,
+            ranWithHighlightingDetailLevel: this.props.subExercise.highlightingDetailLevelIndex || 0
         });
 
         Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/exercise/run', data, options)
@@ -386,7 +389,8 @@ export default class ExerciseExecuter extends Component {
 						node: json.node_data[json.steps[startAtStep].id],
 						step: json.steps[startAtStep],
 						codeType: this.state.codeType,
-                        currentStep: startAtStep
+                        currentStep: startAtStep,
+                        detailLevel: this.state.ranWithHighlightingDetailLevel
 					});
 					this.setState({
 						result: json,
@@ -420,7 +424,8 @@ export default class ExerciseExecuter extends Component {
                 node: this.state.result.node_data[this.state.result.steps[this.state.step+1].id],
                 step: this.state.result.steps[this.state.step+1],
 				codeType: this.state.codeType,
-                currentStep: this.state.step+1
+                currentStep: this.state.step+1,
+                detailLevel: this.state.ranWithHighlightingDetailLevel
             });
             this.setState({
                 step: this.state.step+1,
@@ -445,7 +450,8 @@ export default class ExerciseExecuter extends Component {
                 node: this.state.result.node_data[this.state.result.steps[0].id],
                 step: this.state.result.steps[0],
 				codeType: this.state.codeType,
-                currentStep: 0
+                currentStep: 0,
+                detailLevel: this.state.ranWithHighlightingDetailLevel
             });
             this.setState({
                 step: 0
@@ -464,7 +470,8 @@ export default class ExerciseExecuter extends Component {
                     node: this.state.result.node_data[this.state.result.steps[this.state.step+1].id],
                     step: this.state.result.steps[this.state.step+1],
 					codeType: this.state.codeType,
-                    currentStep: this.state.step+1
+                    currentStep: this.state.step+1,
+                    detailLevel: this.state.ranWithHighlightingDetailLevel
                 });
                 this.setState({
                     step: this.state.step+1
@@ -475,7 +482,8 @@ export default class ExerciseExecuter extends Component {
                     node: this.state.result.node_data[this.state.result.steps[0].id],
                     step: this.state.result.steps[0],
 					codeType: this.state.codeType,
-                    currentStep: 0
+                    currentStep: 0,
+                    detailLevel: this.state.ranWithHighlightingDetailLevel
                 });
                 this.setState({
                     step: 0
@@ -495,7 +503,8 @@ export default class ExerciseExecuter extends Component {
                         node: this.state.result.node_data[this.state.result.steps[0].id],
                         step: this.state.result.steps[0],
 						codeType: this.state.codeType,
-                        currentStep: 0
+                        currentStep: 0,
+                        detailLevel: this.state.ranWithHighlightingDetailLevel
                     });
                     this.setState({
                         step: 0
@@ -528,7 +537,8 @@ export default class ExerciseExecuter extends Component {
                     node: this.state.result.node_data[this.state.result.steps[this.state.step-1].id],
                     step: this.state.result.steps[this.state.step-1],
 					codeType: this.state.codeType,
-                    currentStep: this.state.step-1
+                    currentStep: this.state.step-1,
+                    detailLevel: this.state.ranWithHighlightingDetailLevel
                 });
                 this.setState({
                     step: this.state.step-1
@@ -539,7 +549,8 @@ export default class ExerciseExecuter extends Component {
                     node: this.state.result.node_data[this.state.result.steps[this.state.result.steps.length-1].id],
                     step: this.state.result.steps[this.state.result.steps.length-1],
 					codeType: this.state.codeType,
-                    currentStep: this.state.step-1
+                    currentStep: this.state.step-1,
+                    detailLevel: this.state.ranWithHighlightingDetailLevel
                 });
                 this.setState({
                     step: this.state.result.steps.length-1
@@ -558,7 +569,8 @@ export default class ExerciseExecuter extends Component {
                 node: this.state.result.node_data[this.state.result.steps[this.state.result.steps.length-1].id],
                 step: this.state.result.steps[this.state.result.steps.length-1],
 				codeType: this.state.codeType,
-                currentStep: this.state.result.steps.length-1
+                currentStep: this.state.result.steps.length-1,
+                detailLevel: this.state.ranWithHighlightingDetailLevel
             });
             this.setState({
                 step: this.state.result.steps.length-1
