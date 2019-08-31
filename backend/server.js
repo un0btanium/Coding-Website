@@ -575,8 +575,8 @@ app.route('/api/course/exercise')
 				
                 course
 					.save()
-					.then(course => {
-						res.status(200).json('Exercise updated');
+					.then(course2 => {
+						res.status(200).json({ exercise: course2.exercises.id(req.body.exerciseID) });
 					})
 					.catch(err => {
 						console.log(err)

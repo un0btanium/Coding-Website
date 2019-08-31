@@ -1051,9 +1051,13 @@ export default class ExerciseEdit extends Component {
         Axios.put(process.env.REACT_APP_BACKEND_SERVER + '/course/exercise', data)
         .then(res => {
             console.log(res.data);
-			toast(<div style={{textAlign: "center"}}>Exercise saved!</div>, {type: toast.TYPE.SUCCESS, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})	
+			toast(<div style={{textAlign: "center"}}>Exercise saved!</div>, {type: toast.TYPE.SUCCESS, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
 			if (switchToSolveMode) {
 				this.props.setModeToSolve();
+			} else {
+				this.setState({
+					exercise: res.data.exercise
+				});
 			}
 		})
 		.catch((error) => {
