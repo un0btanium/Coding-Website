@@ -518,20 +518,29 @@ app.route('/api/course/exercise')
 								package: "main",
 								name: "Main",
 								code: "package main;\n" + 
-								"\n" + 
-								"import java.util.*;\n" + 
-								"import java.io.*;\n" + 
-								"import java.math.*;\n" + 
-								"\n" + 
-								"import java.io.Console;\n" + 
-								"\n" + 
-								"public class Main {\n" + 
-								"    \n" + 
-								"    public static void main(String[] args) {\n" + 
-								"// main_method_body\n" + 
-								"    }\n" + 
-								"    \n" + 
-								"}"
+									"\n" + 
+									"import java.util.*;\n" + 
+									"import java.io.*;\n" + 
+									"import java.math.*;\n" + 
+									"\n" + 
+									"import java.io.Console;\n" + 
+									"\n" + 
+									"public class Main {\n" + 
+									"    \n" + 
+									"	public Main() {}\n" +
+									"	\n" +
+									"    public static void main(String[] args) {\n" + 
+									"		Main mainInstance = new Main();\n" +
+									"		mainInstance.main();\n" +
+									"    }\n" + 
+									"	\n" +
+									"	public void main() {\n" +
+									"// main_method_body\n" + 
+									"	}\n" +
+									"	\n" +
+									"// main_instance_methods\n" +
+									"    \n" + 
+									"}"
 							}]
 						}
 					]

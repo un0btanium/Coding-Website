@@ -334,7 +334,8 @@ export default class ExerciseEdit extends Component {
 
 							<Form.Group as={Row} className="form-group">
 								<Col style={{ textAlign: "center" }}>
-									<Button variant="outline-primary" onClick={this.addNewSourceFile} style={{width: '150px'}}>+Source File</Button>
+									<Button variant="outline-primary" onClick={() => this.addNewSourceFile(0)} style={{width: '300px'}}>+Source File (static main method)</Button>
+									<Button variant="outline-primary" onClick={() => this.addNewSourceFile(1)} style={{width: '300px'}}>+Source File (Main Object)</Button>
 								</Col>
 							</Form.Group>
 						</Tab>
@@ -428,20 +429,29 @@ export default class ExerciseEdit extends Component {
 				package: "main",
 				name: "Main",
 				code: "package main;\n" + 
-				"\n" + 
-				"import java.util.*;\n" + 
-				"import java.io.*;\n" + 
-				"import java.math.*;\n" + 
-				"\n" + 
-				"import java.io.Console;\n" + 
-				"\n" + 
-				"public class Main {\n" + 
-				"    \n" + 
-				"    public static void main(String[] args) {\n" + 
-				"// main_method_body\n" + 
-				"    }\n" + 
-				"    \n" + 
-				"}"
+					"\n" + 
+					"import java.util.*;\n" + 
+					"import java.io.*;\n" + 
+					"import java.math.*;\n" + 
+					"\n" + 
+					"import java.io.Console;\n" + 
+					"\n" + 
+					"public class Main {\n" + 
+					"    \n" + 
+					"	public Main() {}\n" +
+					"	\n" +
+					"    public static void main(String[] args) {\n" + 
+					"		Main mainInstance = new Main();\n" +
+					"		mainInstance.main();\n" +
+					"    }\n" + 
+					"	\n" +
+					"	public void main() {\n" +
+					"// main_method_body\n" + 
+					"	}\n" +
+					"	\n" +
+					"// main_instance_methods\n" +
+					"    \n" + 
+					"}"
 			}]
 		};
 
@@ -495,42 +505,96 @@ export default class ExerciseEdit extends Component {
         });
 	}
 
-    addNewSourceFile() {
+    addNewSourceFile(sourceFileTemplateType) {
+		sourceFileTemplateType = sourceFileTemplateType || 0;
+
+
         if (this.state.exercise.subExercises[this.state.subExerciseIndex].sourceFiles.length === 0) {
-            this.setState({
-				contentIDCounter: this.state.contentIDCounter+1,
-				didChangeCode: true,
-				exercise: update(this.state.exercise, {
-					subExercises: {
-						[this.state.subExerciseIndex]: {
-							sourceFiles: {
-								$push: [
-									{
-										_id: "NEW " + this.state.contentIDCounter,
-										package: "main",
-										name: "Main",
-										code: "package main;\n" + 
-										"\n" + 
-										"import java.util.*;\n" + 
-										"import java.io.*;\n" + 
-										"import java.math.*;\n" + 
-										"\n" + 
-										"import java.io.Console;\n" + 
-										"\n" + 
-										"public class Main {\n" + 
-										"    \n" + 
-										"    public static void main(String[] args) {\n" + 
-										"// main_method_body\n" + 
-										"    }\n" + 
-										"    \n" + 
-										"}"
+			switch(sourceFileTemplateType) {
+				default:
+				case 0:
+					this.setState({
+						contentIDCounter: this.state.contentIDCounter+1,
+						didChangeCode: true,
+						exercise: update(this.state.exercise, {
+							subExercises: {
+								[this.state.subExerciseIndex]: {
+									sourceFiles: {
+										$push: [
+											{
+												_id: "NEW " + this.state.contentIDCounter,
+												package: "main",
+												name: "Main",
+												code: "package main;\n" + 
+												"\n" + 
+												"import java.util.*;\n" + 
+												"import java.io.*;\n" + 
+												"import java.math.*;\n" + 
+												"\n" + 
+												"import java.io.Console;\n" + 
+												"\n" + 
+												"public class Main {\n" + 
+												"    \n" + 
+												"    public static void main(String[] args) {\n" + 
+												"// main_method_body\n" + 
+												"    }\n" + 
+												"    \n" + 
+												"}"
+											}
+										]
 									}
-								]
+								}
 							}
-						}
-					}
-				})
-            });
+						})
+					});
+					break;
+				case 1:
+					this.setState({
+						contentIDCounter: this.state.contentIDCounter+1,
+						didChangeCode: true,
+						exercise: update(this.state.exercise, {
+							subExercises: {
+								[this.state.subExerciseIndex]: {
+									sourceFiles: {
+										$push: [
+											{
+												_id: "NEW " + this.state.contentIDCounter,
+												package: "main",
+												name: "Main",
+												code: "package main;\n" + 
+												"\n" + 
+												"import java.util.*;\n" + 
+												"import java.io.*;\n" + 
+												"import java.math.*;\n" + 
+												"\n" + 
+												"import java.io.Console;\n" + 
+												"\n" + 
+												"public class Main {\n" + 
+												"    \n" + 
+												"	public Main() {}\n" +
+												"	\n" +
+												"    public static void main(String[] args) {\n" + 
+												"		Main mainInstance = new Main();\n" +
+												"		mainInstance.main();\n" +
+												"    }\n" + 
+												"	\n" +
+												"	public void main() {\n" +
+												"// main_method_body\n" + 
+												"	}\n" +
+												"	\n" +
+												"// main_instance_methods\n" +
+												"    \n" + 
+												"}"
+											}
+										]
+									}
+								}
+							}
+						})
+					});
+					break;
+			}
+			
         } else {
             this.setState({
 				contentIDCounter: this.state.contentIDCounter+1,
@@ -674,17 +738,18 @@ export default class ExerciseEdit extends Component {
     addNewEditor() {
         let identifier = "";
 
-        let containsEditor = false;
+        let editorCount = 0;
         for (let element of this.state.exercise.subExercises[this.state.subExerciseIndex].content) {
             if (element.type === "editor") {
-                containsEditor = true;
-                break;
+                editorCount++;
             }
         }
 
-        if (!containsEditor) {
+        if (editorCount === 0) {
             identifier = "main_method_body";
-        }
+        } else if (editorCount === 1) {
+			identifier = "main_instance_methods";
+		}
 
         this.setState({
 			contentIDCounter: this.state.contentIDCounter+1,
