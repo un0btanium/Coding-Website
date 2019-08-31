@@ -51,6 +51,7 @@ export default class ExerciseEdit extends Component {
         this.moveSourceFile = this.moveSourceFile.bind(this);
 
         this.onSubmit = this.onSubmit.bind(this);
+        this.onSaveExercise = this.onSaveExercise.bind(this);
 		this.exportExerciseAsJSON = this.exportExerciseAsJSON.bind(this);
 		
         this.onRanCode = this.onRanCode.bind(this);
@@ -253,7 +254,7 @@ export default class ExerciseEdit extends Component {
 								<br />
 								<hr style={{backgroundColor: "rgb(223, 105, 26)"}}/>
 								<br />
-								<Accordion style={{'marginBottom': '20px', width: "100%", boxShadow: '2px 2px 5px #000000'}} className="disableSelection" defaultActiveKey="0">
+								<Accordion style={{'marginBottom': '20px', width: "100%", boxShadow: '2px 2px 5px #000000'}} className="disableSelection">
 									<Accordion.Toggle as={Card.Header} eventKey="0" style={{textAlign: "center"}}>Show/Hide Presentation</Accordion.Toggle>
 									<Accordion.Collapse eventKey="0" style={{backgroundColor: "#666666"}}>
 										<Iframe url={this.state.exercise.iFrameUrl}
@@ -356,7 +357,8 @@ export default class ExerciseEdit extends Component {
                     }
 
                     <Form.Group className="form-group">
-                        <Button variant="success" onClick={this.onSubmit} style={{marginBottom: '150px', marginTop: '30px', width: '150px', float: 'right'}}><FontAwesomeIcon icon={faSave} /> Save</Button>
+                        <Button variant="success" onClick={this.onSubmit} style={{marginBottom: '150px', marginTop: '30px', width: '150px', float: 'right'}}><FontAwesomeIcon icon={faSave} /> Save and Quit</Button>
+                        <Button variant="info" onClick={this.onSaveExercise} style={{marginBottom: '150px', marginTop: '30px', width: '150px', float: 'right'}}><FontAwesomeIcon icon={faSave} /> Save</Button>
                         <Button variant="danger" onClick={this.exportExerciseAsJSON} style={{marginBottom: '150px', marginTop: '30px', width: '150px', float: 'right'}}><FontAwesomeIcon icon={faDownload} /> Export</Button>
                     </Form.Group>
 
@@ -1001,13 +1003,16 @@ export default class ExerciseEdit extends Component {
     }
 
     
-    onSubmit(e) {
+    onSubmit(e, switchToSolveMode) {
         e.preventDefault();
 
         if (this.state.exercise.name === '') {
             return;
-        }
-
+		}
+		
+		if (switchToSolveMode === undefined) {
+			switchToSolveMode = true;
+		}
 		let subExercises = [];
         for (let subExercise of this.state.exercise.subExercises) {
 			// removes id from new content entries so that the database gives it an accual id
@@ -1047,11 +1052,17 @@ export default class ExerciseEdit extends Component {
         .then(res => {
             console.log(res.data);
 			toast(<div style={{textAlign: "center"}}>Exercise saved!</div>, {type: toast.TYPE.SUCCESS, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})	
-            this.props.setModeToSolve();
+			if (switchToSolveMode) {
+				this.props.setModeToSolve();
+			}
 		})
 		.catch((error) => {
-			// TODO show error modal
+			toast(<div style={{textAlign: "center"}}>Saving exercise failed!</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})	
 		})
+	}
+
+	onSaveExercise(e) {
+		this.onSubmit(e, false);
 	}
 	
 	

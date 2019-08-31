@@ -236,7 +236,7 @@ export default class ExerciseExecuter extends Component {
         }
 
         let options = {
-            timeout: 10*1000, // TODO adjust?
+            timeout: 30*1000, // TODO adjust?
             // responseType: 'stream',
             maxContentLength: 1000000000,
             headers: {
