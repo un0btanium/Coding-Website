@@ -27,7 +27,7 @@ export default class ExerciseEditor extends Component {
 
     render () {
 		
-		if (this.props.highlighting && this.props.highlighting.currentStep === 0 && this.props.highlighting.codeType !== this.state.codeType) {
+		if (this.props.highlighting && this.props.highlighting.isStartOfProgram && this.props.highlighting.codeType !== this.state.codeType) {
 			this.setState({
 				codeType: this.props.highlighting.codeType
 			});
@@ -97,6 +97,7 @@ export default class ExerciseEditor extends Component {
 		
 		let errorOverlay = null;
 		if (this.props.highlighting && 
+			this.props.highlighting.step &&
 			this.props.highlighting.step.type === "error" &&
 			this.props.highlighting.step.identifier === this.props.content.identifier &&
 			this.props.highlighting.step.line !== undefined) {
