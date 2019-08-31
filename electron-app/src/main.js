@@ -170,7 +170,12 @@ expressApp.route("/api/exercise/run")
 					});
 					javaChild.on('close', function (exitCode) {
 						console.log("close")
-						
+
+						if (!javaProcess) {
+							console.log("process closed");
+							return;
+						}
+
 						if (!javaProcess.res) {
 							console.log("canceled response (data was already send)");
 							return;

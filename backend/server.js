@@ -827,6 +827,11 @@ app.route("/api/exercise/run")
 				});
 				javaChild.on('close', function (exitCode) {
 					console.log("close")
+
+					if (!javaProcesses[userData.userId]) {
+						console.log("process closed");
+						return;
+					}
 					
 					if (!javaProcesses[userData.userId].res) {
 						console.log("canceled response (data was already send)");
