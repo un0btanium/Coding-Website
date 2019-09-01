@@ -59,6 +59,7 @@ export default class ExerciseEdit extends Component {
 		this.setHighlightingDetailLevelIndex = this.setHighlightingDetailLevelIndex.bind(this);
 		this.setHighlightingDetailLevelIndexSubExercise = this.setHighlightingDetailLevelIndexSubExercise.bind(this);
 		
+		this.onChangeEditorTheme = this.onChangeEditorTheme.bind(this);
 
         this.state = {
 			courseName: this.props.courseName,
@@ -84,7 +85,9 @@ export default class ExerciseEdit extends Component {
 			exerciseExportJSONString: null,
 			
             highlighting: null,
-            didChangeCode: true
+            didChangeCode: true,
+			
+			isEditorInLightTheme: false
         }
     }
 
@@ -285,6 +288,7 @@ export default class ExerciseEdit extends Component {
 								subExerciseIndex={this.state.subExerciseIndex}
 								content={this.state.exercise.subExercises[this.state.subExerciseIndex].content}
 								mode="edit"
+								isEditorInLightTheme={this.state.isEditorInLightTheme}
 								onChangeExerciseContent={this.onChangeExerciseContent}
 								onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
 								deleteContent={this.deleteContent}
@@ -327,6 +331,7 @@ export default class ExerciseEdit extends Component {
 								onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
 								deleteSourceFile={this.deleteSourceFile}
 								moveSourceFile={this.moveSourceFile}
+								isEditorInLightTheme={this.state.isEditorInLightTheme}
 							/>
 							
 							<br />
@@ -362,6 +367,14 @@ export default class ExerciseEdit extends Component {
                         <Button variant="info" onClick={this.onSaveExercise} style={{marginBottom: '150px', marginTop: '30px', width: '150px', float: 'right'}}><FontAwesomeIcon icon={faSave} /> Save</Button>
                         <Button variant="danger" onClick={this.exportExerciseAsJSON} style={{marginBottom: '150px', marginTop: '30px', width: '150px', float: 'right'}}><FontAwesomeIcon icon={faDownload} /> Export</Button>
                     </Form.Group>
+					
+
+					<br />
+                	<br />
+
+					<div className="disableSelection">
+						<Form.Check draggable={false} id="modeToggleEditorStyle" type="checkbox" className="custom-switch" custom="true" label="Editor Light Theme" checked={this.state.isEditorInLightTheme} onChange={this.onChangeEditorTheme} />
+					</div>
 
 				</div>
             </div>);
@@ -1001,6 +1014,12 @@ export default class ExerciseEdit extends Component {
             }
         }
     }
+
+	onChangeEditorTheme(e) {
+		this.setState({
+            isEditorInLightTheme: e.target.checked
+		});
+	}
 
     getIndexOfContent(id) {
         let index = -1;

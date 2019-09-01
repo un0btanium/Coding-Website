@@ -8,6 +8,7 @@ import ExerciseElementSidebar from './exercise-element-sidebar.component';
 import AceEditor from 'react-ace';
 import 'brace/mode/java';
 import 'brace/theme/monokai';
+import 'brace/theme/github';
 import 'brace/snippets/java';
 import 'brace/ext/language_tools';
 import 'brace/ext/searchbox';
@@ -20,7 +21,8 @@ export default class ExerciseSourceFiles extends Component {
 
         let onChangeExerciseAceEditor = this.props.onChangeExerciseAceEditor;
         let deleteSourceFile = this.props.deleteSourceFile;
-        let moveSourceFile = this.props.moveSourceFile;
+		let moveSourceFile = this.props.moveSourceFile;
+		let isEditorInLightTheme = this.props.isEditorInLightTheme;
 
         let res = 
             this.props.sourceFiles.map(function(sourceFile, i) {
@@ -69,7 +71,7 @@ export default class ExerciseSourceFiles extends Component {
 						<Row style={{'borderColor': '#c20a00', 'borderRadius': '6px', 'borderWidth': '8px', 'borderStyle': 'solid', boxShadow: '2px 2px 5px #000000'}}>
 							<AceEditor
 								mode="java"
-								theme="monokai"
+								theme={isEditorInLightTheme ? "github" : "monokai"}
 								name={"code" + sourceFile._id}
 								fontSize='18px'
 								width='100%'

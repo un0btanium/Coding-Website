@@ -4,7 +4,7 @@ import update from 'immutability-helper';
 
 import Iframe from 'react-iframe';
 
-import { Accordion, Card } from 'react-bootstrap';
+import { Accordion, Card, Form } from 'react-bootstrap';
 
 import ExerciseContent from './content/exercise-content.component';
 import ExerciseExecuter from './content/exercise-executer.component';
@@ -24,6 +24,8 @@ export default class ExerciseSolve extends Component {
 		this.setHighlighting = this.setHighlighting.bind(this);
 		
 		this.setHighlightingDetailLevelIndexSubExercise = this.setHighlightingDetailLevelIndexSubExercise.bind(this);
+
+		this.onChangeEditorTheme = this.onChangeEditorTheme.bind(this);
 
         this.state = {
 			courseName: this.props.courseName,
@@ -50,7 +52,9 @@ export default class ExerciseSolve extends Component {
 			},
 
             highlighting: null,
-            didChangeCode: true
+			didChangeCode: true,
+			
+			isEditorInLightTheme: false
         }
     }
 
@@ -138,7 +142,8 @@ export default class ExerciseSolve extends Component {
                 <ExerciseContent
 					subExerciseIndex={this.state.subExerciseIndex}
                     content={this.state.exercise.subExercises[this.state.subExerciseIndex].content}
-                    mode="solve"
+					mode="solve"
+					isEditorInLightTheme={this.state.isEditorInLightTheme}
                     onChangeExerciseContent={this.onChangeExerciseContent}
                     onChangeExerciseAceEditor={this.onChangeExerciseAceEditor}
                     setHighlighting={this.setHighlighting}
@@ -162,6 +167,14 @@ export default class ExerciseSolve extends Component {
 					largeMargin={true}
 					setHighlightingDetailLevelIndex={this.setHighlightingDetailLevelIndexSubExercise}
                 />
+
+                <br />
+                <br />
+
+				<div className="disableSelection">
+					<Form.Check draggable={false} id="modeToggleEditorStyle" type="checkbox" className="custom-switch" custom="true" label="Editor Light Theme" checked={this.state.isEditorInLightTheme} onChange={this.onChangeEditorTheme} />
+				</div>
+
             </div>
         );
     }
@@ -212,6 +225,12 @@ export default class ExerciseSolve extends Component {
             }
         }
     }
+
+	onChangeEditorTheme(e) {
+		this.setState({
+            isEditorInLightTheme: e.target.checked
+		});
+	}
 
     getIndexOfContent(id) {
         let index = -1;

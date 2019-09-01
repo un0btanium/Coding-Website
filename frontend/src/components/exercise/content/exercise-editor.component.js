@@ -8,6 +8,7 @@ import { getLetterHeight, getLetterWidth } from '../../../services/FontDetector'
 import AceEditor from 'react-ace';
 import 'brace/mode/java';
 import 'brace/theme/monokai';
+import 'brace/theme/github';
 import 'brace/snippets/java';
 import 'brace/ext/language_tools';
 import 'brace/ext/searchbox';
@@ -147,7 +148,7 @@ export default class ExerciseEditor extends Component {
 					{(this.props.highlighting && this.state.codeType === this.props.highlighting.codeType && highlightOverlay) || errorOverlay}
 					<AceEditor	
 						mode="java"
-						theme="monokai"
+						theme={this.props.isEditorInLightTheme ? "github" : "monokai"}
 						name={this.props.content._id}
 						value={this.props.content[this.state.codeType]}
 						width='100%'
@@ -212,7 +213,7 @@ export default class ExerciseEditor extends Component {
 						{(this.props.highlighting && this.state.codeType === this.props.highlighting.codeType && highlightOverlay) || errorOverlay}
 						<AceEditor
 							mode="java"
-							theme="monokai"
+							theme={this.props.isEditorInLightTheme ? "github" : "monokai"}
 							name={this.props.content._id}
 							width='100%'
 							value={this.props.content[this.state.codeType]}

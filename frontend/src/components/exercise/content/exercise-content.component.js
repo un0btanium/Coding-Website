@@ -23,7 +23,8 @@ export default class ExerciseContent extends Component {
         const onChangeExerciseContent = this.props.onChangeExerciseContent;
         const deleteContent = this.props.deleteContent;
         const moveContent = this.props.moveContent;
-        const mode = this.props.mode;
+		const mode = this.props.mode;
+		const isEditorInLightTheme = this.props.isEditorInLightTheme || false;
         const highlighting = this.props.highlighting;
         const setHighlighting = this.props.setHighlighting;
         const showSolutionToggle = this.props.isSubExerciseSolved;
@@ -80,7 +81,8 @@ export default class ExerciseContent extends Component {
                                 onChange={onChangeExerciseAceEditor}
                                 content={currentContent}
                                 mode={mode}
-                                key={"ExerciseContent" + currentContent._id}
+								key={"ExerciseContent" + currentContent._id}
+								isEditorInLightTheme={isEditorInLightTheme}
                             />;
                         break;
                     case "editor":
@@ -94,6 +96,7 @@ export default class ExerciseContent extends Component {
                                 setHighlighting={setHighlighting}
                                 highlighting={highlighting}
                                 mode={mode}
+								isEditorInLightTheme={isEditorInLightTheme}
                                 key={"ExerciseContent" + currentContent._id}
                             />;
                         break;
