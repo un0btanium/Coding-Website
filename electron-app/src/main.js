@@ -125,6 +125,12 @@ expressApp.route("/api/exercise/run")
 					
 					javaChild.stdout.on('data', function (data) {
 						console.log("out")
+
+						if (!javaProcess) {
+							console.log("process closed");
+							return;
+						}
+						
 						if (data && javaProcess.res) {
 							javaProcess.dataArray.push(data);
 							
@@ -162,6 +168,12 @@ expressApp.route("/api/exercise/run")
 					});
 					javaChild.stderr.on('data', function (err) {
 						console.log("error")
+
+						if (!javaProcess) {
+							console.log("process closed");
+							return;
+						}
+
 						if (err && javaProcess.res) {
 							javaProcess.res.status(400).send({});
 							javaProcess.res = undefined;

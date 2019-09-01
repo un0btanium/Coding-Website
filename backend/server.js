@@ -791,6 +791,12 @@ app.route("/api/exercise/run")
 				
 				javaChild.stdout.on('data', function (data) {
 					console.log("out")
+
+					if (!javaProcesses[userData.userId]) {
+						console.log("process closed");
+						return;
+					}
+
 					if (data && javaProcesses[userData.userId].res) {
 						javaProcesses[userData.userId].dataArray.push(data);
 						// Check if it is is a read in command
@@ -828,6 +834,12 @@ app.route("/api/exercise/run")
 				});
 				javaChild.stderr.on('data', function (err) {
 					console.log("error")
+					
+					if (!javaProcesses[userData.userId]) {
+						console.log("process closed");
+						return;
+					}
+
 					if (err && javaProcesses[userData.userId].res) {
 						javaProcesses[userData.userId].res.status(400).send({});
 						javaProcesses[userData.userId].res = undefined;
