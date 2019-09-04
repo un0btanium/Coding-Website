@@ -294,7 +294,7 @@ const createWindow = () => {
 
 	mainWindow.maximize();
 
-	mainWindow.webContents.openDevTools(); // DEBUGGING
+	// mainWindow.webContents.openDevTools(); // DEBUGGING
 
 	mainWindow.on('closed', () => {
 		mainWindow = null;
