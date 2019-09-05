@@ -4,6 +4,7 @@ import { Form, Row } from 'react-bootstrap';
 
 import ExerciseTitle from './exercise-title.component';
 import ExerciseText from './exercise-text.component';
+import ExerciseFormula from './exercise-formula.component';
 import ExerciseCode from './exercise-code.component';
 import ExerciseEditor from './exercise-editor.component';
 import ExerciseSpoiler from './exercise-spoiler.component';
@@ -48,6 +49,16 @@ export default class ExerciseContent extends Component {
                         text = "Text";
                         element =
                             <ExerciseText 
+                                onChange={onChangeExerciseContent}
+                                content={currentContent}
+                                mode={mode}
+                                key={"ExerciseContent" + currentContent._id}
+                            />;
+                        break;
+                    case "formula":
+                        text = "Formula";
+                        element =
+                            <ExerciseFormula
                                 onChange={onChangeExerciseContent}
                                 content={currentContent}
                                 mode={mode}

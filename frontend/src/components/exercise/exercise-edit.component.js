@@ -39,6 +39,7 @@ export default class ExerciseEdit extends Component {
 
         this.addNewTitle = this.addNewTitle.bind(this);
         this.addNewText = this.addNewText.bind(this);
+        this.addNewFormula = this.addNewFormula.bind(this);
         this.addNewSpoiler = this.addNewSpoiler.bind(this);
         this.addNewIFrame = this.addNewIFrame.bind(this);
         this.addNewCode = this.addNewCode.bind(this);
@@ -304,6 +305,7 @@ export default class ExerciseEdit extends Component {
 							<Col style={{ textAlign: "center", marginBottom: "30px" }}>
 								<Button variant="outline-primary" onClick={this.addNewTitle} style={{width: '125px'}}>+Title</Button>
 								<Button variant="outline-primary" onClick={this.addNewText} style={{width: '125px'}}>+Text</Button>
+								<Button variant="outline-primary" onClick={this.addNewFormula} style={{width: '125px'}}>+Formula</Button>
 								<Button variant="outline-primary" onClick={this.addNewSpoiler} style={{width: '125px'}}>+Spoiler</Button>
 								<Button variant="outline-primary" onClick={this.addNewIFrame} style={{width: '125px'}}>+IFrame</Button>
 								<Button variant="outline-primary" onClick={this.addNewCode} style={{width: '125px'}}>+Code</Button>
@@ -671,6 +673,27 @@ export default class ExerciseEdit extends Component {
 								{
 									_id: "NEW " + this.state.contentIDCounter,
 									type: "text",
+									text: ""
+								}
+							]
+						}
+					}
+				}
+			})
+        });
+	}
+
+    addNewFormula() {
+        this.setState({
+			contentIDCounter: this.state.contentIDCounter+1,
+			exercise: update(this.state.exercise, {
+				subExercises: {
+					[this.state.subExerciseIndex]: {
+						content: {
+							$push: [
+								{
+									_id: "NEW " + this.state.contentIDCounter,
+									type: "formula",
 									text: ""
 								}
 							]
