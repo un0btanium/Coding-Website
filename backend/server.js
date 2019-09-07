@@ -43,7 +43,7 @@ let User = require('./models/user.model');
 
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '10mb', extended: true}));
 
 mongoose.connect('mongodb://127.0.0.1:' + MONGODB_PORT + '/codingbuddy', { useNewUrlParser: true });
 const connection = mongoose.connection;
