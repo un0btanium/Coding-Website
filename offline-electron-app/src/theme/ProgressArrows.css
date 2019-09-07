@@ -1,0 +1,80 @@
+
+.progress-arrows-wrap {
+  width: 96%;
+  height: 35px;
+  z-index:-2;
+  white-space: nowrap;
+}
+
+.progress-arrows-wrap div:first-child{
+  margin-left:-2%;
+}
+
+.progress-arrow {
+  margin:0;
+  height: 35px;
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  line-height: 35px;
+  transition: all 0.5s;
+}
+
+.progress-arrow:before,
+.progress-arrow:after {
+  content: "";
+  position: absolute;
+  transition: all 0.5s;
+  z-index:-1;
+}
+.progress-arrow:before {
+  height: 50%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  -webkit-transform: skew(45deg);
+  -moz-transform: skew(45deg);
+  transform: skew(45deg);
+}
+
+.progress-arrow:after {
+  height: 50%;
+  width: 100%;
+  top: 50%;
+  left: 0;
+  -webkit-transform: skew(-45deg);
+  -moz-transform: skew(-45deg);
+  transform: skew(-45deg);
+}
+
+.progress-arrow-boxshadow:before,
+.progress-arrow-boxshadow:after {
+	box-shadow: 2px 2px 5px #000000;
+}
+
+.progress-arrow-boxshadow-selected:before,
+.progress-arrow-boxshadow-selected:after {
+	box-shadow: 2px 2px 7px #a07500;
+}
+
+.progress-arrow-neutral:before,
+.progress-arrow-neutral:after {
+	background: rgb(10, 103, 190);
+}
+
+.progress-arrow-neutral:hover:before,
+.progress-arrow-neutral:hover:after {
+	background: rgb(65, 154, 255);
+}
+
+.progress-arrow-completed:before,
+.progress-arrow-completed:after {
+	background: rgb(0, 189, 9);
+}
+.progress-arrow-completed:hover:before,
+.progress-arrow-completed:hover:after {
+	background: rgb(26, 255, 37);
+}
+
+
+

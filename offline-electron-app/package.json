@@ -1,0 +1,92 @@
+{
+  "name": "electron-app",
+  "productName": "coding-buddy-offline-electron-app",
+  "version": "1.0.0",
+  "description": "Coding Buddy Offline Electron App",
+  "main": "src/main.js",
+  "homepage": "./",
+  "scripts": {
+    "start": "nf start -p 3000",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "electron": "electron .",
+    "electron-start": "node src/electron-wait-react",
+    "react-start": "react-scripts start"
+  },
+  "keywords": [],
+  "author": {
+    "name": "un0btanium",
+    "email": "unobtaniumlol@gmail.com"
+  },
+  "license": "MIT",
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "electron_app"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.17",
+    "@fortawesome/free-regular-svg-icons": "^5.10.1",
+    "@fortawesome/free-solid-svg-icons": "^5.8.1",
+    "@fortawesome/react-fontawesome": "^0.1.4",
+    "@matejmazur/react-katex": "^3.0.2",
+    "axios": "^0.18.1",
+    "bootstrap": "^4.3.1",
+    "dotenv": "^7.0.0",
+    "downloadjs": "^1.4.7",
+    "electron-squirrel-startup": "^1.0.0",
+    "immutability-helper": "^3.0.1",
+    "jwt-decode": "^2.2.0",
+    "katex": "^0.11.0",
+    "lz-string": "^1.4.4",
+    "nedb": "^1.8.0",
+    "node-sass": "^4.11.0",
+    "react": "^16.8.4",
+    "react-ace": "^6.4.0",
+    "react-bootstrap": "^1.0.0-beta.11",
+    "react-compound-slider": "^2.0.0",
+    "react-dom": "^16.8.4",
+    "react-iframe": "^1.8.0",
+    "react-router-dom": "^4.3.1",
+    "react-scripts": "2.1.8",
+    "react-toastify": "^5.3.2"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.44",
+    "@electron-forge/maker-deb": "^6.0.0-beta.44",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.44",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.44",
+    "@electron-forge/maker-zip": "^6.0.0-beta.44",
+    "electron": "6.0.3",
+    "foreman": "^3.0.1"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
