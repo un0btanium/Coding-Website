@@ -661,11 +661,12 @@ app.route("/api/exercise/run")
 		let sourceFilesUser = req.body.sourceFiles;
 		let courseID = req.body.courseID;
 		let exerciseID = req.body.exerciseID;
-		let subExerciseIndex = req.body.subExerciseIndex;
+		let subExerciseIndex = req.body.subExerciseIndex; // TODO might not be correct if changes were made on the exercise in the meanwhile
 		let subExerciseID = req.body.subExerciseID;
 		let highlightingDetailLevelIndex = req.body.highlightingDetailLevelIndex;
 		let userData = req.tokenData;
 		let persistCode = req.body.persistCode;
+		let useSourceFiles = req.body.useSourceFiles;
 
         Course.findById(courseID, function (err, course) {
             if (!course) {
@@ -738,8 +739,8 @@ app.route("/api/exercise/run")
 				}
 				
 
-				let sourceFiles = [];
-				if (sourceFilesUser !== undefined && sourceFilesUser !== null) { // user ran in Edit mode
+				let sourceFiles;
+				if (useSourceFiles) { // user ran in Edit mode
 					sourceFiles = sourceFilesUser;
 				} else {
 					sourceFiles = exercise.subExercises[subExerciseIndex].sourceFiles;

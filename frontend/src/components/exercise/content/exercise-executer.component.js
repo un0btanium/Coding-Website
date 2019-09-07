@@ -301,10 +301,11 @@ export default class ExerciseExecuter extends Component {
 			exerciseID: this.props.exerciseID,
 			subExerciseIndex: this.props.subExerciseIndex,
 			subExerciseID: this.props.subExercise._id,
-			sourceFiles: (this.props.sendSourceFiles ? this.props.subExercise.sourceFiles : undefined),
+			sourceFiles: this.props.subExercise.sourceFiles,
 			code_snippets: code_snippets,
 			highlightingDetailLevelIndex: this.props.subExercise.highlightingDetailLevelIndex || 0,
-			persistCode: codeType === "code" && !this.props.sendSourceFiles
+			persistCode: codeType === "code" && !this.props.sendSourceFiles,
+			useSourceFiles: this.props.sendSourceFiles
 		};
 
         log(data);

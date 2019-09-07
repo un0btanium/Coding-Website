@@ -75,11 +75,11 @@ expressApp.route("/api/exercise/run")
 		};
 		
 		setAuthToken(req.headers.authorization);
-        Axios.post(CODING_BUDDY_URLS.backend + '/exercise/run', data, options)
+        Axios.post(CODING_BUDDY_URLS.backend + '/exercise/run', data, options) // TODO just persist user code here, dont request source file code
             .then(response => {
 					
 				let code_snippets = req.body.code_snippets;
-				let sourceFiles = req.body.sourceFiles || response.data.sourceFiles;
+				let sourceFiles = (data.useSourceFiles ? req.body.sourceFiles || response.data.sourceFiles : response.data.sourceFiles);
 				let highlightingDetailLevelIndex = req.body.highlightingDetailLevelIndex;
 				
 				let arg = {
