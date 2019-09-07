@@ -77,158 +77,156 @@ expressApp.route("/api/exercise/run")
 		setAuthToken(req.headers.authorization);
         Axios.post(CODING_BUDDY_URLS.backend + '/exercise/run', data, options)
             .then(response => {
-                if (response.status === 200) {
 					
-					let code_snippets = req.body.code_snippets;
-					let sourceFiles = req.body.sourceFiles || response.data.sourceFiles;
-					let highlightingDetailLevelIndex = req.body.highlightingDetailLevelIndex;
-					
-					let arg = {
-						highlightingDetailLevelIndex: highlightingDetailLevelIndex || 0,
-						code_snippets: code_snippets,
-						source_files: sourceFiles
-					}
-	
+				let code_snippets = req.body.code_snippets;
+				let sourceFiles = req.body.sourceFiles || response.data.sourceFiles;
+				let highlightingDetailLevelIndex = req.body.highlightingDetailLevelIndex;
+				
+				let arg = {
+					highlightingDetailLevelIndex: highlightingDetailLevelIndex || 0,
+					code_snippets: code_snippets,
+					source_files: sourceFiles
+				}
 
-					if (javaProcess !== undefined) {
-						console.log("Killing java process!");
-						javaProcess.kill('SIGINT');
-						console.log(javaProcess.killed ? "Killed java process!" : "Didnt kill java process!");
-						javaProcess = undefined;
-					}
 
-					let javaExe = "java";
-					if (os.platform() === 'win32') {
-						// javaExe = "C:" + path.sep + "Program Files" + path.sep + "Java" + path.sep + "jdk-11" + path.sep + "bin" + path.sep + "java.exe";
-						javaExe = "java";
-					}
-					let processOptions = { };
-					let filePath = __dirname + path.sep + "java" + path.sep + "executer.jar";
+				if (javaProcess !== undefined) {
+					console.log("Killing java process!");
+					javaProcess.kill('SIGINT');
+					console.log(javaProcess.killed ? "Killed java process!" : "Didnt kill java process!");
+					javaProcess = undefined;
+				}
 
-					let javaChild = undefined;
+				let javaExe = "java";
+				if (os.platform() === 'win32') {
+					// javaExe = "C:" + path.sep + "Program Files" + path.sep + "Java" + path.sep + "jdk-11" + path.sep + "bin" + path.sep + "java.exe";
+					javaExe = "java";
+				}
+				let processOptions = { };
+				let filePath = __dirname + path.sep + "java" + path.sep + "executer.jar";
 
-					try {
-						javaChild = spawn(javaExe, ["-jar", "-Dfile.encoding=UTF-8", filePath, JSON.stringify(arg)], processOptions);
-					} catch (e) {
-						console.log("No java installed or missing JAVA_HOME and/or PATH entry")
-						res.status(400).send({ errMsg: "No java installed or missing JAVA_HOME and/or PATH entry"});
+				let javaChild = undefined;
+
+				try {
+					javaChild = spawn(javaExe, ["-jar", "-Dfile.encoding=UTF-8", filePath, JSON.stringify(arg)], processOptions);
+				} catch (e) {
+					console.log("No java installed or missing JAVA_HOME and/or PATH entry")
+					res.status(400).send({ errMsg: "No java installed or missing JAVA_HOME and/or PATH entry"});
+					return;
+				}
+
+				javaProcess = {
+					res: res,
+					dataArray: [],
+					process: javaChild
+				};
+
+				javaChild.stdin.setDefaultEncoding("UTF-8");
+				
+				javaChild.stdout.on('data', function (data) {
+					console.log("out")
+
+					if (!javaProcess) {
+						console.log("process closed");
 						return;
 					}
-	
-					javaProcess = {
-						res: res,
-						dataArray: [],
-						process: javaChild
-					};
-
-					javaChild.stdin.setDefaultEncoding("UTF-8");
 					
-					javaChild.stdout.on('data', function (data) {
-						console.log("out")
-
-						if (!javaProcess) {
-							console.log("process closed");
-							return;
-						}
-						
-						if (data && javaProcess.res) {
-							javaProcess.dataArray.push(data);
-							
-							try {
-								let buffers = [];
-								for (let buffer of javaProcess.dataArray) {
-									buffers.push(Buffer.from(buffer, "utf-8"));
-								}
-		
-								let finalBuffer = Buffer.concat(buffers);
-								
-								try {
-									let jsonString = finalBuffer.toString("utf-8")
-									if (jsonString.includes("}",jsonString.length-4)) {
-										let json = JSON.parse(jsonString); // checks if it is the end of the json string, throws error if it
-		
-										if (json !== null && (json.isReadIn || json.isGuiReadIn)) {
-											let compressedJson = lzstring.compressToBase64(jsonString);
-											let jsonMessage = {
-												compressedJson: compressedJson
-											};
-											
-											javaProcess.dataArray = [];
-											javaProcess.res.status(200).json(jsonMessage);
-											javaProcess.res = undefined;
-										}
-									}
-								} catch (e) {
-									console.error("Not the end of json string!");
-								}
-							} catch (e) {
-								console.error(e);
-							}
-						}
-					});
-					javaChild.stderr.on('data', function (err) {
-						console.log("error")
-
-						if (!javaProcess) {
-							console.log("process closed");
-							return;
-						}
-
-						if (err && javaProcess.res) {
-							javaProcess.res.status(400).send({});
-							javaProcess.res = undefined;
-							console.log(err.toString()); // TODO send to client and print on screen (warp in json error step)
-						}
-					});
-					javaChild.on('close', function (exitCode) {
-						console.log("close")
-
-						if (!javaProcess) {
-							console.log("process closed");
-							return;
-						}
-
-						if (!javaProcess.res) {
-							console.log("canceled response (data was already send)");
-							return;
-						}
-
-						if (exitCode === null) {
-							return;
-						}
-	
-						let buffers = [];
-						for (let buffer of javaProcess.dataArray) {
-							buffers.push(Buffer.from(buffer, "utf-8"));
-						}
-		
-						let finalBuffer = Buffer.concat(buffers);
+					if (data && javaProcess.res) {
+						javaProcess.dataArray.push(data);
 						
 						try {
-							let jsonString = finalBuffer.toString("utf-8");
-							if (jsonString.includes("}",jsonString.length-4)) {
-								JSON.parse(jsonString); // checks if this is valid json
+							let buffers = [];
+							for (let buffer of javaProcess.dataArray) {
+								buffers.push(Buffer.from(buffer, "utf-8"));
+							}
 	
-								let compressedJson = lzstring.compressToBase64(jsonString);
-								let jsonMessage = {
-									compressedJson: compressedJson
-								};
-								
-								javaProcess.res.status(200).json(jsonMessage);
-								javaProcess = undefined;
-							} else {
-								console.error("Not a valid json string on program close!");
-								javaProcess.res.status(400).send({ errMsg: "Server error on code execution (no json)"} );
-								javaProcess = undefined;
+							let finalBuffer = Buffer.concat(buffers);
+							
+							try {
+								let jsonString = finalBuffer.toString("utf-8")
+								if (jsonString.includes("}",jsonString.length-4)) {
+									let json = JSON.parse(jsonString); // checks if it is the end of the json string, throws error if it
+	
+									if (json !== null && (json.isReadIn || json.isGuiReadIn)) {
+										let compressedJson = lzstring.compressToBase64(jsonString);
+										let jsonMessage = {
+											compressedJson: compressedJson
+										};
+										
+										javaProcess.dataArray = [];
+										javaProcess.res.status(200).json(jsonMessage);
+										javaProcess.res = undefined;
+									}
+								}
+							} catch (e) {
+								console.error("Not the end of json string!");
 							}
 						} catch (e) {
 							console.error(e);
-							javaProcess.res.status(400).send({});
+						}
+					}
+				});
+				javaChild.stderr.on('data', function (err) {
+					console.log("error")
+
+					if (!javaProcess) {
+						console.log("process closed");
+						return;
+					}
+
+					if (err && javaProcess.res) {
+						javaProcess.res.status(400).send({});
+						javaProcess.res = undefined;
+						console.log(err.toString()); // TODO send to client and print on screen (warp in json error step)
+					}
+				});
+				javaChild.on('close', function (exitCode) {
+					console.log("close")
+
+					if (!javaProcess) {
+						console.log("process closed");
+						return;
+					}
+
+					if (!javaProcess.res) {
+						console.log("canceled response (data was already send)");
+						return;
+					}
+
+					if (exitCode === null) {
+						return;
+					}
+
+					let buffers = [];
+					for (let buffer of javaProcess.dataArray) {
+						buffers.push(Buffer.from(buffer, "utf-8"));
+					}
+	
+					let finalBuffer = Buffer.concat(buffers);
+					
+					try {
+						let jsonString = finalBuffer.toString("utf-8");
+						if (jsonString.includes("}",jsonString.length-4)) {
+							JSON.parse(jsonString); // checks if this is valid json
+
+							let compressedJson = lzstring.compressToBase64(jsonString);
+							let jsonMessage = {
+								compressedJson: compressedJson
+							};
+							
+							javaProcess.res.status(200).json(jsonMessage);
+							javaProcess = undefined;
+						} else {
+							console.error("Not a valid json string on program close!");
+							javaProcess.res.status(400).send({ errMsg: "Server error on code execution (no json)"} );
 							javaProcess = undefined;
 						}
-		
-					});
-                }
+					} catch (e) {
+						console.error(e);
+						javaProcess.res.status(400).send({});
+						javaProcess = undefined;
+					}
+	
+				});
             })
             .catch(function (error) {
 				if (error.response) {

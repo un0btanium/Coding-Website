@@ -243,13 +243,8 @@ export default class ExerciseExecuter extends Component {
 
 		sendInputToProcess(data)
 			.then(response => {
-                if (response.status === 200) {
-					log(response);
-                    this.saveCodeResponse(response.data.compressedJson, this.state.result.steps.length-1);
-                } else {
-                    log(response);
-                    // TODO stop code execution because something went wrong
-                }
+				log(response);
+				this.saveCodeResponse(response.data.compressedJson, this.state.result.steps.length-1);
             })
             .catch((error) => {
 				toast(<div style={{textAlign: "center"}}>Code execution failed!<br/>{error.response && error.response.data ? error.response.data.errMsg || "" : ""}</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
@@ -323,9 +318,7 @@ export default class ExerciseExecuter extends Component {
 
         startProcess(data)
             .then(response => {
-                if (response.status === 200) {
-                    this.saveCodeResponse(response.data.compressedJson, 0);
-                }
+				this.saveCodeResponse(response.data.compressedJson, 0);
             })
             .catch((error) => {
                 logError(error);
