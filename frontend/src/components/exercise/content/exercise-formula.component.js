@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import { Form, Row } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 
 import 'katex/dist/katex.min.css';
 import TeX from '@matejmazur/react-katex';
