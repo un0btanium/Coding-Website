@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
-import Axios from 'axios';
 import update from 'immutability-helper';
 
 import Iframe from 'react-iframe';
+
+import { getExercise } from '../../services/DataAPI';
 
 import { Accordion, Card, Form } from 'react-bootstrap';
 
@@ -15,8 +16,6 @@ export default class ExerciseSolve extends Component {
     
     constructor(props) {
         super(props);
-        
-        Axios.defaults.adapter = require('axios/lib/adapters/http');
 
         this.onChangeExerciseAceEditor = this.onChangeExerciseAceEditor.bind(this);
 
@@ -59,7 +58,7 @@ export default class ExerciseSolve extends Component {
     }
 
     componentDidMount() {
-        Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/course/' + this.state.courseID + '/exercise/' + this.state.exerciseID)
+        getExercise(this.state.courseID, this.state.exerciseID)
             .then(response => {
 
 				let exercise = response.data.exercise;

@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import Axios from 'axios';
+
+import { getCoursesOverview } from '../../services/DataAPI';
 
 import { isAuthenticated } from "../../services/Authentication";
 
@@ -19,7 +20,7 @@ export default class CourseList extends Component {
     }
 
     componentDidMount() {
-        Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/courses/' + this.state.page)
+        getCoursesOverview(this.state.page)
             .then(response => {
                 this.setState({
                     courses: response.data.courses,

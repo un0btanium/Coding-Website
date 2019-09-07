@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
-import Axios from 'axios';
 import update from 'immutability-helper';
 import lzstring from 'lz-string';
 import { toast } from 'react-toastify';
+
+import { getExercise, saveExercise } from '../../services/DataAPI';
 
 import { Form, Button, Row, Col, Tabs, Tab, Accordion, Card } from 'react-bootstrap';
 
@@ -29,8 +30,6 @@ export default class ExerciseEdit extends Component {
     
     constructor(props) {
         super(props);
-        
-        Axios.defaults.adapter = require('axios/lib/adapters/http');
 
         this.onChangeExerciseName = this.onChangeExerciseName.bind(this);
         this.onChangeExerciseIFrame = this.onChangeExerciseIFrame.bind(this);
@@ -93,7 +92,7 @@ export default class ExerciseEdit extends Component {
     }
 
     componentDidMount() {
-        Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/course/' + this.state.courseID + '/exercise/' + this.state.exerciseID)
+        getExercise(this.state.courseID, this.state.exerciseID)
             .then(response => {
 				log(response.data.exercise);
 				this.setState({
@@ -1155,21 +1154,21 @@ export default class ExerciseEdit extends Component {
 			subExercises: subExercises
 		}
 
-        Axios.put(process.env.REACT_APP_BACKEND_SERVER + '/course/exercise', data)
-        .then(res => {
-            console.log(res.data);
-			toast(<div style={{textAlign: "center"}}>Exercise saved!</div>, {type: toast.TYPE.SUCCESS, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
-			if (switchToSolveMode) {
-				this.props.setModeToSolve();
-			} else {
-				this.setState({
-					exercise: res.data.exercise
-				});
-			}
-		})
-		.catch((error) => {
-			toast(<div style={{textAlign: "center"}}>Saving exercise failed!</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})	
-		})
+        saveExercise(data)
+			.then(res => {
+				console.log(res.data);
+				toast(<div style={{textAlign: "center"}}>Exercise saved!</div>, {type: toast.TYPE.SUCCESS, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
+				if (switchToSolveMode) {
+					this.props.setModeToSolve();
+				} else {
+					this.setState({
+						exercise: res.data.exercise
+					});
+				}
+			})
+			.catch((error) => {
+				toast(<div style={{textAlign: "center"}}>Saving exercise failed!</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})	
+			})
 	}
 
 	onSaveExercise(e) {

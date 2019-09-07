@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import Axios from 'axios';
 import lzstring from 'lz-string';
+
+import { createCourse } from '../../services/DataAPI';
 
 import { toast } from 'react-toastify';
 
@@ -154,12 +155,13 @@ export default class CourseCreate extends Component {
             exercises: exercises
         }
         
-        //console.log(Axios.defaults.headers.common);
-        Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/course', newCourse)
+        createCourse(newCourse)
             .then(res => {
                 this.props.history.push('/course/' + res.data.id + '/exercises');
-            });
-
+            })
+			.catch(err => {
+				toast(<div style={{textAlign: "center"}}>Server Error! Unable to create course!</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
+			});
         
     }
 

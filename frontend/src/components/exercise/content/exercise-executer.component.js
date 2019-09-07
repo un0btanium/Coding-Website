@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import Axios from 'axios';
 import { toast } from 'react-toastify';
+
+import { startProcess, sendInputToProcess } from '../../../services/DataAPI';
 
 import { Slider, Rail, Handles, Tracks } from 'react-compound-slider';
 import { Track } from '../slider/track';
@@ -234,23 +235,14 @@ export default class ExerciseExecuter extends Component {
         let data = {
             input: ''+value
         }
-
-        let options = {
-            timeout: 30*1000, // TODO adjust?
-            // responseType: 'stream',
-            maxContentLength: 1000000000,
-            headers: {
-                "Content-Type": "application/json"
-            }
-		};
         
         this.setState({
             isExecutingOnServer: true,
             containsReadIn: true
         });
 
-        Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/exercise/input', data, options)
-            .then(response => {
+		sendInputToProcess(data)
+			.then(response => {
                 if (response.status === 200) {
 					log(response);
                     this.saveCodeResponse(response.data.compressedJson, this.state.result.steps.length-1);
@@ -322,15 +314,6 @@ export default class ExerciseExecuter extends Component {
 
         log(data);
         
-        let options = {
-            timeout: 120*1000, // TODO adjust?
-            // responseType: 'stream',
-            maxContentLength: 1000000000,
-            headers: {
-                "Content-Type": "application/json"
-            }
-        };
-        
         this.setState({
 			isExecutingOnServer: true,
 			ranSubExerciseIndex: this.props.subExerciseIndex,
@@ -338,7 +321,7 @@ export default class ExerciseExecuter extends Component {
             ranWithHighlightingDetailLevel: this.props.subExercise.highlightingDetailLevelIndex || 0
         });
 
-        Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/exercise/run', data, options)
+        startProcess(data)
             .then(response => {
                 if (response.status === 200) {
                     this.saveCodeResponse(response.data.compressedJson, 0);

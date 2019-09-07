@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
-import Axios from 'axios';
 import lzstring from 'lz-string';
 import update from 'immutability-helper';
 import { toast } from 'react-toastify';
+
+import { getCourse, getCourseFull, moveExercise, deleteExercise, deleteCourse, switchCourseVisibility, switchExerciseVisibility } from '../../services/DataAPI';
 
 import { isAuthenticated } from "../../services/Authentication";
 
@@ -36,7 +37,7 @@ export default class ExerciseList extends Component {
     }
 
     componentDidMount() {
-        Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/course/' + this.props.match.params.courseID)
+        getCourse(this.props.match.params.courseID)
             .then(response => {
 				this.setState({
 					course: response.data.course,
@@ -226,7 +227,7 @@ export default class ExerciseList extends Component {
 			moveUp: moveUp
 		}
 
-        Axios.put(process.env.REACT_APP_BACKEND_SERVER + '/course/moveexercise', data)
+        moveExercise(data)
             .then(response => {
 				this.setState({
 					course: update(this.state.course, {
@@ -256,7 +257,7 @@ export default class ExerciseList extends Component {
     }
 
     deleteExercise(id) {
-        Axios.delete(process.env.REACT_APP_BACKEND_SERVER + '/course/' + this.props.match.params.courseID + '/exercise/' + id)
+        deleteExercise(this.props.match.params.courseID, id)
             .then(response => {
 
                 let index = -1
@@ -296,7 +297,7 @@ export default class ExerciseList extends Component {
 	
 	
     deleteCourse(id) {
-        Axios.delete(process.env.REACT_APP_BACKEND_SERVER + '/course/'+id)
+        deleteCourse(id)
             .then(response => {
 				toast(<div style={{textAlign: "center"}}>Deleted {this.state.course.name} course!</div>, {type: toast.TYPE.SUCCESS, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
 				this.props.history.push("/");
@@ -310,7 +311,7 @@ export default class ExerciseList extends Component {
 
 
 	switchVisibilityCourse(course) {
-        Axios.put(process.env.REACT_APP_BACKEND_SERVER + '/course/visibility', { id: this.state.course._id, isVisibleToStudents: !this.state.course.isVisibleToStudents})
+        switchCourseVisibility(this.state.course._id, this.state.course.isVisibleToStudents)
             .then(response => {
 				toast(<div style={{textAlign: "center"}}>Switched the visibility of the course '{this.state.course.name}' to '{response.data.isVisibleToStudents ? "visible" : "not visible"}'!</div>, {type: toast.TYPE.SUCCESS, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
 				this.setState({
@@ -329,7 +330,7 @@ export default class ExerciseList extends Component {
 
 	switchVisibilityExercise(e, exercise, index) {
 		e.stopPropagation();
-        Axios.put(process.env.REACT_APP_BACKEND_SERVER + '/exercise/visibility', { courseID: this.state.course._id, exerciseID: exercise._id, isVisibleToStudents: !exercise.isVisibleToStudents})
+        switchExerciseVisibility(this.state.course._id, exercise._id, exercise.isVisibleToStudents)
             .then(response => {
 				toast(<div style={{textAlign: "center"}}>Switched the visibility of the exercise '{this.state.course.exercises[index].name}' to '{response.data.isVisibleToStudents ? "visible" : "not visible"}'!</div>, {type: toast.TYPE.SUCCESS, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
 				this.setState({
@@ -353,7 +354,7 @@ export default class ExerciseList extends Component {
 	
     exportCourseAsJSON() {
 
-        Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/course/full/' + this.state.course._id)
+        getCourseFull(this.state.course._id)
             .then(response => {
 				let courseCopy = {...response.data.course};
 				delete courseCopy._id;
