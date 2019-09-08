@@ -129,7 +129,7 @@ export default class ExerciseList extends Component {
 					<Button variant="warning" onClick={() => this.exportCourseAsJSON()} key="ExportCourseButton"><FontAwesomeIcon icon={faDownload} /></Button>
 					]
 				}
-				{isAuthenticated(["admin"]) &&
+				{isAuthenticated([/*"admin"*/]) &&
 					<Button variant="danger" onClick={() => this.showDeleteModalCourse(this.state.course)} key="DeleteCourseButton"><FontAwesomeIcon icon={faTrashAlt} /></Button>
 				}
 				

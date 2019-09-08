@@ -14,8 +14,17 @@ Course.findByIdAndDelete = (_id, callback) => {
 	Course.remove({_id: _id}, {}, callback);
 }
 
-
 const USER_NAME = "UserCodeCollection";
+
+// INIT USER ENTRY
+User.findOne({ name: USER_NAME }, (err, user) => {
+	if (!user) {
+		User.insert({ name: USER_NAME, code: {} }, (err, newUser) => {
+			console.log("Created user db entry!");
+		});
+	}
+});
+
 
 let promise = undefined;
 
@@ -66,6 +75,51 @@ export const createCourse = (data) => {
 				} });
 			}
 		});
+	})
+}
+
+export const importCourse = (data) => {
+	return new Promise((resolve, reject) => {
+
+		if (!data.course) {
+			reject({ response: { data: { errMsg: "Faulty course import string!" } } });
+		} else {
+			
+			Course.findById(data.course._id, (err, course) => {
+				if (course) {
+					// Course already exists! Save as a seperate course!
+					data.course._id = getMongoDBDocumentID();
+				}
+				Course.insert(data.course, (err, newCourse) => {
+					if (err) {
+						reject({ response: { data: { errMsg: "Adding new course failed" } } });
+					} else {
+
+						if (data.userCode) {
+							User.findOne({ name: USER_NAME }, (err, user) => {
+								if (user) {
+									user.code[data.course._id] = data.userCode;
+
+									User.update({ name: USER_NAME }, { $set: { code: user.code } },  {}, (err) => {
+										if (err) {
+											console.log("Saving user code failed")
+										}
+										resolve({ data: {
+											id: newCourse._id
+										} });
+									});
+								}
+							});
+						} else {
+							resolve({ data: {
+								id: newCourse._id
+							} });
+						}
+					}
+				});
+				
+			});
+		}
 	})
 }
 
@@ -122,6 +176,12 @@ export const getCourseFull = (courseID) => {
 				} });
             }
         })
+	})
+}
+
+export const getCourseAndUserCode = (courseID) => {
+	return new Promise((resolve, reject) => {
+		reject({ response: { data: { errMsg: "Exporting is by design not enabled in this app!" } } });
 	})
 }
 
@@ -514,26 +574,26 @@ export const startProcess = (data) => {
 	
 						if (!user.code[courseID][exerciseID][subExerciseID]) {
 							user.code[courseID][exerciseID][subExerciseID] = {
-								codeSnippets: code_snippets,
-								solved: true
+								codeSnippets: {},
+								solved: false
 							};
-						} else {
-							// This might not be ideal since it is not very memory friendly
-							user.code = update(user.code, {
-								[courseID]: {
-									[exerciseID]: {
-										[subExerciseID]: {
-											codeSnippets: {
-												$set: code_snippets
-											},
-											solved: {
-												$set: true
-											}
+						} 
+
+						// This might not be ideal since it is not very memory friendly
+						user.code = update(user.code, {
+							[courseID]: {
+								[exerciseID]: {
+									[subExerciseID]: {
+										codeSnippets: {
+											$set: code_snippets
+										},
+										solved: {
+											$set: true
 										}
 									}
 								}
-							})
-						}
+							}
+						});
 	
 	
 						User.update({ name: USER_NAME }, { $set: { code: user.code } },  {}, (err) => {

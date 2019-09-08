@@ -1,5 +1,5 @@
 export const isAuthenticated = (allowedRoles) => {
-	if (allowedRoles !== undefined || allowedRoles.length > 0) {
+	if (allowedRoles !== undefined && allowedRoles.length > 0) {
 		return false;
 	}
 	return true;

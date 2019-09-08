@@ -7,6 +7,7 @@ import logo from "./logo.svg";
 
 import CourseList from "./components/course/course-list.component";
 import CourseCreate from "./components/course/course-create.component";
+import CourseImport from "./components/course/course-import.component";
 
 import ExerciseList from "./components/exercise/exercise-list.component";
 import ExerciseCreate from "./components/exercise/exercise-create.component";
@@ -64,6 +65,7 @@ class App extends Component {
 
 						<Nav className="mr-auto">
 						<Nav.Link as={Link} variant="light" to="/courses">Courses</Nav.Link>
+						<Nav.Link as={Link} variant="light" to="/course/import">Import course</Nav.Link>
 						</Nav>
 
 					</div>
@@ -77,6 +79,7 @@ class App extends Component {
 
 				<Route exact path="/courses" component={CourseList} />
 				<Route exact path="/course/create" render={(props) => this.requireAuth(["admin", "maintainer"], <CourseCreate {...props}/>)} />
+				<Route exact path="/course/import" render={(props) => this.requireAuth([], <CourseImport {...props}/>)} />
 
 				<Route exact path="/course/:courseID/exercises" render={(props) => this.requireAuth([], <ExerciseList {...props}/>)} />
 				<Route exact path="/course/:courseID/exercise/create" render={(props) => this.requireAuth(["admin", "maintainer"], <ExerciseCreate {...props}/>)} />

@@ -21,6 +21,12 @@ export const createCourse = (data) => {
 	})
 }
 
+export const importCourse = (data) => {
+	return new Promise((resolve, reject) => {
+		reject({ response: { data: { errMsg: "Importing Course and User Code is not supported yet!" } } });
+	})
+}
+
 export const getCourse = (courseID) => {
 	return new Promise((resolve, reject) => {
 		Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/course/' + courseID)
@@ -32,6 +38,14 @@ export const getCourse = (courseID) => {
 export const getCourseFull = (courseID) => {
 	return new Promise((resolve, reject) => {
 		Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/course/full/' + courseID)
+			.then(response => {return resolve(response);})
+			.catch(function (error) {return reject(error);});
+	})
+}
+
+export const getCourseAndUserCode = (courseID) => {
+	return new Promise((resolve, reject) => {
+		Axios.get(process.env.REACT_APP_BACKEND_SERVER + '/course/full2/' + courseID)
 			.then(response => {return resolve(response);})
 			.catch(function (error) {return reject(error);});
 	})

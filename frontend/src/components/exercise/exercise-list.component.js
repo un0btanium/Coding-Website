@@ -3,11 +3,11 @@ import lzstring from 'lz-string';
 import update from 'immutability-helper';
 import { toast } from 'react-toastify';
 
-import { getCourse, getCourseFull, moveExercise, deleteExercise, deleteCourse, switchCourseVisibility, switchExerciseVisibility } from '../../services/DataAPI';
+import { getCourse, getCourseFull, getCourseAndUserCode, moveExercise, deleteExercise, deleteCourse, switchCourseVisibility, switchExerciseVisibility } from '../../services/DataAPI';
 
 import { isAuthenticated } from "../../services/Authentication";
 
-import { Button, Modal, ButtonGroup, Form } from 'react-bootstrap';
+import { Button, Modal, ButtonGroup, Form, OverlayTrigger, Popover } from 'react-bootstrap';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLock, faLockOpen, faTrashAlt, faEdit, faPlus, faCaretUp, faCaretDown, faDownload } from '@fortawesome/free-solid-svg-icons'
@@ -131,7 +131,25 @@ export default class ExerciseList extends Component {
 				{isAuthenticated(["admin"]) &&
 					<Button variant="danger" onClick={() => this.showDeleteModalCourse(this.state.course)} key="DeleteCourseButton"><FontAwesomeIcon icon={faTrashAlt} /></Button>
 				}
-				
+				{isAuthenticated() &&
+					<OverlayTrigger
+						key="tooltipSolutionToggleButton"
+						placement="top"
+						delay={{'show': 0, 'hide': 128}}
+						overlay={
+							<Popover
+								style={{ padding: '10px', background: 'rgba(0,0,0,0.8)', backgroundColor: 'rgba(0,0,0,0.8)', textAlign: 'left'}}
+								// arrowProps={style="{{background: 'rgba(0,0,0, 0.8)'}}"}
+								id="tooltipSolution"
+							>
+								<b>Export this course and your code to import it into your offline application (This may take a minute!)</b>
+							</Popover>
+						}
+					>
+						<Button variant="info" onClick={() => this.exportCourseAndUserCode()} key="ExportCourseAndUserCodeButton"><FontAwesomeIcon icon={faDownload} /></Button>
+					</OverlayTrigger>
+					
+				}
 
 				{
 					this.state.courseExportJSONString &&
@@ -403,5 +421,18 @@ export default class ExerciseList extends Component {
                 console.log(error);
             });
 
-    }
+	}
+	
+	exportCourseAndUserCode() {
+		getCourseAndUserCode(this.state.course._id)
+			.then(response => {
+				this.setState({
+					courseExportJSONString: response.data.compressedData
+				});
+			})
+			.catch(error => {
+				toast(<div style={{textAlign: "center"}}>Unable to create course export string!</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
+                console.log(error);
+			})
+	}
 }

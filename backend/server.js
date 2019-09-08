@@ -379,7 +379,7 @@ app.route('/api/course/:id')
 					} else {
 
 						if (user.code && user.code[id]) {
-							res.json({ course: simplifiedCourse, userExercisesData: user.code[id]});
+							res.json({ course: simplifiedCourse, userExercisesData: user.code[id]}); // TODO dont send code, just solved key
 						} else {
 							res.json({ course: simplifiedCourse, userExercisesData: {} });
 						}
@@ -416,6 +416,33 @@ app.route('/api/course/full/:id')
 				res.status(200).json({ course: course });
             }
         })
+	});
+
+app.route('/api/course/full2/:id')
+
+	.get((req, res, next) => checkAuth(req, res, next), function (req, res) {
+		Course.findById(req.params.id, function (err, course) {
+			if (err) {
+				console.log("Course " + id + " not found!");
+				res.status(404).send('Course not found!');
+			} else {
+				User.findById(req.tokenData.userId, function (err, user) {
+					try {
+						if (err) {
+							res.json({ compressedData: lzstring.compressToBase64(JSON.stringify({ course: course })) });
+						} else {
+							if (user.code && user.code[req.params.id]) {
+								res.json({ compressedData: lzstring.compressToBase64(JSON.stringify({ course: course, userCode: user.code[req.params.id] })) });
+							} else {
+								res.json({ compressedData: lzstring.compressToBase64(JSON.stringify({ course: course })) });
+							}
+						}
+					} catch (e) {
+						console.error(e);
+					}
+				});
+			}
+		})
 	});
 
 
@@ -699,27 +726,26 @@ app.route("/api/exercise/run")
 
 							if (!user.code[courseID][exerciseID][subExerciseID]) {
 								user.code[courseID][exerciseID][subExerciseID] = {
-									codeSnippets: code_snippets,
-									solved: true
+									codeSnippets: {},
+									solved: false
 								};
-							} else {
-								// This might not be ideal since it is not very memory friendly (do it with mongodb update method instead)
-								user.code = update(user.code, {
-									[courseID]: {
-										[exerciseID]: {
-											[subExerciseID]: {
-												codeSnippets: {
-													$set: code_snippets
-												},
-												solved: {
-													$set: true
-												}
+							} 
+
+							// This might not be ideal since it is not very memory friendly (do it with mongodb update method instead)
+							user.code = update(user.code, {
+								[courseID]: {
+									[exerciseID]: {
+										[subExerciseID]: {
+											codeSnippets: {
+												$set: code_snippets
+											},
+											solved: {
+												$set: true
 											}
 										}
 									}
-								})
-							}
-
+								}
+							})
 
 							user
 							.save()
