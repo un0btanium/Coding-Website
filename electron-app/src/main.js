@@ -91,8 +91,8 @@ expressApp.route("/api/exercise/run")
 
 				if (javaProcess !== undefined) {
 					console.log("Killing java process!");
-					javaProcess.kill('SIGINT');
-					console.log(javaProcess.killed ? "Killed java process!" : "Didnt kill java process!");
+					javaProcess.process.kill('SIGINT');
+					console.log(javaProcess.process.killed ? "Killed java process!" : "Didnt kill java process!");
 					javaProcess = undefined;
 				}
 

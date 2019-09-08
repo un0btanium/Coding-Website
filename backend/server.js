@@ -699,25 +699,27 @@ app.route("/api/exercise/run")
 
 							if (!user.code[courseID][exerciseID][subExerciseID]) {
 								user.code[courseID][exerciseID][subExerciseID] = {
-									codeSnippets: {},
-									solved: false
+									codeSnippets: code_snippets,
+									solved: true
 								};
-							}
-
-							user.code = update(user.code, {
-								[courseID]: {
-									[exerciseID]: {
-										[subExerciseID]: {
-											codeSnippets: {
-												$set: code_snippets
-											},
-											solved: {
-												$set: true
+							} else {
+								// This might not be ideal since it is not very memory friendly (do it with mongodb update method instead)
+								user.code = update(user.code, {
+									[courseID]: {
+										[exerciseID]: {
+											[subExerciseID]: {
+												codeSnippets: {
+													$set: code_snippets
+												},
+												solved: {
+													$set: true
+												}
 											}
 										}
 									}
-								}
-							})
+								})
+							}
+
 
 							user
 							.save()
