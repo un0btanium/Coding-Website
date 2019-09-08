@@ -1,11 +1,8 @@
-import Axios from 'axios'; // TODO delete
 import Datastore from 'nedb';
 import { array_move } from './ArrayShifter';
-import lzstring from 'lz-string';
-import { spawn } from 'child_process';
-import path from 'path';
+const { ipcRenderer } = window.require('electron')
+const update = require('immutability-helper');
 
-Axios.defaults.adapter = require('axios/lib/adapters/http'); // TODO delete
 
 let Course = new Datastore({ filename: "courses", autoload: true });
 let User = new Datastore({ filename: "user", autoload: true });
@@ -16,17 +13,11 @@ Course.findById = (_id, callback) => {
 Course.findByIdAndDelete = (_id, callback) => {
 	Course.remove({_id: _id}, {}, callback);
 }
-User.findById = (_id, callback) => {
-	User.findOne({_id: _id}, callback);
-}
-User.findByIdAndDelete = (_id, callback) => {
-	User.remove({_id: _id}, {}, callback);
-}
 
 
 const USER_NAME = "UserCodeCollection";
 
-let javaProcess;
+let promise = undefined;
 
 /* COURSE */
 
@@ -313,7 +304,7 @@ export const getExercise = (courseID, exerciseID) => {
 
 				if (exercise) {
 
-					User.findById(USER_NAME, (err, user) => {
+					User.findOne({ name: USER_NAME }, (err, user) => {
 						if (err) {
 							resolve({ data: {
 								exercise: exercise,
@@ -459,168 +450,134 @@ export const deleteExercise = (courseID, exerciseID) => {
 export const sendInputToProcess = (data) => {
 	return new Promise((resolve, reject) => {
 
-		// TODO
+		if (promise !== undefined) {
+			// promise.reject({ response: { data: { errMsg: "Process promise overlapping! Might cause issues!" } } });
+		}
 
-		let options = {
-			timeout: 30*1000, // TODO adjust?
-			// responseType: 'stream',
-			maxContentLength: 1000000000,
-			headers: {
-				"Content-Type": "application/json"
-			}
-		};
-		Axios.post(process.env.REACT_APP_BACKEND_SERVER + '/exercise/input', data, options)
-            .then(response => {return resolve(response);})
-            .catch(function (error) {return reject(error);});
-	})
+		promise = {
+			resolve: resolve,
+			reject: reject
+		}
+
+		ipcRenderer.send('write-to-process', data);
+	});
 }
 
 export const startProcess = (data) => {
 	return new Promise((resolve, reject) => {
 		
+		let courseID = data.courseID;
+		let exerciseID = data.exerciseID;
+		let subExerciseID = data.subExerciseID;
+		let persistCode = data.persistCode;
+		let code_snippets = data.code_snippets;
+
 		let arg = {
 			highlightingDetailLevelIndex: data.highlightingDetailLevelIndex || 0,
 			code_snippets: data.code_snippets,
 			source_files: data.sourceFiles
 		}
 
-		if (javaProcess !== undefined) {
-			console.log("Killing java process!");
-			javaProcess.kill('SIGINT');
-			console.log(javaProcess.killed ? "Killed java process!" : "Didnt kill java process!");
-			javaProcess = undefined;
+		// PERSIST USER CODE (only in solve mode)
+		if (persistCode) {
+			User.findOne({ name: USER_NAME }, (err, user) => {
+				if (err) {
+					// error
+				} else {
+
+					if (!user) {
+						let code = {
+							[courseID]: {
+								[exerciseID]: {
+									[subExerciseID]: {
+										codeSnippets: code_snippets,
+										solved: true
+									}
+								}
+							}
+						};
+						User.insert({ name: USER_NAME, code: code }, (err, newUser) => {
+
+						});
+					} else {
+						if (!user.code) {
+							user.code = {};
+						}
+	
+						if (!user.code[courseID]) {
+							user.code[courseID] = {};
+						}
+	
+						if (!user.code[courseID][exerciseID]) {
+							user.code[courseID][exerciseID] = {};
+						}
+	
+						if (!user.code[courseID][exerciseID][subExerciseID]) {
+							user.code[courseID][exerciseID][subExerciseID] = {
+								codeSnippets: code_snippets,
+								solved: true
+							};
+						} else {
+							// This might not be ideal since it is not very memory friendly
+							user.code = update(user.code, {
+								[courseID]: {
+									[exerciseID]: {
+										[subExerciseID]: {
+											codeSnippets: {
+												$set: code_snippets
+											},
+											solved: {
+												$set: true
+											}
+										}
+									}
+								}
+							})
+						}
+	
+	
+						User.update({ name: USER_NAME }, { $set: { code: user.code } },  {}, (err) => {
+							if (err) {
+								console.log("Saving user code failed")
+							} else {
+								
+							}
+						});
+					}
+				}
+			});
 		}
 
-		let javaExe = "java";
-		// let javaExe = "C:" + path.sep + "Program Files" + path.sep + "Java" + path.sep + "jdk-11" + path.sep + "bin" + path.sep + "java.exe";
-		
-		let processOptions = { };
-		let filePath =  "S:/coding/coder-suite/offline-electron-app/src" + path.sep + "java" + path.sep + "executer.jar"; // TODO does this work?
-
-		console.log(filePath);
-		let javaChild = undefined;
-
-		try {
-			// TODO This probably doesnt work here because we are in the React app not Electron (use IPC? how much yikes or no yikes at all?! dont want to use http requests because of admin rights and performance)
-			javaChild = spawn(javaExe, ["-jar", "-Dfile.encoding=UTF-8", filePath, JSON.stringify(arg)], processOptions);
-		} catch (e) {
-			reject({ response: { data: { errMsg: "No java installed or missing JAVA_HOME and/or PATH entry!" } } });
-			console.log(e);
+		if (promise !== undefined) {
+			promise.reject({ response: { data: { errMsg: "Canceled previous code execution! Restarting!" } } });
+			promise = undefined;
 			return;
 		}
 
-		javaProcess = {
-			res: { resolve, reject },
-			dataArray: [],
-			process: javaChild
-		};
+		promise = {
+			resolve: resolve,
+			reject: reject
+		}
 
-		javaChild.stdin.setDefaultEncoding("UTF-8");
-		
-		javaChild.stdout.on('data', function (data) {
-			console.log("out")
-
-			if (!javaProcess) {
-				console.log("process closed");
-				return;
-			}
-			
-			if (data && javaProcess.res) {
-				javaProcess.dataArray.push(data);
-				
-				try {
-					let buffers = [];
-					for (let buffer of javaProcess.dataArray) {
-						buffers.push(Buffer.from(buffer, "utf-8"));
-					}
-
-					let finalBuffer = Buffer.concat(buffers);
-					
-					try {
-						let jsonString = finalBuffer.toString("utf-8")
-						if (jsonString.includes("}",jsonString.length-4)) {
-							let json = JSON.parse(jsonString); // checks if it is the end of the json string, throws error if it
-
-							if (json !== null && (json.isReadIn || json.isGuiReadIn)) {
-								let compressedJson = lzstring.compressToBase64(jsonString);
-								
-								javaProcess.dataArray = [];
-								javaProcess.res = undefined;
-								resolve({ data: {
-									compressedJson: compressedJson
-								} });
-							}
-						}
-					} catch (e) {
-						console.error("Not the end of json string!");
-					}
-				} catch (e) {
-					console.error(e);
-				}
-			}
-		});
-		javaChild.stderr.on('data', function (err) {
-			console.log("error")
-
-			if (!javaProcess) {
-				console.log("process closed");
-				return;
-			}
-
-			if (err && javaProcess.res) {
-				javaProcess.res = undefined;
-				reject({ response: { data: { errMsg: err.toString() } } }); // TODO send to client and print on screen (warp in json error step)
-			}
-		});
-		javaChild.on('close', function (exitCode) {
-			console.log("close")
-
-			if (!javaProcess) {
-				console.log("process closed");
-				return;
-			}
-
-			if (!javaProcess.res) {
-				console.log("canceled response (data was already send)");
-				return;
-			}
-
-			if (exitCode === null) {
-				return;
-			}
-
-			let buffers = [];
-			for (let buffer of javaProcess.dataArray) {
-				buffers.push(Buffer.from(buffer, "utf-8"));
-			}
-
-			let finalBuffer = Buffer.concat(buffers);
-			
-			try {
-				let jsonString = finalBuffer.toString("utf-8");
-				if (jsonString.includes("}",jsonString.length-4)) {
-					JSON.parse(jsonString); // checks if this is valid json
-
-					let compressedJson = lzstring.compressToBase64(jsonString);
-					
-					javaProcess = undefined;
-					resolve({ data: {
-						compressedJson: compressedJson
-					} });
-				} else {
-					console.error("Not a valid json string on program close!");
-					javaProcess = undefined;
-					reject({ response: { data: { errMsg: "Server error on code execution (no json)" } } });
-				}
-			} catch (e) {
-				console.error(e);
-				javaProcess = undefined;
-				reject({ response: { data: { errMsg: "" } } });
-			}
-
-		});
+		ipcRenderer.send('start-process', arg);
 	})
 }
+
+
+ipcRenderer.on('process-response', (event, arg) => {
+
+	if (promise === undefined) {
+		return;
+	}
+
+	if (arg.successful) {
+		promise.resolve(arg.res);
+	} else {
+		promise.reject({ response: { data: { errMsg: arg.errMsg } } });
+	}
+	promise = undefined;
+
+});
 
 
 
