@@ -1,9 +1,10 @@
 const path = require('path');
+const url = require('url');
 const { app, BrowserWindow, ipcMain } = require('electron');
 const lzstring = require('lz-string');
 const { spawn } = require('child_process');
 
-
+const isDev = require('electron-is-dev');
 
 if (require('electron-squirrel-startup')) {
 	p.quit();
@@ -32,17 +33,15 @@ const createWindow = () => {
 
 	mainWindow.setMenu(null);
 
-	const startUrl = process.env.ELECTRON_START_URL || url.format({
-		pathname: path.join(__dirname, '/../build/index.html'),
-		protocol: 'file:',
-		slashes: true
-	});
-	mainWindow.loadURL(startUrl);
+	mainWindow.loadURL(isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html#/courses')}`);
 
 
 	mainWindow.maximize();
 
-	mainWindow.webContents.openDevTools(); // DEBUGGING
+	if (isDev) {
+		mainWindow.webContents.openDevTools();
+	}
+		
 
 	mainWindow.on('closed', () => {
 		mainWindow = null;
@@ -102,7 +101,12 @@ ipcMain.on('start-process', (event, arg) => {
 	let javaExe = "java";
 	// let javaExe = "C:" + path.sep + "Program Files" + path.sep + "Java" + path.sep + "jdk-11" + path.sep + "bin" + path.sep + "java.exe";
 	
-	let filePath =  __dirname + path.sep + "java" + path.sep + "executer.jar"; // TODO does this work?
+	let filePath;
+	if (isDev) {
+		filePath =  __dirname + path.sep + "java" + path.sep + "executer.jar";
+	} else {
+		filePath =  process.resourcesPath + path.sep + "java" + path.sep + "executer.jar";
+	}
 	
 	console.log(filePath);
 	let javaChild = undefined;

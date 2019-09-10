@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router'
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { MemoryRouter as Router, Route } from "react-router-dom";
 import { Link } from 'react-router-dom';
 
 import logo from "./logo.svg";
@@ -40,7 +40,7 @@ class App extends Component {
   componentDidMount() {
     const node = this.fontDetector.current;
     setLetterWidth(node.children[0].offsetWidth/100);
-    setLetterHeight(node.children[0].offsetHeight);
+	setLetterHeight(node.children[0].offsetHeight);
   }
 
   requireAuth(allowedRoles, jsx, routeUnauthorized) {
