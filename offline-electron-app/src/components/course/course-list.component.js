@@ -62,7 +62,11 @@ export default class CourseList extends Component {
                 
 				<div style={{textAlign: "center"}}>
                 	<h1>Courses</h1>
+					{this.state.courses.length === 0 &&
+						<h3>No courses here yet, get started by importing one!</h3>
+					}
 				</div>
+
 				
 				{isAuthenticated(["admin", "maintainer"]) && <Button variant="success" onClick={() => this.newCourse()}><FontAwesomeIcon icon={faPlus} /></Button>}
                     
