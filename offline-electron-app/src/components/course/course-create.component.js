@@ -84,6 +84,7 @@ export default class CourseCreate extends Component {
                                 plaintext="true"
                                 autoComplete="off"
                                 type="text"
+								as="textarea"
                                 className="form-control"
                                 placeholder="Or enter course import string"
                                 value={this.state.importString}
@@ -129,10 +130,10 @@ export default class CourseCreate extends Component {
             try {
                 let json = JSON.parse(lzstring.decompressFromBase64(this.state.importString));
 
-				if (json.name !== "" && json.exercises !== undefined) {
-					name = json.name;
-					isVisibleToStudents = json.isVisibleToStudents || false;
-					exercises = json.exercises;
+				if (json.course !== undefined && json.course.name !== "" && json.course.exercises !== undefined) {
+					name = json.course.name;
+					isVisibleToStudents = json.course.isVisibleToStudents || false;
+					exercises = json.course.exercises;
 				} else {
 					console.log("Faulty course import string!")
 					toast(<div style={{textAlign: "center"}}>Faulty course import string!</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})

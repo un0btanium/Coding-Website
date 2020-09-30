@@ -92,6 +92,7 @@ export default class ExerciseCreate extends Component {
                                 plaintext="true"
                                 autoComplete="off"
                                 type="text"
+								as="textarea"
                                 className="form-control"
                                 placeholder="Or enter exercise import string"
                                 value={this.state.importString}

@@ -410,7 +410,7 @@ export default class ExerciseList extends Component {
 					courseCopy.exercises.push(exercise);
 				}
 				
-				let course = JSON.stringify(courseCopy);
+				let course = JSON.stringify({ course: courseCopy });
 				
 				this.setState({
 					courseExportJSONString: lzstring.compressToBase64(course)

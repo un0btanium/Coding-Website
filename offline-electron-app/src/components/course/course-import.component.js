@@ -83,11 +83,7 @@ export default class CourseImport extends Component {
 			toast(<div style={{textAlign: "center"}}>Faulty course import string!</div>, {type: toast.TYPE.ERROR, autoClose: 3000, draggable: false, hideProgressBar: true, closeButton: false, newestOnTop: true})
 			return;
 		}
-
-		if (!json) {
-			return;
-		}
-        
+		
         importCourse(json)
             .then(res => {
                 this.props.history.push('/course/' + res.data.id + '/exercises');
